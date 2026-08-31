@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The History of the Transistor - HyperFrames</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- GSAP CDN or local bundle for frame capture -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+  <div id="composition"
+       data-composition-id="root"
+       data-width="1920"
+       data-height="1080"
+       data-start="0"
+       data-duration="30">
+    
+    <div class="video-container">
+      
+    <section class="scene scene_1" data-start="0.0" data-duration="7.5">
+      <div class="scene-backdrop">
+        <img class="scene-img" src="assets/images/asset_01.svg" alt="Visual for scene_1" />
+      </div>
+      <div class="scene-content">
+        <span class="badge">The History of the Transistor</span>
+        <h2 class="scene-title">Scene 1</h2>
+        <p class="scene-narration">Key breakthrough 1 regarding The History of the Transistor, driving engineering progress.</p>
+      </div>
+    </section>
+    <section class="scene scene_2" data-start="7.5" data-duration="7.5">
+      <div class="scene-backdrop">
+        <img class="scene-img" src="assets/images/asset_02.svg" alt="Visual for scene_2" />
+      </div>
+      <div class="scene-content">
+        <span class="badge">The History of the Transistor</span>
+        <h2 class="scene-title">Scene 2</h2>
+        <p class="scene-narration">Key breakthrough 2 regarding The History of the Transistor, driving engineering progress.</p>
+      </div>
+    </section>
+    <section class="scene scene_3" data-start="15.0" data-duration="7.5">
+      <div class="scene-backdrop">
+        <img class="scene-img" src="assets/images/asset_03.svg" alt="Visual for scene_3" />
+      </div>
+      <div class="scene-content">
+        <span class="badge">The History of the Transistor</span>
+        <h2 class="scene-title">Scene 3</h2>
+        <p class="scene-narration">Key breakthrough 3 regarding The History of the Transistor, driving engineering progress.</p>
+      </div>
+    </section>
+    <section class="scene scene_4" data-start="22.5" data-duration="7.5">
+      <div class="scene-backdrop">
+        <img class="scene-img" src="assets/images/asset_04.svg" alt="Visual for scene_4" />
+      </div>
+      <div class="scene-content">
+        <span class="badge">The History of the Transistor</span>
+        <h2 class="scene-title">Scene 4</h2>
+        <p class="scene-narration">Key breakthrough 4 regarding The History of the Transistor, driving engineering progress.</p>
+      </div>
+    </section>
+    </div>
+
+    <!-- Decoupled audio element for playback -->
+    <audio id="narration-audio" src="assets/audio/narration.wav" data-track-index="1"></audio>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

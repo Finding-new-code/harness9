@@ -1,0 +1,26 @@
+{
+  "ffmpeg_direct_success": true,
+  "mp4_path": "g:\\Finding-new-code\\harness9\\.agents\\explorer_env_0\\render_test\\test_output.mp4",
+  "mp4_size": 54676,
+  "probe_data": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "2.000000",
+      "size": "54676",
+      "bit_rate": "218704"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; padding: 0; width: 1280px; height: 720px; background: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+  h1 { font-size: 56px; color: #38bdf8; margin: 0; }
+  p { font-size: 28px; color: #94a3b8; margin-top: 16px; }
+  .box { width: 100px; height: 100px; background: #f43f5e; border-radius: 12px; margin-top: 30px; }
+</style>
+</head>
+<body>
+  <h1 id="title">Harness 9 HyperFrames POC</h1>
+  <p id="sub">Automated Video Composition Engine</p>
+  <div id="box" class="box"></div>
+  <script>
+    // Frame step helper
+    function seekFrame(frame, totalFrames) {
+      const progress = frame / totalFrames;
+      document.getElementById("box").style.transform = "rotate(" + (progress * 360) + "deg) scale(" + (1 + 0.5 * Math.sin(progress * Math.PI)) + ")";
+      document.getElementById("title").style.opacity = Math.min(1, progress * 4);
+    }
+  </script>
+</body>
+</html>

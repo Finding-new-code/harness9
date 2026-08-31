@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "run_1788156321_crispr-cas9_prec",
+  "topic": "CRISPR-Cas9 Precision Molecular Scissors",
+  "start_time": "2026-08-31T06:05:21.197644+00:00",
+  "end_time": "2026-08-31T06:05:51.428252+00:00",
+  "total_duration_seconds": 30.231,
+  "status": "SUCCESS",
+  "output_directory": "G:\\Finding-new-code\\harness9\\output\\audit_cli_crispr",
+  "stages": [
+    {
+      "stage_name": "research",
+      "success": true,
+      "execution_time_seconds": 0.10442352294921875,
+      "artifacts": [
+        "research_dossier.json",
+        "research_dossier.yaml"
+      ],
+      "metrics": {
+        "claims_count": 4,
+        "talking_points_count": 3
+      }
+    },
+    {
+      "stage_name": "assets",
+      "success": true,
+      "execution_time_seconds": 0.17124056816101074,
+      "artifacts": [
+        "asset_ledger.json",
+        "asset_ledger.yaml",
+        "assets/images/asset_01_crispr-cas9_precision_mo.svg",
+        "assets/images/asset_02_crispr-cas9_precision_mo.svg",
+        "assets/images/asset_03_crispr-cas9_precision_mo.svg",
+        "assets/images/asset_04_crispr-cas9_precision_mo.svg"
+      ],
+      "metrics": {
+        "total_assets": 4,
+        "licenses": {
+          "CC0-1.0 (Public Domain)": 4
+        }
+      }
+    },
+    {
+      "stage_name": "script_voiceover",
+      "success": true,
+      "execution_time_seconds": 4.213722229003906,
+      "artifacts": [
+        "BRIEF.md",
+        "DESIGN.md",
+        "SCRIPT.md",
+        "STORYBOARD.md",
+        "assets/audio/narration.wav",
+        "assets/transcript.json"
+      ],
+      "metrics": {
+        "scenes_count": 4,
+        "audio_duration": 80.00816326530612,
+        "audio_provider": "windows_sapi"
+      }
+    },
+    {
+      "stage_name": "hyperframes_render",
+      "success": true,
+      "execution_time_seconds": 25.720216512680054,
+      "artifacts": [
+        "index.html",
+        "styles.css",
+        "main.js",
+        "renders/final.mp4"
+      ],
+      "metrics": {
+        "video_duration": 10.0,
+        "video_size_bytes": 344943,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30
+      }
+    }
+  ],
+  "metrics": {
+    "format": "16:9",
+    "target_duration_seconds": 10,
+    "offline_mode": true,
+    "voice": "default"
+  },
+  "final_video_path": "renders/final.mp4"
+}

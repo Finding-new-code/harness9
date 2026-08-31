@@ -1,0 +1,164 @@
+{
+  "python": {
+    "version": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+    "executable": "C:\\Users\\User\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+    "prefix": "C:\\Users\\User\\AppData\\Local\\Python\\pythoncore-3.14-64",
+    "in_venv": false
+  },
+  "packages": {
+    "requests": {
+      "available": false,
+      "error": "No module named 'requests'"
+    },
+    "urllib.request": {
+      "available": true,
+      "version": "builtin/unknown"
+    },
+    "httpx": {
+      "available": true,
+      "version": "0.28.1"
+    },
+    "aiohttp": {
+      "available": false,
+      "error": "No module named 'aiohttp'"
+    },
+    "bs4": {
+      "available": false,
+      "error": "No module named 'bs4'"
+    },
+    "yaml": {
+      "available": true,
+      "version": "6.0.3"
+    },
+    "pydantic": {
+      "available": false,
+      "error": "No module named 'pydantic'"
+    },
+    "pytest": {
+      "available": false,
+      "error": "No module named 'pytest'"
+    },
+    "edge_tts": {
+      "available": false,
+      "error": "No module named 'edge_tts'"
+    },
+    "pyttsx3": {
+      "available": false,
+      "error": "No module named 'pyttsx3'"
+    },
+    "elevenlabs": {
+      "available": false,
+      "error": "No module named 'elevenlabs'"
+    },
+    "playwright": {
+      "available": false,
+      "error": "No module named 'playwright'"
+    },
+    "puppeteer": {
+      "available": false,
+      "error": "No module named 'puppeteer'"
+    },
+    "selenium": {
+      "available": false,
+      "error": "No module named 'selenium'"
+    },
+    "soundfile": {
+      "available": true,
+      "version": "0.14.0"
+    },
+    "numpy": {
+      "available": true,
+      "version": "2.5.1"
+    },
+    "torch": {
+      "available": true,
+      "version": "2.13.0+cpu"
+    },
+    "transformers": {
+      "available": true,
+      "version": "5.14.1"
+    },
+    "PIL": {
+      "available": false,
+      "error": "No module named 'PIL'"
+    },
+    "jinja2": {
+      "available": true,
+      "version": "3.1.6"
+    },
+    "rich": {
+      "available": true,
+      "version": "builtin/unknown"
+    },
+    "typer": {
+      "available": true,
+      "version": "0.27.0"
+    }
+  },
+  "cli_tools": {
+    "python": {
+      "found": true,
+      "path": "C:\\Users\\User\\AppData\\Local\\Microsoft\\WindowsApps\\python.EXE",
+      "version_output": "Python 3.14.6"
+    },
+    "node": {
+      "found": true,
+      "path": "F:\\node.EXE",
+      "version_output": "v24.11.1"
+    },
+    "npm": {
+      "found": true,
+      "path": "F:\\npm.CMD",
+      "version_output": "Error: Command '['F:\\\\npm.CMD', '--version']' timed out after 5 seconds"
+    },
+    "npx": {
+      "found": true,
+      "path": "F:\\npx.CMD",
+      "version_output": "Error: Command '['F:\\\\npx.CMD', '--version']' timed out after 5 seconds"
+    },
+    "uv": {
+      "found": true,
+      "path": "C:\\Users\\User\\.local\\bin\\uv.EXE",
+      "version_output": "uv 0.11.24 (5e04460c0 2026-06-23 x86_64-pc-windows-msvc)"
+    },
+    "ffmpeg": {
+      "found": true,
+      "path": "G:\\software[Code]\\ffmpeg-2026-06-10-git-b29bdd3715-essentials_build\\bin\\ffmpeg.EXE",
+      "version_output": "ffmpeg version 2026-06-10-git-b29bdd3715-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "found": true,
+      "path": "G:\\software[Code]\\ffmpeg-2026-06-10-git-b29bdd3715-essentials_build\\bin\\ffprobe.EXE",
+      "version_output": "ffprobe version 2026-06-10-git-b29bdd3715-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers"
+    },
+    "git": {
+      "found": true,
+      "path": "C:\\Program Files\\Git\\cmd\\git.EXE",
+      "version_output": "git version 2.51.0.windows.1"
+    },
+    "curl": {
+      "found": true,
+      "path": "C:\\Windows\\system32\\curl.EXE",
+      "version_output": "curl 8.13.0 (Windows) libcurl/8.13.0 Schannel zlib/1.3.1 WinIDN"
+    }
+  },
+  "ffmpeg_test": {
+    "ffmpeg_path": "G:\\software[Code]\\ffmpeg-2026-06-10-git-b29bdd3715-essentials_build\\bin\\ffmpeg.EXE",
+    "ffprobe_path": "G:\\software[Code]\\ffmpeg-2026-06-10-git-b29bdd3715-essentials_build\\bin\\ffprobe.EXE",
+    "path_has_brackets": true
+  },
+  "browsers": {
+    "chrome": {
+      "found": true,
+      "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    },
+    "edge": {
+      "found": true,
+      "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    },
+    "chrome_headless_shell": {
+      "found": true,
+      "path": "C:\\Users\\User\\.cache\\puppeteer\\chrome-headless-shell\\win64-145.0.7632.46\\chrome-headless-shell-win64\\chrome-headless-shell.exe"
+    }
+  }
+}

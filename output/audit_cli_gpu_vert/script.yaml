@@ -1,0 +1,148 @@
+topic: 'How GPUs Work: Parallel Computing'
+title: 'How GPUs Work: Parallel Computing: The Definitive Breakdown'
+total_duration: 10.0
+full_transcript: 'The Chef vs. The Assembly Line. If a CPU is a master chef preparing
+  one complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping
+  vegetables at once. A central processing unit (CPU) typically possesses between
+  8 and 64 high-speed cores designed for complex branching logic and low latency.
+  The Power of SIMD Parallelism. Originally designed to render 3D video game polygons,
+  GPUs process massive arrays of pixels with a single broadcast instruction. Modern
+  flagship GPUs feature over 16,000 arithmetic logic units (ALUs) executing parallel
+  mathematical operations across high-bandwidth memory. Fueling the AI Revolution.
+  Because artificial intelligence calculations are essentially giant matrix multiplications,
+  GPUs became the turbo-engine of modern deep learning. Matrix multiplication in neural
+  networks maps directly to GPU tensor architectures, enabling trillion-parameter
+  AI models to train efficiently. Looking forward, How GPUs Work: Parallel Computing
+  continues to accelerate innovations across modern research and engineering domains.'
+word_count: 151
+generated_at: '2026-08-31T06:04:53.297948+00:00'
+storyboard:
+  project_id: proj_how_gpus_work:_parallel_computing
+  target_duration: 10.0
+  aspect_ratio: '16:9'
+  scenes:
+  - scene_id: scene_1
+    title: The Chef vs. The Assembly Line
+    start_time: 0.0
+    duration: 2.5
+    narration_text: The Chef vs. The Assembly Line. If a CPU is a master chef preparing
+      one complex dish at lighting speed, a GPU is a factory of ten thousand cooks
+      chopping vegetables at once. A central processing unit (CPU) typically possesses
+      between 8 and 64 high-speed cores designed for complex branching logic and low
+      latency.
+    visual_asset_path: assets/images/asset_01_cpu_vs_gpu_architecture_.svg
+    hero_frame_description: Hero frame showcasing The Chef vs. The Assembly Line with
+      backing asset assets/images/asset_01_cpu_vs_gpu_architecture_.svg and kinetic
+      typography.
+    entrance_animation: 'gsap.from(''.scene_1 .scene-content'', { opacity: 0, y: 30,
+      duration: 0.8, ease: ''power2.out'' })'
+    transition_out: Seamless push-slide transition to next scene
+    beats:
+    - beat_id: beat_1_1
+      start_time: 0.0
+      end_time: 1.25
+      duration: 1.25
+      text: The Chef vs. The Assembly Line
+      visual_cue: Header entrance for The Chef vs. The Assembly Line
+    - beat_id: beat_1_2
+      start_time: 1.25
+      end_time: 2.5
+      duration: 1.25
+      text: The Chef vs. The Assembly Line. If a CPU is a master chef preparing one
+        complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping
+        vegetables at once. A central processing unit (CPU) typically possesses between
+        8 and 64 high-speed cores designed for complex branching logic and low latency.
+      visual_cue: Diagram comparing a CPU with a few large complex cores to a GPU
+        grid with thousands of tiny stream cores
+  - scene_id: scene_2
+    title: The Power of SIMD Parallelism
+    start_time: 2.5
+    duration: 2.5
+    narration_text: The Power of SIMD Parallelism. Originally designed to render 3D
+      video game polygons, GPUs process massive arrays of pixels with a single broadcast
+      instruction. Modern flagship GPUs feature over 16,000 arithmetic logic units
+      (ALUs) executing parallel mathematical operations across high-bandwidth memory.
+    visual_asset_path: assets/images/asset_02_silicon_die_shot_of_mode.svg
+    hero_frame_description: Hero frame showcasing The Power of SIMD Parallelism with
+      backing asset assets/images/asset_02_silicon_die_shot_of_mode.svg and kinetic
+      typography.
+    entrance_animation: 'gsap.from(''.scene_2 .scene-content'', { opacity: 0, y: 30,
+      duration: 0.8, ease: ''power2.out'' })'
+    transition_out: Seamless push-slide transition to next scene
+    beats:
+    - beat_id: beat_2_1
+      start_time: 2.5
+      end_time: 3.75
+      duration: 1.25
+      text: The Power of SIMD Parallelism
+      visual_cue: Header entrance for The Power of SIMD Parallelism
+    - beat_id: beat_2_2
+      start_time: 3.75
+      end_time: 5.0
+      duration: 1.25
+      text: The Power of SIMD Parallelism. Originally designed to render 3D video
+        game polygons, GPUs process massive arrays of pixels with a single broadcast
+        instruction. Modern flagship GPUs feature over 16,000 arithmetic logic units
+        (ALUs) executing parallel mathematical operations across high-bandwidth memory.
+      visual_cue: High-resolution silicon die shot of modern GPU showing symmetric
+        grid of streaming multiprocessors
+  - scene_id: scene_3
+    title: Fueling the AI Revolution
+    start_time: 5.0
+    duration: 2.5
+    narration_text: Fueling the AI Revolution. Because artificial intelligence calculations
+      are essentially giant matrix multiplications, GPUs became the turbo-engine of
+      modern deep learning. Matrix multiplication in neural networks maps directly
+      to GPU tensor architectures, enabling trillion-parameter AI models to train
+      efficiently.
+    visual_asset_path: assets/images/asset_03_3d_wireframe_polygon_ren.svg
+    hero_frame_description: Hero frame showcasing Fueling the AI Revolution with backing
+      asset assets/images/asset_03_3d_wireframe_polygon_ren.svg and kinetic typography.
+    entrance_animation: 'gsap.from(''.scene_3 .scene-content'', { opacity: 0, y: 30,
+      duration: 0.8, ease: ''power2.out'' })'
+    transition_out: Seamless push-slide transition to next scene
+    beats:
+    - beat_id: beat_3_1
+      start_time: 5.0
+      end_time: 6.25
+      duration: 1.25
+      text: Fueling the AI Revolution
+      visual_cue: Header entrance for Fueling the AI Revolution
+    - beat_id: beat_3_2
+      start_time: 6.25
+      end_time: 7.5
+      duration: 1.25
+      text: Fueling the AI Revolution. Because artificial intelligence calculations
+        are essentially giant matrix multiplications, GPUs became the turbo-engine
+        of modern deep learning. Matrix multiplication in neural networks maps directly
+        to GPU tensor architectures, enabling trillion-parameter AI models to train
+        efficiently.
+      visual_cue: Visualization of matrix multiplication dot-products accelerating
+        through hardware systolic array tensor cores
+  - scene_id: scene_4
+    title: Future Horizons & Scale 1
+    start_time: 7.5
+    duration: 2.5
+    narration_text: 'Looking forward, How GPUs Work: Parallel Computing continues
+      to accelerate innovations across modern research and engineering domains.'
+    visual_asset_path: assets/images/asset_04_artificial_intelligence_.svg
+    hero_frame_description: Hero frame showcasing Fueling the AI Revolution with backing
+      asset assets/images/asset_04_artificial_intelligence_.svg and kinetic typography.
+    entrance_animation: 'gsap.from(''.scene_4 .scene-content'', { opacity: 0, y: 30,
+      duration: 0.8, ease: ''power2.out'' })'
+    transition_out: Final fade out
+    beats:
+    - beat_id: beat_4_1
+      start_time: 7.5
+      end_time: 8.75
+      duration: 1.25
+      text: Future Horizons & Scale 1
+      visual_cue: Header entrance for Future Horizons & Scale 1
+    - beat_id: beat_4_2
+      start_time: 8.75
+      end_time: 10.0
+      duration: 1.25
+      text: 'Looking forward, How GPUs Work: Parallel Computing continues to accelerate
+        innovations across modern research and engineering domains.'
+      visual_cue: 'Visual roadmap and scaling analysis for How GPUs Work: Parallel
+        Computing'

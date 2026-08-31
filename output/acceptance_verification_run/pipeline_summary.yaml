@@ -1,0 +1,66 @@
+schema_version: 1.0.0
+run_id: run_1788155486_the_history_of_t
+topic: The History of the Transistor
+start_time: '2026-08-31T05:51:26.882350+00:00'
+end_time: '2026-08-31T05:52:18.707072+00:00'
+total_duration_seconds: 51.825
+status: SUCCESS
+output_directory: G:\Finding-new-code\harness9\output\acceptance_verification_run
+stages:
+- stage_name: research
+  success: true
+  execution_time_seconds: 0.04133963584899902
+  artifacts:
+  - research_dossier.json
+  - research_dossier.yaml
+  metrics:
+    claims_count: 4
+    talking_points_count: 3
+- stage_name: assets
+  success: true
+  execution_time_seconds: 0.04483509063720703
+  artifacts:
+  - asset_ledger.json
+  - asset_ledger.yaml
+  - assets/images/asset_01_point_contact_transistor.svg
+  - assets/images/asset_02_bardeen_brattain_shockle.svg
+  - assets/images/asset_03_vacuum_tube_vs_transisto.svg
+  - assets/images/asset_04_modern_silicon_wafer_sem.svg
+  metrics:
+    total_assets: 4
+    licenses:
+      CC0-1.0 (Public Domain): 4
+- stage_name: script_voiceover
+  success: true
+  execution_time_seconds: 1.7044048309326172
+  artifacts:
+  - BRIEF.md
+  - DESIGN.md
+  - SCRIPT.md
+  - STORYBOARD.md
+  - assets/audio/narration.wav
+  - assets/transcript.json
+  metrics:
+    scenes_count: 4
+    audio_duration: 73.39560090702948
+    audio_provider: windows_sapi
+- stage_name: hyperframes_render
+  success: true
+  execution_time_seconds: 49.933868646621704
+  artifacts:
+  - index.html
+  - styles.css
+  - main.js
+  - renders/final.mp4
+  metrics:
+    video_duration: 30.0
+    video_size_bytes: 650227
+    width: 1920
+    height: 1080
+    fps: 30
+metrics:
+  format: '16:9'
+  target_duration_seconds: 30
+  offline_mode: true
+  voice: default
+final_video_path: renders/final.mp4

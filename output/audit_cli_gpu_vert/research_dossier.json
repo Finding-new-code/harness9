@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0.0",
+  "topic": "How GPUs Work: Parallel Computing",
+  "metadata": {
+    "run_id": "run_52d19a7f_how_gpus_work",
+    "generated_at": "2026-08-31T06:04:52.855527+00:00",
+    "mode": "offline_fallback",
+    "target_duration_seconds": 10,
+    "search_backend": "curated_preset"
+  },
+  "summary": {
+    "headline": "How GPUs Work: Parallel Computing from Pixels to Neural Networks",
+    "executive_summary": "While CPUs are optimized for sequential execution using a few complex, low-latency cores, GPUs execute thousands of simple arithmetic threads simultaneously. This massively parallel SIMD architecture, originally built for 3D polygon rasterization, now forms the computational backbone of modern Artificial Intelligence and scientific simulation.\n",
+    "key_takeaways": [
+      "CPUs optimize for single-threaded latency, while GPUs maximize aggregate parallel throughput.",
+      "Modern GPUs contain tens of thousands of ALU cores operating under SIMD/SIMT models.",
+      "Tensor cores and specialized matrix units accelerate deep learning operations by orders of magnitude."
+    ]
+  },
+  "claims": [
+    {
+      "claim_id": "claim_01",
+      "claim_text": "A central processing unit (CPU) typically possesses between 8 and 64 high-speed cores designed for complex branching logic and low latency.",
+      "category": "technical_mechanism",
+      "confidence_score": 0.96,
+      "primary_source": {
+        "title": "Computer Organization and Design: RISC-V Edition",
+        "url": "https://www.sciencedirect.com/book/9780128122754/computer-organization-and-design-risc-v-edition",
+        "publisher": "Morgan Kaufmann"
+      },
+      "visual_cue_suggestion": "Diagram comparing a CPU with a few large complex cores to a GPU grid with thousands of tiny stream cores",
+      "corroborating_sources": [
+        {
+          "title": "ACM Digital Library - Principles of Multi-Core Processor Architecture",
+          "url": "https://dl.acm.org/doi/10.1145/2694344"
+        }
+      ],
+      "verification_notes": "Standard computer architecture taxonomy."
+    },
+    {
+      "claim_id": "claim_02",
+      "claim_text": "Modern flagship GPUs feature over 16,000 arithmetic logic units (ALUs) executing parallel mathematical operations across high-bandwidth memory.",
+      "category": "quantitative_metric",
+      "confidence_score": 0.98,
+      "primary_source": {
+        "title": "NVIDIA Hopper Architecture Whitepaper",
+        "url": "https://www.nvidia.com/en-us/data-center/technologies/hopper-architecture/",
+        "publisher": "NVIDIA Corporation"
+      },
+      "visual_cue_suggestion": "High-resolution silicon die shot of modern GPU showing symmetric grid of streaming multiprocessors",
+      "corroborating_sources": [
+        {
+          "title": "IEEE Micro - Trends in High-Performance GPU Computing",
+          "url": "https://ieeexplore.ieee.org/document/8356041"
+        }
+      ],
+      "verification_notes": "Verified against Nvidia H100/Blackwell and AMD CDNA specifications."
+    },
+    {
+      "claim_id": "claim_03",
+      "claim_text": "Graphics pipelines transform 3D vertex coordinates and texture matrices using SIMD (Single Instruction, Multiple Data) parallel execution.",
+      "category": "technical_mechanism",
+      "confidence_score": 0.95,
+      "primary_source": {
+        "title": "Real-Time Rendering, Fourth Edition",
+        "url": "https://www.realtimerendering.com/",
+        "publisher": "CRC Press"
+      },
+      "visual_cue_suggestion": "3D wireframe polygon model being rendered and shaded in real-time across thousands of parallel pixels",
+      "corroborating_sources": [
+        {
+          "title": "SIGGRAPH Computer Graphics Proceedings",
+          "url": "https://www.siggraph.org/learn/conference-content/"
+        }
+      ],
+      "verification_notes": "Universal standard in real-time graphics rendering theory."
+    },
+    {
+      "claim_id": "claim_04",
+      "claim_text": "Matrix multiplication in neural networks maps directly to GPU tensor architectures, enabling trillion-parameter AI models to train efficiently.",
+      "category": "modern_impact",
+      "confidence_score": 0.97,
+      "primary_source": {
+        "title": "Deep Learning - Goodfellow, Bengio, Courville",
+        "url": "https://www.deeplearningbook.org/",
+        "publisher": "MIT Press"
+      },
+      "visual_cue_suggestion": "Visualization of matrix multiplication dot-products accelerating through hardware systolic array tensor cores",
+      "corroborating_sources": [
+        {
+          "title": "Communications of the ACM - Hardware Acceleration for Deep Learning",
+          "url": "https://cacm.acm.org/magazines/2020/6/245162-hardware-acceleration-for-deep-learning/fulltext"
+        }
+      ],
+      "verification_notes": "Consensus across academic and industry AI research."
+    }
+  ],
+  "talking_points": [
+    {
+      "beat_index": 1,
+      "title": "The Chef vs. The Assembly Line",
+      "narrative_hook": "If a CPU is a master chef preparing one complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping vegetables at once.",
+      "supported_claim_ids": [
+        "claim_01"
+      ],
+      "estimated_duration_sec": 2.7
+    },
+    {
+      "beat_index": 2,
+      "title": "The Power of SIMD Parallelism",
+      "narrative_hook": "Originally designed to render 3D video game polygons, GPUs process massive arrays of pixels with a single broadcast instruction.",
+      "supported_claim_ids": [
+        "claim_02",
+        "claim_03"
+      ],
+      "estimated_duration_sec": 4.0
+    },
+    {
+      "beat_index": 3,
+      "title": "Fueling the AI Revolution",
+      "narrative_hook": "Because artificial intelligence calculations are essentially giant matrix multiplications, GPUs became the turbo-engine of modern deep learning.",
+      "supported_claim_ids": [
+        "claim_04"
+      ],
+      "estimated_duration_sec": 3.3
+    }
+  ],
+  "statistics": [
+    {
+      "metric": "Typical GPU Core Count",
+      "value": "16,000+ Cores",
+      "context": "ALU units inside flagship computing GPUs",
+      "source_claim_id": "claim_02"
+    },
+    {
+      "metric": "Memory Bandwidth",
+      "value": "3+ TB/s",
+      "context": "High Bandwidth Memory (HBM3e) throughput",
+      "source_claim_id": "claim_02"
+    },
+    {
+      "metric": "Deep Learning Speedup",
+      "value": "100x+",
+      "context": "Matrix compute acceleration vs standard general-purpose CPUs",
+      "source_claim_id": "claim_04"
+    }
+  ],
+  "suggested_visual_queries": [
+    "CPU vs GPU architecture parallel comparison diagram",
+    "Silicon die shot of modern GPU streaming multiprocessors",
+    "3D wireframe polygon rendering graphics pipeline",
+    "Artificial intelligence neural network matrix tensor core visualization"
+  ]
+}

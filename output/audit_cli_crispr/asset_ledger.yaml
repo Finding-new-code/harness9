@@ -1,0 +1,115 @@
+schema_version: 1.0.0
+project_id: proj_crispr-cas9_precision_molecular_scissors
+generated_at: '2026-08-31T06:05:21.323073+00:00'
+total_assets: 4
+license_summary:
+  CC0-1.0 (Public Domain): 4
+assets:
+- asset_id: asset_01
+  claim_id_refs:
+  - claim_01
+  scene_target: scene_1
+  media_type: image/svg+xml
+  local_path: assets/images/asset_01_crispr-cas9_precision_mo.svg
+  file_size_bytes: 4759
+  file_sha256: 98ef5d479c5be6b6c79691836e33268a0658b954ae9199265d04b72a9ae01c5b
+  source_provider: procedural_generator
+  source_url: procedural://vector/asset_01_crispr-cas9_precision_mo.svg
+  verification_status: FALLBACK_GENERATED
+  absolute_path: G:\Finding-new-code\harness9\output\audit_cli_crispr\assets\images\asset_01_crispr-cas9_precision_mo.svg
+  dimensions:
+    width: 1920
+    height: 1080
+    aspect_ratio: '16:9'
+  creator:
+    name: Harness 9 Procedural Asset Engine
+    profile_url: https://github.com/nousresearch/hermes-agent
+  license:
+    license_type: CC0-1.0 (Public Domain)
+    attribution_text: Procedural SVG Graphic by Harness 9 Engine (CC0)
+    attribution_required: false
+    commercial_use_allowed: true
+    modification_allowed: true
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  downloaded_at: '2026-08-31T06:05:21.326074+00:00'
+- asset_id: asset_02
+  claim_id_refs:
+  - claim_02
+  scene_target: scene_2
+  media_type: image/svg+xml
+  local_path: assets/images/asset_02_crispr-cas9_precision_mo.svg
+  file_size_bytes: 4770
+  file_sha256: e9049882e49c742e07f5b9be7156001d29fb677083b04ca6e5a47013a051642c
+  source_provider: procedural_generator
+  source_url: procedural://vector/asset_02_crispr-cas9_precision_mo.svg
+  verification_status: FALLBACK_GENERATED
+  absolute_path: G:\Finding-new-code\harness9\output\audit_cli_crispr\assets\images\asset_02_crispr-cas9_precision_mo.svg
+  dimensions:
+    width: 1920
+    height: 1080
+    aspect_ratio: '16:9'
+  creator:
+    name: Harness 9 Procedural Asset Engine
+    profile_url: https://github.com/nousresearch/hermes-agent
+  license:
+    license_type: CC0-1.0 (Public Domain)
+    attribution_text: Procedural SVG Graphic by Harness 9 Engine (CC0)
+    attribution_required: false
+    commercial_use_allowed: true
+    modification_allowed: true
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  downloaded_at: '2026-08-31T06:05:21.327075+00:00'
+- asset_id: asset_03
+  claim_id_refs:
+  - claim_03
+  scene_target: scene_3
+  media_type: image/svg+xml
+  local_path: assets/images/asset_03_crispr-cas9_precision_mo.svg
+  file_size_bytes: 4774
+  file_sha256: ac08bef3b4bce28099e24811b2479140efd3058ddbf9161fbd5b6c2588eff48b
+  source_provider: procedural_generator
+  source_url: procedural://vector/asset_03_crispr-cas9_precision_mo.svg
+  verification_status: FALLBACK_GENERATED
+  absolute_path: G:\Finding-new-code\harness9\output\audit_cli_crispr\assets\images\asset_03_crispr-cas9_precision_mo.svg
+  dimensions:
+    width: 1920
+    height: 1080
+    aspect_ratio: '16:9'
+  creator:
+    name: Harness 9 Procedural Asset Engine
+    profile_url: https://github.com/nousresearch/hermes-agent
+  license:
+    license_type: CC0-1.0 (Public Domain)
+    attribution_text: Procedural SVG Graphic by Harness 9 Engine (CC0)
+    attribution_required: false
+    commercial_use_allowed: true
+    modification_allowed: true
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  downloaded_at: '2026-08-31T06:05:21.417664+00:00'
+- asset_id: asset_04
+  claim_id_refs:
+  - claim_04
+  scene_target: scene_4
+  media_type: image/svg+xml
+  local_path: assets/images/asset_04_crispr-cas9_precision_mo.svg
+  file_size_bytes: 4759
+  file_sha256: f91c22fb87955fcc2132818298f4536c2b9a33f86893d305a43d97c06c87cc8e
+  source_provider: procedural_generator
+  source_url: procedural://vector/asset_04_crispr-cas9_precision_mo.svg
+  verification_status: FALLBACK_GENERATED
+  absolute_path: G:\Finding-new-code\harness9\output\audit_cli_crispr\assets\images\asset_04_crispr-cas9_precision_mo.svg
+  dimensions:
+    width: 1920
+    height: 1080
+    aspect_ratio: '16:9'
+  creator:
+    name: Harness 9 Procedural Asset Engine
+    profile_url: https://github.com/nousresearch/hermes-agent
+  license:
+    license_type: CC0-1.0 (Public Domain)
+    attribution_text: Procedural SVG Graphic by Harness 9 Engine (CC0)
+    attribution_required: false
+    commercial_use_allowed: true
+    modification_allowed: true
+    license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  downloaded_at: '2026-08-31T06:05:21.419667+00:00'

@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "proj_1788154136",
+  "total_assets": 4,
+  "license_summary": {
+    "CC-BY-4.0": 4
+  },
+  "assets": [
+    {
+      "asset_id": "asset_01",
+      "claim_id_refs": [
+        "claim_01"
+      ],
+      "scene_target": "scene_1",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_01.svg",
+      "file_size_bytes": 7149,
+      "file_sha256": "19b7ea8bb99db05ae6782423528f379458f37f18e4996a703ddac7a19cbf4531",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "source_provider": "procedural_vector_generator",
+      "source_url": "https://commons.wikimedia.org/wiki/Special:Search?search=Point+contact+transistor+1947+Bell+Labs+replica",
+      "creator": "Harness 9 Procedural Asset Engine",
+      "license": "CC0-1.0 (Public Domain)",
+      "verification_status": "verified_offline"
+    },
+    {
+      "asset_id": "asset_02",
+      "claim_id_refs": [
+        "claim_02"
+      ],
+      "scene_target": "scene_2",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_02.svg",
+      "file_size_bytes": 7148,
+      "file_sha256": "c4b2f6897e496d96fbec96b525d175ce815efccd72c2256f1eefc53e299efb31",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "source_provider": "procedural_vector_generator",
+      "source_url": "https://commons.wikimedia.org/wiki/Special:Search?search=Bardeen+Brattain+Shockley+Bell+Labs+laboratory",
+      "creator": "Harness 9 Procedural Asset Engine",
+      "license": "CC0-1.0 (Public Domain)",
+      "verification_status": "verified_offline"
+    },
+    {
+      "asset_id": "asset_03",
+      "claim_id_refs": [
+        "claim_03"
+      ],
+      "scene_target": "scene_3",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_03.svg",
+      "file_size_bytes": 7138,
+      "file_sha256": "513bb51bb8dda6f1eda304047afe4d23d7d7cdb66e8700c47ad6b9efc0760ec5",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "source_provider": "procedural_vector_generator",
+      "source_url": "https://commons.wikimedia.org/wiki/Special:Search?search=Vacuum+tube+vs+transistor+comparison",
+      "creator": "Harness 9 Procedural Asset Engine",
+      "license": "CC0-1.0 (Public Domain)",
+      "verification_status": "verified_offline"
+    },
+    {
+      "asset_id": "asset_04",
+      "claim_id_refs": [
+        "claim_04"
+      ],
+      "scene_target": "scene_4",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_04.svg",
+      "file_size_bytes": 7146,
+      "file_sha256": "ea3a4149fc74479f3cd598200ec9a2eb2d31cec3b9ef5ae41ccdd41aaf9176b9",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "source_provider": "procedural_vector_generator",
+      "source_url": "https://commons.wikimedia.org/wiki/Special:Search?search=Modern+silicon+wafer+semiconductor+microchip",
+      "creator": "Harness 9 Procedural Asset Engine",
+      "license": "CC0-1.0 (Public Domain)",
+      "verification_status": "verified_offline"
+    }
+  ]
+}

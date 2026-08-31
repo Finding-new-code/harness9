@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How GPUs Work: Parallel Computing — HyperFrames Composition</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- GSAP Core & Plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Root Composition Canvas -->
+  <div data-composition-id="root" data-start="0" data-duration="10" data-width="1080" data-height="1920">
+    
+    <!-- Visual Stage Layers -->
+    <div id="stage" class="stage-container">
+    <!-- Scene 1: scene_1 -->
+    <div class="scene" id="scene_1" data-start="0.0" data-duration="2.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_01_cpu_vs_gpu_architecture_.svg" alt="The Chef vs. The Assembly Line" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 01 • HARNESS 9</div>
+        <h2 class="scene-title">The Chef vs. The Assembly Line</h2>
+        <p class="scene-narration">The Chef vs. The Assembly Line. If a CPU is a master chef preparing one complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping vegetables at once. A central processing unit (CPU) typically possesses between 8 and 64 high-speed cores designed for complex branching logic and low latency.</p>
+      </div>
+    </div>
+    <!-- Scene 2: scene_2 -->
+    <div class="scene" id="scene_2" data-start="2.5" data-duration="2.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_02_silicon_die_shot_of_mode.svg" alt="The Power of SIMD Parallelism" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 02 • HARNESS 9</div>
+        <h2 class="scene-title">The Power of SIMD Parallelism</h2>
+        <p class="scene-narration">The Power of SIMD Parallelism. Originally designed to render 3D video game polygons, GPUs process massive arrays of pixels with a single broadcast instruction. Modern flagship GPUs feature over 16,000 arithmetic logic units (ALUs) executing parallel mathematical operations across high-bandwidth memory.</p>
+      </div>
+    </div>
+    <!-- Scene 3: scene_3 -->
+    <div class="scene" id="scene_3" data-start="5.0" data-duration="2.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_03_3d_wireframe_polygon_ren.svg" alt="Fueling the AI Revolution" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 03 • HARNESS 9</div>
+        <h2 class="scene-title">Fueling the AI Revolution</h2>
+        <p class="scene-narration">Fueling the AI Revolution. Because artificial intelligence calculations are essentially giant matrix multiplications, GPUs became the turbo-engine of modern deep learning. Matrix multiplication in neural networks maps directly to GPU tensor architectures, enabling trillion-parameter AI models to train efficiently.</p>
+      </div>
+    </div>
+    <!-- Scene 4: scene_4 -->
+    <div class="scene" id="scene_4" data-start="7.5" data-duration="2.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_04_artificial_intelligence_.svg" alt="Future Horizons &amp; Scale 1" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 04 • HARNESS 9</div>
+        <h2 class="scene-title">Future Horizons &amp; Scale 1</h2>
+        <p class="scene-narration">Looking forward, How GPUs Work: Parallel Computing continues to accelerate innovations across modern research and engineering domains.</p>
+      </div>
+    </div>
+    </div>
+
+    <!-- Kinetic Captions Container -->
+    <div id="captions-layer" class="captions-overlay">
+      <div id="caption-box" class="caption-text"></div>
+    </div>
+
+    <!-- Decoupled Audio Narration Track -->
+    <audio id="narration-audio" data-start="0" data-duration="10.0" data-track-index="1" data-volume="1.0" src="assets/audio/narration.wav"></audio>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

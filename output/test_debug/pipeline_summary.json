@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "run_1788154856_the_history_of_t",
+  "topic": "The History of the Transistor",
+  "start_time": "2026-08-31T05:40:56.185978+00:00",
+  "end_time": "2026-08-31T05:40:56.275600+00:00",
+  "total_duration_seconds": 0.09,
+  "status": "FAILED",
+  "output_directory": "G:\\Finding-new-code\\harness9\\output\\test_debug",
+  "stages": [
+    {
+      "stage_name": "research",
+      "success": true,
+      "execution_time_seconds": 0.03389763832092285,
+      "artifacts": [
+        "research_dossier.json",
+        "research_dossier.yaml"
+      ],
+      "metrics": {
+        "claims_count": 4,
+        "talking_points_count": 3
+      }
+    },
+    {
+      "stage_name": "assets",
+      "success": true,
+      "execution_time_seconds": 0.04236197471618652,
+      "artifacts": [
+        "asset_ledger.json",
+        "asset_ledger.yaml",
+        "assets/images/asset_01_point_contact_transistor.svg",
+        "assets/images/asset_02_bardeen_brattain_shockle.svg",
+        "assets/images/asset_03_vacuum_tube_vs_transisto.svg",
+        "assets/images/asset_04_modern_silicon_wafer_sem.svg"
+      ],
+      "metrics": {
+        "total_assets": 4,
+        "licenses": {
+          "CC0-1.0 (Public Domain)": 4
+        }
+      }
+    },
+    {
+      "stage_name": "script_voiceover",
+      "success": false,
+      "execution_time_seconds": 9.012222290039062e-05,
+      "artifacts": [],
+      "metrics": {},
+      "error": "ScriptwritingPipeline.run() got an unexpected keyword argument 'format_aspect'"
+    }
+  ],
+  "metrics": {
+    "format": "16:9",
+    "target_duration_seconds": 1,
+    "offline_mode": true,
+    "voice": "default"
+  }
+}

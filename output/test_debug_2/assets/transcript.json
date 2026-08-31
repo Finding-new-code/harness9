@@ -1,0 +1,1469 @@
+{
+  "schema_version": "1.0.0",
+  "total_duration": 65.067,
+  "total_words": 133,
+  "scenes": [
+    {
+      "scene_id": "scene_1",
+      "start": 0.0,
+      "end": 14.459,
+      "duration": 14.459,
+      "text": "The Vacuum Tube Bottleneck. Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes. Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits.",
+      "word_count": 43,
+      "groups": [
+        {
+          "text": "The Vacuum Tube",
+          "start": 0.0,
+          "end": 0.8,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Bottleneck. Before the",
+          "start": 0.8,
+          "end": 1.986,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "computer in your",
+          "start": 1.986,
+          "end": 2.886,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "pocket, early computers",
+          "start": 2.886,
+          "end": 4.101,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "filled entire rooms",
+          "start": 4.101,
+          "end": 5.087,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "with burning hot,",
+          "start": 5.087,
+          "end": 5.844,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "glass vacuum tubes.",
+          "start": 5.844,
+          "end": 6.872,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Early vacuum tubes",
+          "start": 6.872,
+          "end": 7.901,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "consumed large amounts",
+          "start": 7.901,
+          "end": 9.044,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "of power and",
+          "start": 9.044,
+          "end": 9.616,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "generated high heat;",
+          "start": 9.616,
+          "end": 10.673,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "transistors slashed power",
+          "start": 10.673,
+          "end": 11.83,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "consumption by over",
+          "start": 11.83,
+          "end": 12.816,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "99% and miniaturized",
+          "start": 12.816,
+          "end": 13.874,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "circuits.",
+          "start": 13.874,
+          "end": 14.459,
+          "scene_id": "scene_1",
+          "word_count": 1
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_2",
+      "start": 14.459,
+      "end": 43.378,
+      "duration": 28.919,
+      "text": "The Miracle at Bell Labs. On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip. The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories.",
+      "word_count": 48,
+      "groups": [
+        {
+          "text": "The Miracle at",
+          "start": 14.459,
+          "end": 15.894,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Bell Labs. On",
+          "start": 15.894,
+          "end": 17.211,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "two cold days",
+          "start": 17.211,
+          "end": 18.44,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "in December 1947,",
+          "start": 18.44,
+          "end": 20.138,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "three physicists made",
+          "start": 20.138,
+          "end": 22.274,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "history with a",
+          "start": 22.274,
+          "end": 23.709,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "sliver of germanium,",
+          "start": 23.709,
+          "end": 25.875,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "gold foil, and",
+          "start": 25.875,
+          "end": 27.25,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "a paper clip.",
+          "start": 27.25,
+          "end": 28.714,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "The first working",
+          "start": 28.714,
+          "end": 30.177,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "point-contact transistor was",
+          "start": 30.177,
+          "end": 32.812,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "successfully demonstrated on",
+          "start": 32.812,
+          "end": 35.651,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "December 23, 1947,",
+          "start": 35.651,
+          "end": 37.495,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "by John Bardeen",
+          "start": 37.495,
+          "end": 38.988,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "and Walter Brattain",
+          "start": 38.988,
+          "end": 40.861,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "at Bell Laboratories.",
+          "start": 40.861,
+          "end": 43.378,
+          "scene_id": "scene_2",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_3",
+      "start": 43.378,
+      "end": 65.067,
+      "duration": 21.689,
+      "text": "100 Billion Strong. Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth. By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp.",
+      "word_count": 42,
+      "groups": [
+        {
+          "text": "100 Billion Strong.",
+          "start": 43.378,
+          "end": 44.968,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Today, that single",
+          "start": 44.968,
+          "end": 46.511,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "rough prototype has",
+          "start": 46.511,
+          "end": 48.148,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "scaled to over",
+          "start": 48.148,
+          "end": 49.311,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "100 billion microscopic",
+          "start": 49.311,
+          "end": 51.256,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "switches powering every",
+          "start": 51.256,
+          "end": 53.202,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "AI and phone",
+          "start": 53.202,
+          "end": 54.27,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "on Earth. By",
+          "start": 54.27,
+          "end": 55.409,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "2026, leading-edge semiconductor",
+          "start": 55.409,
+          "end": 58.162,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "chips pack over",
+          "start": 58.162,
+          "end": 59.253,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "100 billion transistors",
+          "start": 59.253,
+          "end": 61.081,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "onto a silicon",
+          "start": 61.081,
+          "end": 62.362,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "die smaller than",
+          "start": 62.362,
+          "end": 63.62,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "a postage stamp.",
+          "start": 63.62,
+          "end": 65.067,
+          "scene_id": "scene_3",
+          "word_count": 3
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "text": "The Vacuum Tube",
+      "start": 0.0,
+      "end": 0.8,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Bottleneck. Before the",
+      "start": 0.8,
+      "end": 1.986,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "computer in your",
+      "start": 1.986,
+      "end": 2.886,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "pocket, early computers",
+      "start": 2.886,
+      "end": 4.101,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "filled entire rooms",
+      "start": 4.101,
+      "end": 5.087,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "with burning hot,",
+      "start": 5.087,
+      "end": 5.844,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "glass vacuum tubes.",
+      "start": 5.844,
+      "end": 6.872,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Early vacuum tubes",
+      "start": 6.872,
+      "end": 7.901,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "consumed large amounts",
+      "start": 7.901,
+      "end": 9.044,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "of power and",
+      "start": 9.044,
+      "end": 9.616,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "generated high heat;",
+      "start": 9.616,
+      "end": 10.673,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "transistors slashed power",
+      "start": 10.673,
+      "end": 11.83,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "consumption by over",
+      "start": 11.83,
+      "end": 12.816,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "99% and miniaturized",
+      "start": 12.816,
+      "end": 13.874,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "circuits.",
+      "start": 13.874,
+      "end": 14.459,
+      "scene_id": "scene_1",
+      "word_count": 1
+    },
+    {
+      "text": "The Miracle at",
+      "start": 14.459,
+      "end": 15.894,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Bell Labs. On",
+      "start": 15.894,
+      "end": 17.211,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "two cold days",
+      "start": 17.211,
+      "end": 18.44,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "in December 1947,",
+      "start": 18.44,
+      "end": 20.138,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "three physicists made",
+      "start": 20.138,
+      "end": 22.274,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "history with a",
+      "start": 22.274,
+      "end": 23.709,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "sliver of germanium,",
+      "start": 23.709,
+      "end": 25.875,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "gold foil, and",
+      "start": 25.875,
+      "end": 27.25,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "a paper clip.",
+      "start": 27.25,
+      "end": 28.714,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "The first working",
+      "start": 28.714,
+      "end": 30.177,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "point-contact transistor was",
+      "start": 30.177,
+      "end": 32.812,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "successfully demonstrated on",
+      "start": 32.812,
+      "end": 35.651,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "December 23, 1947,",
+      "start": 35.651,
+      "end": 37.495,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "by John Bardeen",
+      "start": 37.495,
+      "end": 38.988,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "and Walter Brattain",
+      "start": 38.988,
+      "end": 40.861,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "at Bell Laboratories.",
+      "start": 40.861,
+      "end": 43.378,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "100 Billion Strong.",
+      "start": 43.378,
+      "end": 44.968,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Today, that single",
+      "start": 44.968,
+      "end": 46.511,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "rough prototype has",
+      "start": 46.511,
+      "end": 48.148,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "scaled to over",
+      "start": 48.148,
+      "end": 49.311,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "100 billion microscopic",
+      "start": 49.311,
+      "end": 51.256,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "switches powering every",
+      "start": 51.256,
+      "end": 53.202,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "AI and phone",
+      "start": 53.202,
+      "end": 54.27,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "on Earth. By",
+      "start": 54.27,
+      "end": 55.409,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "2026, leading-edge semiconductor",
+      "start": 55.409,
+      "end": 58.162,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "chips pack over",
+      "start": 58.162,
+      "end": 59.253,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "100 billion transistors",
+      "start": 59.253,
+      "end": 61.081,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "onto a silicon",
+      "start": 61.081,
+      "end": 62.362,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "die smaller than",
+      "start": 62.362,
+      "end": 63.62,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "a postage stamp.",
+      "start": 63.62,
+      "end": 65.067,
+      "scene_id": "scene_3",
+      "word_count": 3
+    }
+  ],
+  "words": [
+    {
+      "word": "The",
+      "start": 0.0,
+      "end": 0.157,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Vacuum",
+      "start": 0.157,
+      "end": 0.543,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Tube",
+      "start": 0.543,
+      "end": 0.8,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Bottleneck.",
+      "start": 0.8,
+      "end": 1.443,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Before",
+      "start": 1.443,
+      "end": 1.829,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "the",
+      "start": 1.829,
+      "end": 1.986,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "computer",
+      "start": 1.986,
+      "end": 2.429,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "in",
+      "start": 2.429,
+      "end": 2.558,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "your",
+      "start": 2.558,
+      "end": 2.886,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "pocket,",
+      "start": 2.886,
+      "end": 3.272,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "early",
+      "start": 3.272,
+      "end": 3.629,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "computers",
+      "start": 3.629,
+      "end": 4.101,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "filled",
+      "start": 4.101,
+      "end": 4.415,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "entire",
+      "start": 4.415,
+      "end": 4.801,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "rooms",
+      "start": 4.801,
+      "end": 5.087,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "with",
+      "start": 5.087,
+      "end": 5.272,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "burning",
+      "start": 5.272,
+      "end": 5.615,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "hot,",
+      "start": 5.615,
+      "end": 5.844,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "glass",
+      "start": 5.844,
+      "end": 6.058,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "vacuum",
+      "start": 6.058,
+      "end": 6.444,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "tubes.",
+      "start": 6.444,
+      "end": 6.872,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Early",
+      "start": 6.872,
+      "end": 7.23,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "vacuum",
+      "start": 7.23,
+      "end": 7.615,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "tubes",
+      "start": 7.615,
+      "end": 7.901,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "consumed",
+      "start": 7.901,
+      "end": 8.344,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "large",
+      "start": 8.344,
+      "end": 8.63,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "amounts",
+      "start": 8.63,
+      "end": 9.044,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 9.044,
+      "end": 9.173,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "power",
+      "start": 9.173,
+      "end": 9.459,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 9.459,
+      "end": 9.616,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "generated",
+      "start": 9.616,
+      "end": 10.159,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "high",
+      "start": 10.159,
+      "end": 10.344,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "heat;",
+      "start": 10.344,
+      "end": 10.673,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "transistors",
+      "start": 10.673,
+      "end": 11.202,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "slashed",
+      "start": 11.202,
+      "end": 11.545,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "power",
+      "start": 11.545,
+      "end": 11.83,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "consumption",
+      "start": 11.83,
+      "end": 12.431,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "by",
+      "start": 12.431,
+      "end": 12.559,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "over",
+      "start": 12.559,
+      "end": 12.816,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "99%",
+      "start": 12.816,
+      "end": 12.945,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 12.945,
+      "end": 13.102,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "miniaturized",
+      "start": 13.102,
+      "end": 13.874,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "circuits.",
+      "start": 13.874,
+      "end": 14.459,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 14.459,
+      "end": 14.781,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Miracle",
+      "start": 14.781,
+      "end": 15.63,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "at",
+      "start": 15.63,
+      "end": 15.894,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Bell",
+      "start": 15.894,
+      "end": 16.274,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Labs.",
+      "start": 16.274,
+      "end": 16.947,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "On",
+      "start": 16.947,
+      "end": 17.211,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "two",
+      "start": 17.211,
+      "end": 17.533,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "cold",
+      "start": 17.533,
+      "end": 17.913,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "days",
+      "start": 17.913,
+      "end": 18.44,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "in",
+      "start": 18.44,
+      "end": 18.704,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "December",
+      "start": 18.704,
+      "end": 19.611,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "1947,",
+      "start": 19.611,
+      "end": 20.138,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "three",
+      "start": 20.138,
+      "end": 20.723,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "physicists",
+      "start": 20.723,
+      "end": 21.748,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "made",
+      "start": 21.748,
+      "end": 22.274,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "history",
+      "start": 22.274,
+      "end": 23.123,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "with",
+      "start": 23.123,
+      "end": 23.504,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "a",
+      "start": 23.504,
+      "end": 23.709,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "sliver",
+      "start": 23.709,
+      "end": 24.353,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "of",
+      "start": 24.353,
+      "end": 24.616,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "germanium,",
+      "start": 24.616,
+      "end": 25.875,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "gold",
+      "start": 25.875,
+      "end": 26.255,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "foil,",
+      "start": 26.255,
+      "end": 26.928,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 26.928,
+      "end": 27.25,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "a",
+      "start": 27.25,
+      "end": 27.455,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "paper",
+      "start": 27.455,
+      "end": 28.041,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "clip.",
+      "start": 28.041,
+      "end": 28.714,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "The",
+      "start": 28.714,
+      "end": 29.036,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "first",
+      "start": 29.036,
+      "end": 29.475,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "working",
+      "start": 29.475,
+      "end": 30.177,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "point-contact",
+      "start": 30.177,
+      "end": 31.465,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "transistor",
+      "start": 31.465,
+      "end": 32.49,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "was",
+      "start": 32.49,
+      "end": 32.812,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "successfully",
+      "start": 32.812,
+      "end": 34.1,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "demonstrated",
+      "start": 34.1,
+      "end": 35.387,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "on",
+      "start": 35.387,
+      "end": 35.651,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "December",
+      "start": 35.651,
+      "end": 36.558,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "23,",
+      "start": 36.558,
+      "end": 36.968,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "1947,",
+      "start": 36.968,
+      "end": 37.495,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "by",
+      "start": 37.495,
+      "end": 37.758,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "John",
+      "start": 37.758,
+      "end": 38.139,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Bardeen",
+      "start": 38.139,
+      "end": 38.988,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 38.988,
+      "end": 39.31,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Walter",
+      "start": 39.31,
+      "end": 39.954,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Brattain",
+      "start": 39.954,
+      "end": 40.861,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "at",
+      "start": 40.861,
+      "end": 41.124,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Bell",
+      "start": 41.124,
+      "end": 41.505,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Laboratories.",
+      "start": 41.505,
+      "end": 43.378,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "100",
+      "start": 43.378,
+      "end": 43.639,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Billion",
+      "start": 43.639,
+      "end": 44.327,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Strong.",
+      "start": 44.327,
+      "end": 44.968,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Today,",
+      "start": 44.968,
+      "end": 45.68,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "that",
+      "start": 45.68,
+      "end": 45.988,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "single",
+      "start": 45.988,
+      "end": 46.511,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "rough",
+      "start": 46.511,
+      "end": 46.985,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "prototype",
+      "start": 46.985,
+      "end": 47.887,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "has",
+      "start": 47.887,
+      "end": 48.148,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "scaled",
+      "start": 48.148,
+      "end": 48.67,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "to",
+      "start": 48.67,
+      "end": 48.883,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "over",
+      "start": 48.883,
+      "end": 49.311,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "100",
+      "start": 49.311,
+      "end": 49.572,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "billion",
+      "start": 49.572,
+      "end": 50.26,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "microscopic",
+      "start": 50.26,
+      "end": 51.256,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "switches",
+      "start": 51.256,
+      "end": 51.873,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "powering",
+      "start": 51.873,
+      "end": 52.609,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "every",
+      "start": 52.609,
+      "end": 53.202,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "AI",
+      "start": 53.202,
+      "end": 53.535,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "and",
+      "start": 53.535,
+      "end": 53.796,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "phone",
+      "start": 53.796,
+      "end": 54.27,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "on",
+      "start": 54.27,
+      "end": 54.484,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Earth.",
+      "start": 54.484,
+      "end": 55.196,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "By",
+      "start": 55.196,
+      "end": 55.409,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "2026,",
+      "start": 55.409,
+      "end": 55.836,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "leading-edge",
+      "start": 55.836,
+      "end": 56.952,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "semiconductor",
+      "start": 56.952,
+      "end": 58.162,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "chips",
+      "start": 58.162,
+      "end": 58.518,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "pack",
+      "start": 58.518,
+      "end": 58.826,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "over",
+      "start": 58.826,
+      "end": 59.253,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "100",
+      "start": 59.253,
+      "end": 59.514,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "billion",
+      "start": 59.514,
+      "end": 60.203,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "transistors",
+      "start": 60.203,
+      "end": 61.081,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "onto",
+      "start": 61.081,
+      "end": 61.508,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "a",
+      "start": 61.508,
+      "end": 61.674,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "silicon",
+      "start": 61.674,
+      "end": 62.362,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "die",
+      "start": 62.362,
+      "end": 62.742,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "smaller",
+      "start": 62.742,
+      "end": 63.311,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "than",
+      "start": 63.311,
+      "end": 63.62,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "a",
+      "start": 63.62,
+      "end": 63.786,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "postage",
+      "start": 63.786,
+      "end": 64.474,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "stamp.",
+      "start": 64.474,
+      "end": 65.067,
+      "scene_id": "scene_3"
+    }
+  ]
+}

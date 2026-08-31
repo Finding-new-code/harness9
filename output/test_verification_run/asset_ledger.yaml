@@ -1,0 +1,70 @@
+assets:
+- asset_id: asset_01
+  claim_id_refs:
+  - claim_01
+  creator: Harness 9 Procedural Asset Engine
+  dimensions:
+    height: 1080
+    width: 1920
+  file_sha256: 19b7ea8bb99db05ae6782423528f379458f37f18e4996a703ddac7a19cbf4531
+  file_size_bytes: 7149
+  license: CC0-1.0 (Public Domain)
+  local_path: assets/images/asset_01.svg
+  media_type: image/svg+xml
+  scene_target: scene_1
+  source_provider: procedural_vector_generator
+  source_url: https://commons.wikimedia.org/wiki/Special:Search?search=Point+contact+transistor+1947+Bell+Labs+replica
+  verification_status: verified_offline
+- asset_id: asset_02
+  claim_id_refs:
+  - claim_02
+  creator: Harness 9 Procedural Asset Engine
+  dimensions:
+    height: 1080
+    width: 1920
+  file_sha256: c4b2f6897e496d96fbec96b525d175ce815efccd72c2256f1eefc53e299efb31
+  file_size_bytes: 7148
+  license: CC0-1.0 (Public Domain)
+  local_path: assets/images/asset_02.svg
+  media_type: image/svg+xml
+  scene_target: scene_2
+  source_provider: procedural_vector_generator
+  source_url: https://commons.wikimedia.org/wiki/Special:Search?search=Bardeen+Brattain+Shockley+Bell+Labs+laboratory
+  verification_status: verified_offline
+- asset_id: asset_03
+  claim_id_refs:
+  - claim_03
+  creator: Harness 9 Procedural Asset Engine
+  dimensions:
+    height: 1080
+    width: 1920
+  file_sha256: 513bb51bb8dda6f1eda304047afe4d23d7d7cdb66e8700c47ad6b9efc0760ec5
+  file_size_bytes: 7138
+  license: CC0-1.0 (Public Domain)
+  local_path: assets/images/asset_03.svg
+  media_type: image/svg+xml
+  scene_target: scene_3
+  source_provider: procedural_vector_generator
+  source_url: https://commons.wikimedia.org/wiki/Special:Search?search=Vacuum+tube+vs+transistor+comparison
+  verification_status: verified_offline
+- asset_id: asset_04
+  claim_id_refs:
+  - claim_04
+  creator: Harness 9 Procedural Asset Engine
+  dimensions:
+    height: 1080
+    width: 1920
+  file_sha256: ea3a4149fc74479f3cd598200ec9a2eb2d31cec3b9ef5ae41ccdd41aaf9176b9
+  file_size_bytes: 7146
+  license: CC0-1.0 (Public Domain)
+  local_path: assets/images/asset_04.svg
+  media_type: image/svg+xml
+  scene_target: scene_4
+  source_provider: procedural_vector_generator
+  source_url: https://commons.wikimedia.org/wiki/Special:Search?search=Modern+silicon+wafer+semiconductor+microchip
+  verification_status: verified_offline
+license_summary:
+  CC-BY-4.0: 4
+project_id: proj_1788154136
+schema_version: 1.0.0
+total_assets: 4

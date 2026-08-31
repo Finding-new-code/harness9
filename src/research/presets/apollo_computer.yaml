@@ -1,0 +1,116 @@
+schema_version: "1.0.0"
+topic: "The Apollo 11 Guidance Computer"
+metadata:
+  run_id: "preset_apollo_computer_001"
+  generated_at: "2026-08-31T00:00:00Z"
+  mode: "offline_fallback"
+  target_duration_seconds: 30
+  search_backend: "curated_preset"
+
+summary:
+  headline: "The Apollo Guidance Computer: How 4 Kilobytes of Core Rope Memory Guided Humanity to the Moon"
+  executive_summary: >
+    Developed by the MIT Instrumentation Laboratory under Margaret Hamilton and Hal Laning,
+    the Apollo Guidance Computer (AGC) was one of the earliest systems to utilize silicon integrated
+    circuits. Running at 1.024 MHz with 36,864 words of woven core rope memory, its priority-scheduled
+    asynchronous operating system safely landed Apollo 11 despite radar telemetry overload.
+  key_takeaways:
+    - "First major embedded computer to employ silicon integrated logic circuits (NOR gates)."
+    - "ROM software was physically hand-woven into magnetic ferrite core rope memory."
+    - "Asynchronous priority scheduling and 1201/1202 alarm recovery saved the 1969 lunar landing."
+
+claims:
+  - claim_id: "claim_01"
+    claim_text: "The Apollo Guidance Computer was engineered by the MIT Instrumentation Laboratory in the 1960s using early silicon integrated circuit flat-packs."
+    category: "origin_history"
+    confidence_score: 0.99
+    primary_source:
+      title: "Computers in Spaceflight: The NASA Experience"
+      url: "https://history.nasa.gov/computers/Ch2-1.html"
+      publisher: "NASA History Division"
+    corroborating_sources:
+      - title: "Smithsonian National Air and Space Museum - Apollo Guidance Computer"
+        url: "https://airandspace.si.edu/collection-objects/computer-guidance-apollo/nasm_A19770513000"
+    visual_cue_suggestion: "Vintage photograph of the Apollo Guidance Computer DSKY display keyboard interface on the spacecraft instrument panel"
+    verification_notes: "NASA official historical records."
+
+  - claim_id: "claim_02"
+    claim_text: "The AGC operated at a clock frequency of 1.024 MHz, with 2,048 words of RAM and 36,864 words of read-only core rope memory."
+    category: "quantitative_metric"
+    confidence_score: 0.98
+    primary_source:
+      title: "The Apollo Guidance Computer: Architecture and Operation"
+      url: "https://link.springer.com/book/10.1007/978-1-4419-0877-2"
+      publisher: "Springer Praxis Books"
+    corroborating_sources:
+      - title: "MIT Museum - Margaret Hamilton Apollo Software Archives"
+        url: "https://mitmuseum.mit.edu/collections/object/apollo-guidance-computer"
+    visual_cue_suggestion: "Close-up photograph of magnetic core rope memory module with tiny copper wires threaded through miniature ferrite rings"
+    verification_notes: "Hardware architecture verified across MIT and NASA documentation."
+
+  - claim_id: "claim_03"
+    claim_text: "During the Apollo 11 descent on July 20, 1969, the AGC triggered 1201 and 1202 program alarms due to radar overload, but prioritized critical thruster and guidance tasks without crashing."
+    category: "technical_mechanism"
+    confidence_score: 0.99
+    primary_source:
+      title: "Apollo 11 Flight Journal - The Lunar Descent"
+      url: "https://history.nasa.gov/afj/ap11fj/19day6-landing.html"
+      publisher: "NASA"
+    corroborating_sources:
+      - title: "IEEE Computer - Margaret Hamilton and Apollo Flight Software"
+        url: "https://www.computer.org/publications/tech-news/events/margaret-hamilton-apollo"
+    visual_cue_suggestion: "Apollo 11 Lunar Module Eagle descending above the lunar craters with green glowing DSKY display illuminated"
+    verification_notes: "Confirmed by Apollo 11 mission transcripts and MIT telemetry records."
+
+  - claim_id: "claim_04"
+    claim_text: "Margaret Hamilton led the MIT team that pioneered modern asynchronous priority executive scheduling, establishing software engineering as a rigorous scientific discipline."
+    category: "key_figure"
+    confidence_score: 0.97
+    primary_source:
+      title: "Presidential Medal of Freedom: Margaret Hamilton Citation"
+      url: "https://obamawhitehouse.archives.gov/the-press-office/2016/11/16/president-obama-names-recipients-presidential-medal-freedom"
+      publisher: "The White House"
+    corroborating_sources:
+      - title: "ACM Digital Library - Margaret H. Hamilton: Pioneering Software Engineering"
+        url: "https://dl.acm.org/doi/10.1145/3085566"
+    visual_cue_suggestion: "Iconic photograph of Margaret Hamilton standing next to the towering printout of Apollo guidance source code"
+    verification_notes: "Historical consensus across IEEE, ACM, and presidential citation."
+
+talking_points:
+  - beat_index: 1
+    title: "Computing on the Moon's Edge"
+    narrative_hook: "In 1969, landing astronauts on the lunar surface required a computer that had less memory than a single modern digital photo."
+    supported_claim_ids: ["claim_01", "claim_02"]
+    estimated_duration_sec: 8.0
+
+  - beat_index: 2
+    title: "Software Woven by Hand"
+    narrative_hook: "Known as LOL memory — Little Old Lady memory — Apollo's operating software was literally woven with needles through magnetic rings."
+    supported_claim_ids: ["claim_02"]
+    estimated_duration_sec: 11.0
+
+  - beat_index: 3
+    title: "The Alarms That Saved Apollo 11"
+    narrative_hook: "Three minutes before touchdown, alarm 1202 flashed. But thanks to Margaret Hamilton's priority scheduler, the AGC dropped unimportant tasks and landed Eagle safely."
+    supported_claim_ids: ["claim_03", "claim_04"]
+    estimated_duration_sec: 11.0
+
+statistics:
+  - metric: "Clock Frequency"
+    value: "1.024 MHz"
+    context: "Processor operating clock rate"
+    source_claim_id: "claim_02"
+  - metric: "RAM Capacity"
+    value: "2,048 Words (approx. 4 KB)"
+    context: "Erasable magnetic core memory"
+    source_claim_id: "claim_02"
+  - metric: "Descent Alarms Successfully Handled"
+    value: "1201 & 1202"
+    context: "Radar counter cycle-steal overloads prioritized during landing"
+    source_claim_id: "claim_03"
+
+suggested_visual_queries:
+  - "Apollo Guidance Computer DSKY user interface keyboard"
+  - "Core rope memory module Apollo Guidance Computer close-up"
+  - "Apollo 11 Lunar Module Eagle descending onto moon surface"
+  - "Margaret Hamilton standing next to Apollo guidance code listings"

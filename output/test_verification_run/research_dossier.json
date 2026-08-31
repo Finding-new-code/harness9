@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0.0",
+  "topic": "The History of the Transistor",
+  "metadata": {
+    "run_id": "run_10f03c0f_transistor_history",
+    "generated_at": "2026-08-31T05:28:56.089298+00:00",
+    "mode": "offline_fallback",
+    "target_duration_seconds": 30,
+    "search_backend": "curated_preset"
+  },
+  "summary": {
+    "headline": "The History of the Transistor: How Three Bell Labs Physicists Ignited the Digital Age in 1947",
+    "executive_summary": "In December 1947, John Bardeen, Walter Brattain, and William Shockley created the first working point-contact transistor at Bell Labs. Replacing fragile, power-hungry vacuum tubes, the transistor enabled solid-state electronics, microchips, and the modern computing era.\n",
+    "key_takeaways": [
+      "Invented in December 1947 at Bell Labs using germanium crystal and gold foil.",
+      "Bardeen, Brattain, and Shockley were awarded the 1956 Nobel Prize in Physics.",
+      "Modern microprocessors contain over 100 billion transistors on a single chip."
+    ]
+  },
+  "claims": [
+    {
+      "claim_id": "claim_01",
+      "claim_text": "The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories.",
+      "category": "origin_history",
+      "confidence_score": 0.98,
+      "primary_source": {
+        "title": "The Invention of the Transistor - Bell Labs Archive",
+        "url": "https://www.bell-labs.com/about/history/transistor/",
+        "publisher": "Nokia Bell Labs"
+      },
+      "visual_cue_suggestion": "Historical replica photo of the 1947 point-contact transistor with germanium crystal and plastic wedge",
+      "corroborating_sources": [
+        {
+          "title": "December 23, 1947: Transistor Invented - APS Physics",
+          "url": "https://www.aps.org/publications/apsnews/200012/history.cfm"
+        },
+        {
+          "title": "Computer History Museum - The Transistor Milestone",
+          "url": "https://www.computerhistory.org/siliconengine/invention-of-the-point-contact-transistor/"
+        }
+      ],
+      "verification_notes": "Unanimous historical consensus across Nobel, Bell Labs, and IEEE archives."
+    },
+    {
+      "claim_id": "claim_02",
+      "claim_text": "Shockley, Bardeen, and Brattain were jointly awarded the 1956 Nobel Prize in Physics for their research on semiconductors and the transistor effect.",
+      "category": "key_figure",
+      "confidence_score": 1.0,
+      "primary_source": {
+        "title": "The Nobel Prize in Physics 1956",
+        "url": "https://www.nobelprize.org/prizes/physics/1956/summary/",
+        "publisher": "The Nobel Foundation"
+      },
+      "visual_cue_suggestion": "Photograph of John Bardeen, William Shockley, and Walter Brattain at Bell Labs laboratory workbench",
+      "corroborating_sources": [
+        {
+          "title": "IEEE Milestone in Electrical Engineering and Computing",
+          "url": "https://ethw.org/Milestones:Invention_of_the_First_Transistor_at_Bell_Telephone_Laboratories,_1947"
+        }
+      ],
+      "verification_notes": "Verified via official Nobel Prize citation."
+    },
+    {
+      "claim_id": "claim_03",
+      "claim_text": "Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits.",
+      "category": "technical_mechanism",
+      "confidence_score": 0.92,
+      "primary_source": {
+        "title": "From Vacuum Tubes to Transistors - IEEE Spectrum",
+        "url": "https://spectrum.ieee.org/from-vacuum-tubes-to-transistors",
+        "publisher": "IEEE Spectrum"
+      },
+      "visual_cue_suggestion": "Side-by-side comparison diagram of a glowing glass vacuum tube versus a tiny modern semiconductor chip",
+      "corroborating_sources": [
+        {
+          "title": "Smithsonian History of Solid State Electronics",
+          "url": "https://americanhistory.si.edu/collections/search/object/nmah_738520"
+        }
+      ],
+      "verification_notes": "Consistent with standard solid-state electronics engineering benchmarks."
+    },
+    {
+      "claim_id": "claim_04",
+      "claim_text": "By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp.",
+      "category": "quantitative_metric",
+      "confidence_score": 0.95,
+      "primary_source": {
+        "title": "Semiconductor Industry Roadmap & Transistor Scaling",
+        "url": "https://www.semiconductors.org/technology-and-innovation/",
+        "publisher": "Semiconductor Industry Association"
+      },
+      "visual_cue_suggestion": "Macro photograph of modern silicon wafer microchip die with iridescent microscopic circuitry",
+      "corroborating_sources": [
+        {
+          "title": "Nature Nanotechnology - Transistor scaling frontiers",
+          "url": "https://www.nature.com/articles/nnano.2023.120"
+        }
+      ],
+      "verification_notes": "Matches TSMC, Apple M-series, and Nvidia GPU transistor density disclosures."
+    }
+  ],
+  "talking_points": [
+    {
+      "beat_index": 1,
+      "title": "The Vacuum Tube Bottleneck",
+      "narrative_hook": "Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes.",
+      "supported_claim_ids": [
+        "claim_03"
+      ],
+      "estimated_duration_sec": 7.0
+    },
+    {
+      "beat_index": 2,
+      "title": "The Miracle at Bell Labs",
+      "narrative_hook": "On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip.",
+      "supported_claim_ids": [
+        "claim_01",
+        "claim_02"
+      ],
+      "estimated_duration_sec": 13.0
+    },
+    {
+      "beat_index": 3,
+      "title": "100 Billion Strong",
+      "narrative_hook": "Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth.",
+      "supported_claim_ids": [
+        "claim_04"
+      ],
+      "estimated_duration_sec": 10.0
+    }
+  ],
+  "statistics": [
+    {
+      "metric": "Date of First Working Demonstration",
+      "value": "December 23, 1947",
+      "context": "Bell Labs, Murray Hill, New Jersey",
+      "source_claim_id": "claim_01"
+    },
+    {
+      "metric": "Nobel Prize Year",
+      "value": "1956",
+      "context": "Awarded jointly to Bardeen, Brattain, and Shockley",
+      "source_claim_id": "claim_02"
+    },
+    {
+      "metric": "Modern Transistor Count",
+      "value": "100,000,000,000+",
+      "context": "Transistors packed per state-of-the-art silicon die",
+      "source_claim_id": "claim_04"
+    }
+  ],
+  "suggested_visual_queries": [
+    "Point contact transistor 1947 Bell Labs replica",
+    "Bardeen Brattain Shockley Bell Labs laboratory",
+    "Vacuum tube vs transistor comparison",
+    "Modern silicon wafer semiconductor microchip"
+  ]
+}

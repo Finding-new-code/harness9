@@ -1,0 +1,24 @@
+{
+  "wikimedia_status": 200,
+  "sample_assets": [
+    {
+      "title": "Insulated gate bipolar transistor",
+      "url": null,
+      "license": "Unknown",
+      "author": "Unknown"
+    },
+    {
+      "title": "Microtechnology",
+      "url": null,
+      "license": "Unknown",
+      "author": "Unknown"
+    },
+    {
+      "title": "SVG integrated circuits",
+      "url": null,
+      "license": "Unknown",
+      "author": "Unknown"
+    }
+  ],
+  "yaml_support": true
+}

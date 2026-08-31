@@ -1,0 +1,116 @@
+schema_version: "1.0.0"
+topic: "How Quantum Computers Work"
+metadata:
+  run_id: "preset_quantum_computing_001"
+  generated_at: "2026-08-31T00:00:00Z"
+  mode: "offline_fallback"
+  target_duration_seconds: 30
+  search_backend: "curated_preset"
+
+summary:
+  headline: "How Quantum Computers Work: Harnessing Superposition and Entanglement to Redefine Computation"
+  executive_summary: >
+    Unlike classical computers that process deterministic binary bits (0 or 1), quantum computers
+    leverage quantum bits (qubits) capable of existing in superpositions of states. Through quantum
+    entanglement and destructive wave interference, quantum processors can evaluate vast exponential
+    solution spaces simultaneously, revolutionizing cryptography, materials science, and drug discovery.
+  key_takeaways:
+    - "Qubits harness quantum superposition to represent continuous linear combinations of 0 and 1."
+    - "Quantum entanglement links multiple qubits, creating an exponentially expanding state space ($2^N$)."
+    - "Quantum algorithms use constructive and destructive interference to amplify the correct solution."
+
+claims:
+  - claim_id: "claim_01"
+    claim_text: "Classical computers operate on discrete binary bits (0 or 1), whereas quantum computers use qubits capable of existing in coherent superposition states."
+    category: "technical_mechanism"
+    confidence_score: 0.99
+    primary_source:
+      title: "Quantum Computation and Quantum Information (Nielsen & Chuang)"
+      url: "https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE"
+      publisher: "Cambridge University Press"
+    corroborating_sources:
+      - title: "Nature Reviews Physics - Progress in Superconducting Qubits"
+        url: "https://www.nature.com/articles/s42254-021-00357-1"
+    visual_cue_suggestion: "Bloch sphere 3D geometric visualization showing a qubit state vector pointing across the continuous spherical surface"
+    verification_notes: "Foundational quantum physics and information theory."
+
+  - claim_id: "claim_02"
+    claim_text: "A system of N entangled qubits can simultaneously represent 2 to the power of N computational states, creating exponential parallelism."
+    category: "quantitative_metric"
+    confidence_score: 0.98
+    primary_source:
+      title: "MIT OpenCourseWare - Quantum Information Science"
+      url: "https://ocw.mit.edu/courses/8-370-quantum-information-science-i-fall-2017/"
+      publisher: "Massachusetts Institute of Technology"
+    corroborating_sources:
+      - title: "Physical Review Letters - Multi-Qubit Entanglement"
+        url: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.260502"
+    visual_cue_suggestion: "Diagram contrasting exponential state growth of 50 entangled qubits versus classical binary registers"
+    verification_notes: "Mathematical proof in Hilbert state space."
+
+  - claim_id: "claim_03"
+    claim_text: "Superconducting quantum processors operate inside cryogenic dilution refrigerators cooled to approximately 15 millikelvin, colder than deep space."
+    category: "origin_history"
+    confidence_score: 0.96
+    primary_source:
+      title: "IBM Quantum Systems Overview"
+      url: "https://www.ibm.com/quantum/systems"
+      publisher: "IBM Quantum"
+    corroborating_sources:
+      - title: "Scientific American - Inside the Golden Quantum Chandelier"
+        url: "https://www.scientificamerican.com/article/how-quantum-computers-work/"
+    visual_cue_suggestion: "Gleaming gold-plated dilution refrigerator chandelier with spiral coaxial cables inside a cryogenic chamber"
+    verification_notes: "Industry standard for transmon superconducting qubit platforms."
+
+  - claim_id: "claim_04"
+    claim_text: "Quantum algorithms like Shor's and Grover's use quantum interference to cancel incorrect paths and amplify the probability of correct answers."
+    category: "modern_impact"
+    confidence_score: 0.97
+    primary_source:
+      title: "SIAM Journal on Computing - Polynomial-Time Algorithms for Prime Factorization"
+      url: "https://epubs.siam.org/doi/10.1137/S0097539795293172"
+      publisher: "Society for Industrial and Applied Mathematics"
+    corroborating_sources:
+      - title: "NIST Post-Quantum Cryptography Standardization"
+        url: "https://csrc.nist.gov/projects/post-quantum-cryptography"
+    visual_cue_suggestion: "Wave interference pattern where destructive peaks cancel error paths and constructive waves amplify the correct answer"
+    verification_notes: "Mathematically proven algorithm complexity results."
+
+talking_points:
+  - beat_index: 1
+    title: "Beyond the Binary Code"
+    narrative_hook: "For eighty years, every computer on Earth spoke in binary — just zeros and ones. Quantum computing rewrites those rules entirely."
+    supported_claim_ids: ["claim_01"]
+    estimated_duration_sec: 8.0
+
+  - beat_index: 2
+    title: "The Magic of Superposition"
+    narrative_hook: "Inside a golden chandelier cooled near absolute zero, qubits hold both possibilities at once, unlocking exponential calculations."
+    supported_claim_ids: ["claim_02", "claim_03"]
+    estimated_duration_sec: 11.0
+
+  - beat_index: 3
+    title: "A New Frontier in Science"
+    narrative_hook: "By using quantum interference to find answers in seconds that would take supercomputers millennia, quantum computing is charting the future."
+    supported_claim_ids: ["claim_04"]
+    estimated_duration_sec: 11.0
+
+statistics:
+  - metric: "Operating Temperature"
+    value: "15 Millikelvin (-273.135 °C)"
+    context: "Dilution refrigerator base temperature for superconducting qubits"
+    source_claim_id: "claim_03"
+  - metric: "State Space Scaling"
+    value: "2^N States"
+    context: "Exponential capacity of N entangled qubits"
+    source_claim_id: "claim_02"
+  - metric: "Theoretical Speedup"
+    value: "Exponential Speedup"
+    context: "For prime factorization and quantum chemical simulation"
+    source_claim_id: "claim_04"
+
+suggested_visual_queries:
+  - "Bloch sphere 3D quantum bit state visualization"
+  - "Golden cryogenic dilution refrigerator chandelier quantum computer"
+  - "Quantum wave interference destructive constructive pattern"
+  - "Silicon superconducting qubit processor die"

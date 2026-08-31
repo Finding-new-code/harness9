@@ -1,0 +1,1627 @@
+{
+  "schema_version": "1.0.0",
+  "total_duration": 80.008,
+  "total_words": 146,
+  "scenes": [
+    {
+      "scene_id": "scene_1",
+      "start": 0.0,
+      "end": 20.002,
+      "duration": 20.002,
+      "text": "The Genesis of CRISPR-Cas9 Precision Molecular Scissors. Every great technological revolution starts with a challenge. For CRISPR-Cas9 Precision Molecular Scissors, it began with a daring new approach. The foundational principles of CRISPR-Cas9 Precision Molecular Scissors were established through seminal experimental breakthroughs and early theoretical formulations.",
+      "word_count": 45,
+      "groups": [
+        {
+          "text": "The Genesis of",
+          "start": 0.0,
+          "end": 0.769,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "CRISPR-Cas9 Precision Molecular",
+          "start": 0.769,
+          "end": 2.434,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Scissors. Every great",
+          "start": 2.434,
+          "end": 3.705,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "technological revolution starts",
+          "start": 3.705,
+          "end": 5.479,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "with a challenge.",
+          "start": 5.479,
+          "end": 6.468,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "For CRISPR-Cas9 Precision",
+          "start": 6.468,
+          "end": 7.709,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Molecular Scissors, it",
+          "start": 7.709,
+          "end": 8.933,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "began with a",
+          "start": 8.933,
+          "end": 9.561,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "daring new approach.",
+          "start": 9.561,
+          "end": 10.723,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "The foundational principles",
+          "start": 10.723,
+          "end": 12.293,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "of CRISPR-Cas9 Precision",
+          "start": 12.293,
+          "end": 13.502,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Molecular Scissors were",
+          "start": 13.502,
+          "end": 14.79,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "established through seminal",
+          "start": 14.79,
+          "end": 16.281,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "experimental breakthroughs and",
+          "start": 16.281,
+          "end": 17.945,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "early theoretical formulations.",
+          "start": 17.945,
+          "end": 20.002,
+          "scene_id": "scene_1",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_2",
+      "start": 20.002,
+      "end": 40.004,
+      "duration": 20.002,
+      "text": "The Architecture of CRISPR-Cas9 Precision Molecular Scissors. Behind its outward simplicity lies an intricate system designed for precision, speed, and continuous scaling. At its functional core, CRISPR-Cas9 Precision Molecular Scissors operates by transforming input energy or signals through structured physical and algorithmic mechanisms.",
+      "word_count": 43,
+      "groups": [
+        {
+          "text": "The Architecture of",
+          "start": 20.002,
+          "end": 21.185,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "CRISPR-Cas9 Precision Molecular",
+          "start": 21.185,
+          "end": 23.001,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Scissors. Behind its",
+          "start": 23.001,
+          "end": 24.184,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "outward simplicity lies",
+          "start": 24.184,
+          "end": 25.675,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "an intricate system",
+          "start": 25.675,
+          "end": 26.858,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "designed for precision,",
+          "start": 26.858,
+          "end": 28.315,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "speed, and continuous",
+          "start": 28.315,
+          "end": 29.703,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "scaling. At its",
+          "start": 29.703,
+          "end": 30.629,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "functional core, CRISPR-Cas9",
+          "start": 30.629,
+          "end": 32.223,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Precision Molecular Scissors",
+          "start": 32.223,
+          "end": 33.971,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "operates by transforming",
+          "start": 33.971,
+          "end": 35.411,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "input energy or",
+          "start": 35.411,
+          "end": 36.37,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "signals through structured",
+          "start": 36.37,
+          "end": 37.793,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "physical and algorithmic",
+          "start": 37.793,
+          "end": 39.233,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "mechanisms.",
+          "start": 39.233,
+          "end": 40.004,
+          "scene_id": "scene_2",
+          "word_count": 1
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_3",
+      "start": 40.004,
+      "end": 60.006,
+      "duration": 20.002,
+      "text": "Transforming the Modern World. Today, CRISPR-Cas9 Precision Molecular Scissors quietly powers the systems we rely on daily, laying the groundwork for tomorrow's breakthroughs. Today, CRISPR-Cas9 Precision Molecular Scissors serves as a critical technological pillar across modern computing, manufacturing, and global digital infrastructure.",
+      "word_count": 42,
+      "groups": [
+        {
+          "text": "Transforming the Modern",
+          "start": 40.004,
+          "end": 41.25,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "World. Today, CRISPR-Cas9",
+          "start": 41.25,
+          "end": 42.721,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Precision Molecular Scissors",
+          "start": 42.721,
+          "end": 44.486,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "quietly powers the",
+          "start": 44.486,
+          "end": 45.645,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "systems we rely",
+          "start": 45.645,
+          "end": 46.527,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "on daily, laying",
+          "start": 46.527,
+          "end": 47.669,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "the groundwork for",
+          "start": 47.669,
+          "end": 48.655,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "tomorrow's breakthroughs. Today,",
+          "start": 48.655,
+          "end": 50.715,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "CRISPR-Cas9 Precision Molecular",
+          "start": 50.715,
+          "end": 52.549,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Scissors serves as",
+          "start": 52.549,
+          "end": 53.535,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "a critical technological",
+          "start": 53.535,
+          "end": 55.075,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "pillar across modern",
+          "start": 55.075,
+          "end": 56.217,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "computing, manufacturing, and",
+          "start": 56.217,
+          "end": 58.034,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "global digital infrastructure.",
+          "start": 58.034,
+          "end": 60.006,
+          "scene_id": "scene_3",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_4",
+      "start": 60.006,
+      "end": 80.008,
+      "duration": 20.002,
+      "text": "Looking forward, CRISPR-Cas9 Precision Molecular Scissors continues to accelerate innovations across modern research and engineering domains.",
+      "word_count": 16,
+      "groups": [
+        {
+          "text": "Looking forward, CRISPR-Cas9",
+          "start": 60.006,
+          "end": 63.519,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "Precision Molecular Scissors",
+          "start": 63.519,
+          "end": 67.592,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "continues to accelerate",
+          "start": 67.592,
+          "end": 71.265,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "innovations across modern",
+          "start": 71.265,
+          "end": 74.898,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "research and engineering",
+          "start": 74.898,
+          "end": 78.451,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "domains.",
+          "start": 78.451,
+          "end": 80.008,
+          "scene_id": "scene_4",
+          "word_count": 1
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "text": "The Genesis of",
+      "start": 0.0,
+      "end": 0.769,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "CRISPR-Cas9 Precision Molecular",
+      "start": 0.769,
+      "end": 2.434,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Scissors. Every great",
+      "start": 2.434,
+      "end": 3.705,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "technological revolution starts",
+      "start": 3.705,
+      "end": 5.479,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "with a challenge.",
+      "start": 5.479,
+      "end": 6.468,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "For CRISPR-Cas9 Precision",
+      "start": 6.468,
+      "end": 7.709,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Molecular Scissors, it",
+      "start": 7.709,
+      "end": 8.933,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "began with a",
+      "start": 8.933,
+      "end": 9.561,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "daring new approach.",
+      "start": 9.561,
+      "end": 10.723,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "The foundational principles",
+      "start": 10.723,
+      "end": 12.293,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "of CRISPR-Cas9 Precision",
+      "start": 12.293,
+      "end": 13.502,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Molecular Scissors were",
+      "start": 13.502,
+      "end": 14.79,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "established through seminal",
+      "start": 14.79,
+      "end": 16.281,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "experimental breakthroughs and",
+      "start": 16.281,
+      "end": 17.945,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "early theoretical formulations.",
+      "start": 17.945,
+      "end": 20.002,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "The Architecture of",
+      "start": 20.002,
+      "end": 21.185,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "CRISPR-Cas9 Precision Molecular",
+      "start": 21.185,
+      "end": 23.001,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Scissors. Behind its",
+      "start": 23.001,
+      "end": 24.184,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "outward simplicity lies",
+      "start": 24.184,
+      "end": 25.675,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "an intricate system",
+      "start": 25.675,
+      "end": 26.858,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "designed for precision,",
+      "start": 26.858,
+      "end": 28.315,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "speed, and continuous",
+      "start": 28.315,
+      "end": 29.703,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "scaling. At its",
+      "start": 29.703,
+      "end": 30.629,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "functional core, CRISPR-Cas9",
+      "start": 30.629,
+      "end": 32.223,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Precision Molecular Scissors",
+      "start": 32.223,
+      "end": 33.971,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "operates by transforming",
+      "start": 33.971,
+      "end": 35.411,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "input energy or",
+      "start": 35.411,
+      "end": 36.37,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "signals through structured",
+      "start": 36.37,
+      "end": 37.793,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "physical and algorithmic",
+      "start": 37.793,
+      "end": 39.233,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "mechanisms.",
+      "start": 39.233,
+      "end": 40.004,
+      "scene_id": "scene_2",
+      "word_count": 1
+    },
+    {
+      "text": "Transforming the Modern",
+      "start": 40.004,
+      "end": 41.25,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "World. Today, CRISPR-Cas9",
+      "start": 41.25,
+      "end": 42.721,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Precision Molecular Scissors",
+      "start": 42.721,
+      "end": 44.486,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "quietly powers the",
+      "start": 44.486,
+      "end": 45.645,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "systems we rely",
+      "start": 45.645,
+      "end": 46.527,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "on daily, laying",
+      "start": 46.527,
+      "end": 47.669,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "the groundwork for",
+      "start": 47.669,
+      "end": 48.655,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "tomorrow's breakthroughs. Today,",
+      "start": 48.655,
+      "end": 50.715,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "CRISPR-Cas9 Precision Molecular",
+      "start": 50.715,
+      "end": 52.549,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Scissors serves as",
+      "start": 52.549,
+      "end": 53.535,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "a critical technological",
+      "start": 53.535,
+      "end": 55.075,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "pillar across modern",
+      "start": 55.075,
+      "end": 56.217,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "computing, manufacturing, and",
+      "start": 56.217,
+      "end": 58.034,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "global digital infrastructure.",
+      "start": 58.034,
+      "end": 60.006,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Looking forward, CRISPR-Cas9",
+      "start": 60.006,
+      "end": 63.519,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "Precision Molecular Scissors",
+      "start": 63.519,
+      "end": 67.592,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "continues to accelerate",
+      "start": 67.592,
+      "end": 71.265,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "innovations across modern",
+      "start": 71.265,
+      "end": 74.898,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "research and engineering",
+      "start": 74.898,
+      "end": 78.451,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "domains.",
+      "start": 78.451,
+      "end": 80.008,
+      "scene_id": "scene_4",
+      "word_count": 1
+    }
+  ],
+  "words": [
+    {
+      "word": "The",
+      "start": 0.0,
+      "end": 0.173,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Genesis",
+      "start": 0.173,
+      "end": 0.628,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 0.628,
+      "end": 0.769,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 0.769,
+      "end": 1.24,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Precision",
+      "start": 1.24,
+      "end": 1.837,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Molecular",
+      "start": 1.837,
+      "end": 2.434,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Scissors.",
+      "start": 2.434,
+      "end": 2.999,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Every",
+      "start": 2.999,
+      "end": 3.391,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "great",
+      "start": 3.391,
+      "end": 3.705,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "technological",
+      "start": 3.705,
+      "end": 4.506,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "revolution",
+      "start": 4.506,
+      "end": 5.212,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "starts",
+      "start": 5.212,
+      "end": 5.479,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "with",
+      "start": 5.479,
+      "end": 5.683,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 5.683,
+      "end": 5.793,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "challenge.",
+      "start": 5.793,
+      "end": 6.468,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "For",
+      "start": 6.468,
+      "end": 6.641,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 6.641,
+      "end": 7.112,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Precision",
+      "start": 7.112,
+      "end": 7.709,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Molecular",
+      "start": 7.709,
+      "end": 8.305,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Scissors,",
+      "start": 8.305,
+      "end": 8.792,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "it",
+      "start": 8.792,
+      "end": 8.933,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "began",
+      "start": 8.933,
+      "end": 9.247,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "with",
+      "start": 9.247,
+      "end": 9.452,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 9.452,
+      "end": 9.561,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "daring",
+      "start": 9.561,
+      "end": 9.907,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "new",
+      "start": 9.907,
+      "end": 10.08,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "approach.",
+      "start": 10.08,
+      "end": 10.723,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 10.723,
+      "end": 10.896,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "foundational",
+      "start": 10.896,
+      "end": 11.744,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "principles",
+      "start": 11.744,
+      "end": 12.293,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 12.293,
+      "end": 12.435,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 12.435,
+      "end": 12.906,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Precision",
+      "start": 12.906,
+      "end": 13.502,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Molecular",
+      "start": 13.502,
+      "end": 14.099,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Scissors",
+      "start": 14.099,
+      "end": 14.507,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "were",
+      "start": 14.507,
+      "end": 14.79,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "established",
+      "start": 14.79,
+      "end": 15.449,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "through",
+      "start": 15.449,
+      "end": 15.826,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "seminal",
+      "start": 15.826,
+      "end": 16.281,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "experimental",
+      "start": 16.281,
+      "end": 17.05,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "breakthroughs",
+      "start": 17.05,
+      "end": 17.773,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 17.773,
+      "end": 17.945,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "early",
+      "start": 17.945,
+      "end": 18.338,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "theoretical",
+      "start": 18.338,
+      "end": 19.076,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "formulations.",
+      "start": 19.076,
+      "end": 20.002,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 20.002,
+      "end": 20.191,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Architecture",
+      "start": 20.191,
+      "end": 21.03,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "of",
+      "start": 21.03,
+      "end": 21.185,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 21.185,
+      "end": 21.699,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Precision",
+      "start": 21.699,
+      "end": 22.35,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Molecular",
+      "start": 22.35,
+      "end": 23.001,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Scissors.",
+      "start": 23.001,
+      "end": 23.619,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Behind",
+      "start": 23.619,
+      "end": 23.996,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "its",
+      "start": 23.996,
+      "end": 24.184,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "outward",
+      "start": 24.184,
+      "end": 24.681,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "simplicity",
+      "start": 24.681,
+      "end": 25.367,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "lies",
+      "start": 25.367,
+      "end": 25.675,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "an",
+      "start": 25.675,
+      "end": 25.83,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "intricate",
+      "start": 25.83,
+      "end": 26.481,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "system",
+      "start": 26.481,
+      "end": 26.858,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "designed",
+      "start": 26.858,
+      "end": 27.389,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "for",
+      "start": 27.389,
+      "end": 27.578,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "precision,",
+      "start": 27.578,
+      "end": 28.315,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "speed,",
+      "start": 28.315,
+      "end": 28.743,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 28.743,
+      "end": 28.932,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "continuous",
+      "start": 28.932,
+      "end": 29.703,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "scaling.",
+      "start": 29.703,
+      "end": 30.286,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "At",
+      "start": 30.286,
+      "end": 30.44,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "its",
+      "start": 30.44,
+      "end": 30.629,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "functional",
+      "start": 30.629,
+      "end": 31.314,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "core,",
+      "start": 31.314,
+      "end": 31.708,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 31.708,
+      "end": 32.223,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Precision",
+      "start": 32.223,
+      "end": 32.874,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Molecular",
+      "start": 32.874,
+      "end": 33.525,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Scissors",
+      "start": 33.525,
+      "end": 33.971,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "operates",
+      "start": 33.971,
+      "end": 34.588,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "by",
+      "start": 34.588,
+      "end": 34.742,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "transforming",
+      "start": 34.742,
+      "end": 35.411,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "input",
+      "start": 35.411,
+      "end": 35.753,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "energy",
+      "start": 35.753,
+      "end": 36.216,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "or",
+      "start": 36.216,
+      "end": 36.37,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "signals",
+      "start": 36.37,
+      "end": 36.782,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "through",
+      "start": 36.782,
+      "end": 37.193,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "structured",
+      "start": 37.193,
+      "end": 37.793,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "physical",
+      "start": 37.793,
+      "end": 38.324,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 38.324,
+      "end": 38.513,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "algorithmic",
+      "start": 38.513,
+      "end": 39.233,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "mechanisms.",
+      "start": 39.233,
+      "end": 40.004,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Transforming",
+      "start": 40.004,
+      "end": 40.679,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 40.679,
+      "end": 40.869,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Modern",
+      "start": 40.869,
+      "end": 41.25,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "World.",
+      "start": 41.25,
+      "end": 41.682,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Today,",
+      "start": 41.682,
+      "end": 42.202,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 42.202,
+      "end": 42.721,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Precision",
+      "start": 42.721,
+      "end": 43.378,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Molecular",
+      "start": 43.378,
+      "end": 44.036,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Scissors",
+      "start": 44.036,
+      "end": 44.486,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "quietly",
+      "start": 44.486,
+      "end": 45.074,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "powers",
+      "start": 45.074,
+      "end": 45.454,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 45.454,
+      "end": 45.645,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "systems",
+      "start": 45.645,
+      "end": 46.06,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "we",
+      "start": 46.06,
+      "end": 46.216,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "rely",
+      "start": 46.216,
+      "end": 46.527,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "on",
+      "start": 46.527,
+      "end": 46.683,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "daily,",
+      "start": 46.683,
+      "end": 47.202,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "laying",
+      "start": 47.202,
+      "end": 47.669,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 47.669,
+      "end": 47.86,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "groundwork",
+      "start": 47.86,
+      "end": 48.465,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "for",
+      "start": 48.465,
+      "end": 48.655,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "tomorrow's",
+      "start": 48.655,
+      "end": 49.226,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "breakthroughs.",
+      "start": 49.226,
+      "end": 50.195,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Today,",
+      "start": 50.195,
+      "end": 50.715,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 50.715,
+      "end": 51.234,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Precision",
+      "start": 51.234,
+      "end": 51.891,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Molecular",
+      "start": 51.891,
+      "end": 52.549,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Scissors",
+      "start": 52.549,
+      "end": 52.998,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "serves",
+      "start": 52.998,
+      "end": 53.379,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "as",
+      "start": 53.379,
+      "end": 53.535,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "a",
+      "start": 53.535,
+      "end": 53.656,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "critical",
+      "start": 53.656,
+      "end": 54.192,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "technological",
+      "start": 54.192,
+      "end": 55.075,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "pillar",
+      "start": 55.075,
+      "end": 55.455,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "across",
+      "start": 55.455,
+      "end": 55.836,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "modern",
+      "start": 55.836,
+      "end": 56.217,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "computing,",
+      "start": 56.217,
+      "end": 56.874,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "manufacturing,",
+      "start": 56.874,
+      "end": 57.843,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "and",
+      "start": 57.843,
+      "end": 58.034,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "global",
+      "start": 58.034,
+      "end": 58.414,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "digital",
+      "start": 58.414,
+      "end": 58.916,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "infrastructure.",
+      "start": 58.916,
+      "end": 60.006,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Looking",
+      "start": 60.006,
+      "end": 61.164,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "forward,",
+      "start": 61.164,
+      "end": 62.322,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "CRISPR-Cas9",
+      "start": 62.322,
+      "end": 63.519,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Precision",
+      "start": 63.519,
+      "end": 65.037,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Molecular",
+      "start": 65.037,
+      "end": 66.554,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Scissors",
+      "start": 66.554,
+      "end": 67.592,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "continues",
+      "start": 67.592,
+      "end": 69.109,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "to",
+      "start": 69.109,
+      "end": 69.468,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "accelerate",
+      "start": 69.468,
+      "end": 71.265,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "innovations",
+      "start": 71.265,
+      "end": 73.141,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "across",
+      "start": 73.141,
+      "end": 74.02,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "modern",
+      "start": 74.02,
+      "end": 74.898,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "research",
+      "start": 74.898,
+      "end": 76.136,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "and",
+      "start": 76.136,
+      "end": 76.575,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "engineering",
+      "start": 76.575,
+      "end": 78.451,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "domains.",
+      "start": 78.451,
+      "end": 80.008,
+      "scene_id": "scene_4"
+    }
+  ]
+}

@@ -1,0 +1,1645 @@
+{
+  "schema_version": "1.0.0",
+  "total_duration": 77.42,
+  "total_words": 149,
+  "scenes": [
+    {
+      "scene_id": "scene_1",
+      "start": 0.0,
+      "end": 19.355,
+      "duration": 19.355,
+      "text": "The Chef vs. The Assembly Line. If a CPU is a master chef preparing one complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping vegetables at once. A central processing unit (CPU) typically possesses between 8 and 64 high-speed cores designed for complex branching logic and low latency.",
+      "word_count": 54,
+      "groups": [
+        {
+          "text": "The Chef vs.",
+          "start": 0.0,
+          "end": 0.813,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "The Assembly Line.",
+          "start": 0.813,
+          "end": 2.136,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "If a CPU",
+          "start": 2.136,
+          "end": 2.646,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "is a master",
+          "start": 2.646,
+          "end": 3.364,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "chef preparing one",
+          "start": 3.364,
+          "end": 4.536,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "complex dish at",
+          "start": 4.536,
+          "end": 5.406,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "lighting speed, a",
+          "start": 5.406,
+          "end": 6.502,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "GPU is a",
+          "start": 6.502,
+          "end": 7.012,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "factory of ten",
+          "start": 7.012,
+          "end": 7.939,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "thousand cooks chopping",
+          "start": 7.939,
+          "end": 9.394,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "vegetables at once.",
+          "start": 9.394,
+          "end": 10.849,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "A central processing",
+          "start": 10.849,
+          "end": 12.097,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "unit (CPU) typically",
+          "start": 12.097,
+          "end": 13.363,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "possesses between 8",
+          "start": 13.363,
+          "end": 14.667,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "and 64 high-speed",
+          "start": 14.667,
+          "end": 15.669,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "cores designed for",
+          "start": 15.669,
+          "end": 16.841,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "complex branching logic",
+          "start": 16.841,
+          "end": 18.202,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "and low latency.",
+          "start": 18.202,
+          "end": 19.355,
+          "scene_id": "scene_1",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_2",
+      "start": 19.355,
+      "end": 38.71,
+      "duration": 19.355,
+      "text": "The Power of SIMD Parallelism. Originally designed to render 3D video game polygons, GPUs process massive arrays of pixels with a single broadcast instruction. Modern flagship GPUs feature over 16,000 arithmetic logic units (ALUs) executing parallel mathematical operations across high-bandwidth memory.",
+      "word_count": 41,
+      "groups": [
+        {
+          "text": "The Power of",
+          "start": 19.355,
+          "end": 20.099,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "SIMD Parallelism. Originally",
+          "start": 20.099,
+          "end": 22.147,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "designed to render",
+          "start": 22.147,
+          "end": 23.3,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "3D video game",
+          "start": 23.3,
+          "end": 24.268,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "polygons, GPUs process",
+          "start": 24.268,
+          "end": 25.627,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "massive arrays of",
+          "start": 25.627,
+          "end": 26.836,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "pixels with a",
+          "start": 26.836,
+          "end": 27.618,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "single broadcast instruction.",
+          "start": 27.618,
+          "end": 29.609,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Modern flagship GPUs",
+          "start": 29.609,
+          "end": 30.745,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "feature over 16,000",
+          "start": 30.745,
+          "end": 31.992,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "arithmetic logic units",
+          "start": 31.992,
+          "end": 33.48,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "(ALUs) executing parallel",
+          "start": 33.48,
+          "end": 35.099,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "mathematical operations across",
+          "start": 35.099,
+          "end": 37.258,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "high-bandwidth memory.",
+          "start": 37.258,
+          "end": 38.71,
+          "scene_id": "scene_2",
+          "word_count": 2
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_3",
+      "start": 38.71,
+      "end": 58.065,
+      "duration": 19.355,
+      "text": "Fueling the AI Revolution. Because artificial intelligence calculations are essentially giant matrix multiplications, GPUs became the turbo-engine of modern deep learning. Matrix multiplication in neural networks maps directly to GPU tensor architectures, enabling trillion-parameter AI models to train efficiently.",
+      "word_count": 39,
+      "groups": [
+        {
+          "text": "Fueling the AI",
+          "start": 38.71,
+          "end": 39.619,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Revolution. Because artificial",
+          "start": 39.619,
+          "end": 41.874,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "intelligence calculations are",
+          "start": 41.874,
+          "end": 43.793,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "essentially giant matrix",
+          "start": 43.793,
+          "end": 45.291,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "multiplications, GPUs became",
+          "start": 45.291,
+          "end": 47.058,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "the turbo-engine of",
+          "start": 47.058,
+          "end": 48.185,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "modern deep learning.",
+          "start": 48.185,
+          "end": 49.549,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Matrix multiplication in",
+          "start": 49.549,
+          "end": 51.047,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "neural networks maps",
+          "start": 51.047,
+          "end": 52.157,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "directly to GPU",
+          "start": 52.157,
+          "end": 53.016,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "tensor architectures, enabling",
+          "start": 53.016,
+          "end": 54.85,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "trillion-parameter AI models",
+          "start": 54.85,
+          "end": 56.617,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "to train efficiently.",
+          "start": 56.617,
+          "end": 58.065,
+          "scene_id": "scene_3",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_4",
+      "start": 58.065,
+      "end": 77.42,
+      "duration": 19.355,
+      "text": "Looking forward, How GPUs Work continues to accelerate innovations across modern research and engineering domains.",
+      "word_count": 15,
+      "groups": [
+        {
+          "text": "Looking forward, How",
+          "start": 58.065,
+          "end": 61.354,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "GPUs Work continues",
+          "start": 61.354,
+          "end": 64.405,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "to accelerate innovations",
+          "start": 64.405,
+          "end": 69.22,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "across modern research",
+          "start": 69.22,
+          "end": 72.796,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "and engineering domains.",
+          "start": 72.796,
+          "end": 77.42,
+          "scene_id": "scene_4",
+          "word_count": 3
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "text": "The Chef vs.",
+      "start": 0.0,
+      "end": 0.813,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "The Assembly Line.",
+      "start": 0.813,
+      "end": 2.136,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "If a CPU",
+      "start": 2.136,
+      "end": 2.646,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "is a master",
+      "start": 2.646,
+      "end": 3.364,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "chef preparing one",
+      "start": 3.364,
+      "end": 4.536,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "complex dish at",
+      "start": 4.536,
+      "end": 5.406,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "lighting speed, a",
+      "start": 5.406,
+      "end": 6.502,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "GPU is a",
+      "start": 6.502,
+      "end": 7.012,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "factory of ten",
+      "start": 7.012,
+      "end": 7.939,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "thousand cooks chopping",
+      "start": 7.939,
+      "end": 9.394,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "vegetables at once.",
+      "start": 9.394,
+      "end": 10.849,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "A central processing",
+      "start": 10.849,
+      "end": 12.097,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "unit (CPU) typically",
+      "start": 12.097,
+      "end": 13.363,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "possesses between 8",
+      "start": 13.363,
+      "end": 14.667,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "and 64 high-speed",
+      "start": 14.667,
+      "end": 15.669,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "cores designed for",
+      "start": 15.669,
+      "end": 16.841,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "complex branching logic",
+      "start": 16.841,
+      "end": 18.202,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "and low latency.",
+      "start": 18.202,
+      "end": 19.355,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "The Power of",
+      "start": 19.355,
+      "end": 20.099,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "SIMD Parallelism. Originally",
+      "start": 20.099,
+      "end": 22.147,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "designed to render",
+      "start": 22.147,
+      "end": 23.3,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "3D video game",
+      "start": 23.3,
+      "end": 24.268,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "polygons, GPUs process",
+      "start": 24.268,
+      "end": 25.627,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "massive arrays of",
+      "start": 25.627,
+      "end": 26.836,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "pixels with a",
+      "start": 26.836,
+      "end": 27.618,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "single broadcast instruction.",
+      "start": 27.618,
+      "end": 29.609,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Modern flagship GPUs",
+      "start": 29.609,
+      "end": 30.745,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "feature over 16,000",
+      "start": 30.745,
+      "end": 31.992,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "arithmetic logic units",
+      "start": 31.992,
+      "end": 33.48,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "(ALUs) executing parallel",
+      "start": 33.48,
+      "end": 35.099,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "mathematical operations across",
+      "start": 35.099,
+      "end": 37.258,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "high-bandwidth memory.",
+      "start": 37.258,
+      "end": 38.71,
+      "scene_id": "scene_2",
+      "word_count": 2
+    },
+    {
+      "text": "Fueling the AI",
+      "start": 38.71,
+      "end": 39.619,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Revolution. Because artificial",
+      "start": 39.619,
+      "end": 41.874,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "intelligence calculations are",
+      "start": 41.874,
+      "end": 43.793,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "essentially giant matrix",
+      "start": 43.793,
+      "end": 45.291,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "multiplications, GPUs became",
+      "start": 45.291,
+      "end": 47.058,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "the turbo-engine of",
+      "start": 47.058,
+      "end": 48.185,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "modern deep learning.",
+      "start": 48.185,
+      "end": 49.549,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Matrix multiplication in",
+      "start": 49.549,
+      "end": 51.047,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "neural networks maps",
+      "start": 51.047,
+      "end": 52.157,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "directly to GPU",
+      "start": 52.157,
+      "end": 53.016,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "tensor architectures, enabling",
+      "start": 53.016,
+      "end": 54.85,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "trillion-parameter AI models",
+      "start": 54.85,
+      "end": 56.617,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "to train efficiently.",
+      "start": 56.617,
+      "end": 58.065,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Looking forward, How",
+      "start": 58.065,
+      "end": 61.354,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "GPUs Work continues",
+      "start": 61.354,
+      "end": 64.405,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "to accelerate innovations",
+      "start": 64.405,
+      "end": 69.22,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "across modern research",
+      "start": 69.22,
+      "end": 72.796,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "and engineering domains.",
+      "start": 72.796,
+      "end": 77.42,
+      "scene_id": "scene_4",
+      "word_count": 3
+    }
+  ],
+  "words": [
+    {
+      "word": "The",
+      "start": 0.0,
+      "end": 0.208,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Chef",
+      "start": 0.208,
+      "end": 0.454,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "vs.",
+      "start": 0.454,
+      "end": 0.813,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 0.813,
+      "end": 1.021,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Assembly",
+      "start": 1.021,
+      "end": 1.607,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Line.",
+      "start": 1.607,
+      "end": 2.136,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "If",
+      "start": 2.136,
+      "end": 2.306,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 2.306,
+      "end": 2.438,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "CPU",
+      "start": 2.438,
+      "end": 2.646,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "is",
+      "start": 2.646,
+      "end": 2.816,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 2.816,
+      "end": 2.949,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "master",
+      "start": 2.949,
+      "end": 3.364,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "chef",
+      "start": 3.364,
+      "end": 3.61,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "preparing",
+      "start": 3.61,
+      "end": 4.234,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "one",
+      "start": 4.234,
+      "end": 4.536,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "complex",
+      "start": 4.536,
+      "end": 4.99,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "dish",
+      "start": 4.99,
+      "end": 5.236,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "at",
+      "start": 5.236,
+      "end": 5.406,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "lighting",
+      "start": 5.406,
+      "end": 5.897,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "speed,",
+      "start": 5.897,
+      "end": 6.37,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 6.37,
+      "end": 6.502,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "GPU",
+      "start": 6.502,
+      "end": 6.71,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "is",
+      "start": 6.71,
+      "end": 6.88,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 6.88,
+      "end": 7.012,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "factory",
+      "start": 7.012,
+      "end": 7.561,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 7.561,
+      "end": 7.731,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "ten",
+      "start": 7.731,
+      "end": 7.939,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "thousand",
+      "start": 7.939,
+      "end": 8.524,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "cooks",
+      "start": 8.524,
+      "end": 8.903,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "chopping",
+      "start": 8.903,
+      "end": 9.394,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "vegetables",
+      "start": 9.394,
+      "end": 10.15,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "at",
+      "start": 10.15,
+      "end": 10.32,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "once.",
+      "start": 10.32,
+      "end": 10.849,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "A",
+      "start": 10.849,
+      "end": 10.982,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "central",
+      "start": 10.982,
+      "end": 11.435,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "processing",
+      "start": 11.435,
+      "end": 12.097,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "unit",
+      "start": 12.097,
+      "end": 12.437,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "(CPU)",
+      "start": 12.437,
+      "end": 12.645,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "typically",
+      "start": 12.645,
+      "end": 13.363,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "possesses",
+      "start": 13.363,
+      "end": 13.987,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "between",
+      "start": 13.987,
+      "end": 14.535,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "8",
+      "start": 14.535,
+      "end": 14.667,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 14.667,
+      "end": 14.875,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "64",
+      "start": 14.875,
+      "end": 15.045,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "high-speed",
+      "start": 15.045,
+      "end": 15.669,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "cores",
+      "start": 15.669,
+      "end": 16.047,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "designed",
+      "start": 16.047,
+      "end": 16.633,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "for",
+      "start": 16.633,
+      "end": 16.841,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "complex",
+      "start": 16.841,
+      "end": 17.295,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "branching",
+      "start": 17.295,
+      "end": 17.824,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "logic",
+      "start": 17.824,
+      "end": 18.202,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 18.202,
+      "end": 18.41,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "low",
+      "start": 18.41,
+      "end": 18.618,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "latency.",
+      "start": 18.618,
+      "end": 19.355,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 19.355,
+      "end": 19.56,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Power",
+      "start": 19.56,
+      "end": 19.932,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "of",
+      "start": 19.932,
+      "end": 20.099,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "SIMD",
+      "start": 20.099,
+      "end": 20.341,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Parallelism.",
+      "start": 20.341,
+      "end": 21.309,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Originally",
+      "start": 21.309,
+      "end": 22.147,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "designed",
+      "start": 22.147,
+      "end": 22.723,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "to",
+      "start": 22.723,
+      "end": 22.891,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "render",
+      "start": 22.891,
+      "end": 23.3,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "3D",
+      "start": 23.3,
+      "end": 23.468,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "video",
+      "start": 23.468,
+      "end": 23.933,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "game",
+      "start": 23.933,
+      "end": 24.268,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "polygons,",
+      "start": 24.268,
+      "end": 24.938,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "GPUs",
+      "start": 24.938,
+      "end": 25.18,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "process",
+      "start": 25.18,
+      "end": 25.627,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "massive",
+      "start": 25.627,
+      "end": 26.166,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "arrays",
+      "start": 26.166,
+      "end": 26.669,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "of",
+      "start": 26.669,
+      "end": 26.836,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "pixels",
+      "start": 26.836,
+      "end": 27.246,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "with",
+      "start": 27.246,
+      "end": 27.488,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "a",
+      "start": 27.488,
+      "end": 27.618,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "single",
+      "start": 27.618,
+      "end": 28.027,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "broadcast",
+      "start": 28.027,
+      "end": 28.642,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "instruction.",
+      "start": 28.642,
+      "end": 29.609,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Modern",
+      "start": 29.609,
+      "end": 30.019,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "flagship",
+      "start": 30.019,
+      "end": 30.503,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "GPUs",
+      "start": 30.503,
+      "end": 30.745,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "feature",
+      "start": 30.745,
+      "end": 31.377,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "over",
+      "start": 31.377,
+      "end": 31.712,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "16,000",
+      "start": 31.712,
+      "end": 31.992,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "arithmetic",
+      "start": 31.992,
+      "end": 32.736,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "logic",
+      "start": 32.736,
+      "end": 33.108,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "units",
+      "start": 33.108,
+      "end": 33.48,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "(ALUs)",
+      "start": 33.48,
+      "end": 33.815,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "executing",
+      "start": 33.815,
+      "end": 34.523,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "parallel",
+      "start": 34.523,
+      "end": 35.099,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "mathematical",
+      "start": 35.099,
+      "end": 36.011,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "operations",
+      "start": 36.011,
+      "end": 36.849,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "across",
+      "start": 36.849,
+      "end": 37.258,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "high-bandwidth",
+      "start": 37.258,
+      "end": 38.021,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "memory.",
+      "start": 38.021,
+      "end": 38.71,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Fueling",
+      "start": 38.71,
+      "end": 39.198,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 39.198,
+      "end": 39.383,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "AI",
+      "start": 39.383,
+      "end": 39.619,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Revolution.",
+      "start": 39.619,
+      "end": 40.544,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Because",
+      "start": 40.544,
+      "end": 41.117,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "artificial",
+      "start": 41.117,
+      "end": 41.874,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "intelligence",
+      "start": 41.874,
+      "end": 42.699,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "calculations",
+      "start": 42.699,
+      "end": 43.523,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "are",
+      "start": 43.523,
+      "end": 43.793,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "essentially",
+      "start": 43.793,
+      "end": 44.584,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "giant",
+      "start": 44.584,
+      "end": 44.92,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "matrix",
+      "start": 44.92,
+      "end": 45.291,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "multiplications,",
+      "start": 45.291,
+      "end": 46.385,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "GPUs",
+      "start": 46.385,
+      "end": 46.603,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "became",
+      "start": 46.603,
+      "end": 47.058,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 47.058,
+      "end": 47.243,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "turbo-engine",
+      "start": 47.243,
+      "end": 48.034,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "of",
+      "start": 48.034,
+      "end": 48.185,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "modern",
+      "start": 48.185,
+      "end": 48.556,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "deep",
+      "start": 48.556,
+      "end": 48.859,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "learning.",
+      "start": 48.859,
+      "end": 49.549,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Matrix",
+      "start": 49.549,
+      "end": 49.919,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "multiplication",
+      "start": 49.919,
+      "end": 50.895,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "in",
+      "start": 50.895,
+      "end": 51.047,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "neural",
+      "start": 51.047,
+      "end": 51.501,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "networks",
+      "start": 51.501,
+      "end": 51.939,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "maps",
+      "start": 51.939,
+      "end": 52.157,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "directly",
+      "start": 52.157,
+      "end": 52.679,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "to",
+      "start": 52.679,
+      "end": 52.831,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "GPU",
+      "start": 52.831,
+      "end": 53.016,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "tensor",
+      "start": 53.016,
+      "end": 53.386,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "architectures,",
+      "start": 53.386,
+      "end": 54.329,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "enabling",
+      "start": 54.329,
+      "end": 54.85,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "trillion-parameter",
+      "start": 54.85,
+      "end": 56.012,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "AI",
+      "start": 56.012,
+      "end": 56.247,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "models",
+      "start": 56.247,
+      "end": 56.617,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "to",
+      "start": 56.617,
+      "end": 56.769,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "train",
+      "start": 56.769,
+      "end": 57.106,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "efficiently.",
+      "start": 57.106,
+      "end": 58.065,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Looking",
+      "start": 58.065,
+      "end": 59.447,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "forward,",
+      "start": 59.447,
+      "end": 60.83,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "How",
+      "start": 60.83,
+      "end": 61.354,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "GPUs",
+      "start": 61.354,
+      "end": 61.974,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Work",
+      "start": 61.974,
+      "end": 62.594,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "continues",
+      "start": 62.594,
+      "end": 64.405,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "to",
+      "start": 64.405,
+      "end": 64.834,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "accelerate",
+      "start": 64.834,
+      "end": 66.98,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "innovations",
+      "start": 66.98,
+      "end": 69.22,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "across",
+      "start": 69.22,
+      "end": 70.269,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "modern",
+      "start": 70.269,
+      "end": 71.318,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "research",
+      "start": 71.318,
+      "end": 72.796,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "and",
+      "start": 72.796,
+      "end": 73.32,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "engineering",
+      "start": 73.32,
+      "end": 75.561,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "domains.",
+      "start": 75.561,
+      "end": 77.42,
+      "scene_id": "scene_4"
+    }
+  ]
+}

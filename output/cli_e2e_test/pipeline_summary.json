@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "run_1788155548_how_gpus_work",
+  "topic": "How GPUs Work",
+  "start_time": "2026-08-31T05:52:28.795021+00:00",
+  "end_time": "2026-08-31T05:52:45.728799+00:00",
+  "total_duration_seconds": 16.934,
+  "status": "SUCCESS",
+  "output_directory": "G:\\Finding-new-code\\harness9\\output\\cli_e2e_test",
+  "stages": [
+    {
+      "stage_name": "research",
+      "success": true,
+      "execution_time_seconds": 0.02341294288635254,
+      "artifacts": [
+        "research_dossier.json",
+        "research_dossier.yaml"
+      ],
+      "metrics": {
+        "claims_count": 4,
+        "talking_points_count": 3
+      }
+    },
+    {
+      "stage_name": "assets",
+      "success": true,
+      "execution_time_seconds": 0.09560203552246094,
+      "artifacts": [
+        "asset_ledger.json",
+        "asset_ledger.yaml",
+        "assets/images/asset_01_cpu_vs_gpu_architecture_.svg",
+        "assets/images/asset_02_silicon_die_shot_of_mode.svg",
+        "assets/images/asset_03_3d_wireframe_polygon_ren.svg",
+        "assets/images/asset_04_artificial_intelligence_.svg"
+      ],
+      "metrics": {
+        "total_assets": 4,
+        "licenses": {
+          "CC0-1.0 (Public Domain)": 4
+        }
+      }
+    },
+    {
+      "stage_name": "script_voiceover",
+      "success": true,
+      "execution_time_seconds": 4.7003700733184814,
+      "artifacts": [
+        "BRIEF.md",
+        "DESIGN.md",
+        "SCRIPT.md",
+        "STORYBOARD.md",
+        "assets/audio/narration.wav",
+        "assets/transcript.json"
+      ],
+      "metrics": {
+        "scenes_count": 4,
+        "audio_duration": 77.41981859410431,
+        "audio_provider": "windows_sapi"
+      }
+    },
+    {
+      "stage_name": "hyperframes_render",
+      "success": true,
+      "execution_time_seconds": 12.112662553787231,
+      "artifacts": [
+        "index.html",
+        "styles.css",
+        "main.js",
+        "renders/final.mp4"
+      ],
+      "metrics": {
+        "video_duration": 5.0,
+        "video_size_bytes": 214967,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30
+      }
+    }
+  ],
+  "metrics": {
+    "format": "16:9",
+    "target_duration_seconds": 5,
+    "offline_mode": true,
+    "voice": "default"
+  },
+  "final_video_path": "renders/final.mp4"
+}
