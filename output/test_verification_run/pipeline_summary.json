@@ -4,6 +4,6 @@
   "format": "16:9",
   "target_duration_seconds": 30,
   "render_path": "output\\test_verification_run\\renders\\final.mp4",
-  "total_assets": 4,
-  "verified_at": "2026-08-31T05:29:20Z"
+  "total_assets": 3,
+  "verified_at": "2026-08-31T15:48:34Z"
 }

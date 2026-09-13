@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Quantum Hall Effect — HyperFrames Composition</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- GSAP Core & Plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Root Composition Canvas -->
+  <div data-composition-id="root" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+    
+    <!-- Visual Stage Layers -->
+    <div id="stage" class="stage-container">
+    <!-- Scene 1: scene_1 -->
+    <div class="scene" id="scene_1" data-start="0.0" data-duration="3.75">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_01_the_quantum_hall_effect_.svg" alt="The Genesis of The Quantum Hall Effect" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 01 • HARNESS 9</div>
+        <h2 class="scene-title">The Genesis of The Quantum Hall Effect</h2>
+        <p class="scene-narration">The Genesis of The Quantum Hall Effect. Every great technological revolution starts with a challenge. For The Quantum Hall Effect, it began with a daring new approach. The foundational principles of The Quantum Hall Effect were established through seminal experimental breakthroughs and early theoretical formulations.</p>
+      </div>
+    </div>
+    <!-- Scene 2: scene_2 -->
+    <div class="scene" id="scene_2" data-start="3.75" data-duration="3.75">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_02_the_quantum_hall_effect_.svg" alt="The Architecture of The Quantum Hall Effect" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 02 • HARNESS 9</div>
+        <h2 class="scene-title">The Architecture of The Quantum Hall Effect</h2>
+        <p class="scene-narration">The Architecture of The Quantum Hall Effect. Behind its outward simplicity lies an intricate system designed for precision, speed, and continuous scaling. At its functional core, The Quantum Hall Effect operates by transforming input energy or signals through structured physical and algorithmic mechanisms.</p>
+      </div>
+    </div>
+    <!-- Scene 3: scene_3 -->
+    <div class="scene" id="scene_3" data-start="7.5" data-duration="3.75">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_03_the_quantum_hall_effect_.svg" alt="Transforming the Modern World" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 03 • HARNESS 9</div>
+        <h2 class="scene-title">Transforming the Modern World</h2>
+        <p class="scene-narration">Transforming the Modern World. Today, The Quantum Hall Effect quietly powers the systems we rely on daily, laying the groundwork for tomorrow&#x27;s breakthroughs. Today, The Quantum Hall Effect serves as a critical technological pillar across modern computing, manufacturing, and global digital infrastructure.</p>
+      </div>
+    </div>
+    <!-- Scene 4: scene_4 -->
+    <div class="scene" id="scene_4" data-start="11.25" data-duration="3.75">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_04_the_quantum_hall_effect_.svg" alt="Future Horizons &amp; Scale 1" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 04 • HARNESS 9</div>
+        <h2 class="scene-title">Future Horizons &amp; Scale 1</h2>
+        <p class="scene-narration">Looking forward, The Quantum Hall Effect continues to accelerate innovations across modern research and engineering domains.</p>
+      </div>
+    </div>
+    </div>
+
+    <!-- Kinetic Captions Container -->
+    <div id="captions-layer" class="captions-overlay">
+      <div id="caption-box" class="caption-text"></div>
+    </div>
+
+    <!-- Decoupled Audio Narration Track -->
+    <audio id="narration-audio" data-start="0" data-duration="15.0" data-track-index="1" data-volume="1.0" src="assets/audio/narration.wav"></audio>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+{
+  "topic": "The History of the Transistor",
+  "title": "The History of the Transistor: The Definitive Breakdown",
+  "total_duration": 30.0,
+  "full_transcript": "The Vacuum Tube Bottleneck. Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes. Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits. The Miracle at Bell Labs. On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip. The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories. 100 Billion Strong. Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth. By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp. Looking forward, The History of the Transistor continues to accelerate innovations across modern research and engineering domains.",
+  "word_count": 150,
+  "generated_at": "2026-09-04T09:05:16.149213+00:00",
+  "storyboard": {
+    "project_id": "proj_the_history_of_the_transistor",
+    "target_duration": 30.0,
+    "aspect_ratio": "16:9",
+    "scenes": [
+      {
+        "scene_id": "scene_1",
+        "title": "The Vacuum Tube Bottleneck",
+        "start_time": 0.0,
+        "duration": 7.5,
+        "narration_text": "The Vacuum Tube Bottleneck. Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes. Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits.",
+        "visual_asset_path": "assets/images/asset_01_point_contact_transistor.svg",
+        "hero_frame_description": "Hero frame showcasing The Vacuum Tube Bottleneck with backing asset assets/images/asset_01_point_contact_transistor.svg and kinetic typography.",
+        "entrance_animation": "gsap.from('.scene_1 .scene-content', { opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' })",
+        "transition_out": "Seamless push-slide transition to next scene",
+        "beats": [
+          {
+            "beat_id": "beat_1_1",
+            "start_time": 0.0,
+            "end_time": 3.75,
+            "duration": 3.75,
+            "text": "The Vacuum Tube Bottleneck",
+            "visual_cue": "Header entrance for The Vacuum Tube Bottleneck"
+          },
+          {
+            "beat_id": "beat_1_2",
+            "start_time": 3.75,
+            "end_time": 7.5,
+            "duration": 3.75,
+            "text": "The Vacuum Tube Bottleneck. Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes. Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits.",
+            "visual_cue": "Side-by-side comparison diagram of a glowing glass vacuum tube versus a tiny modern semiconductor chip"
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_2",
+        "title": "The Miracle at Bell Labs",
+        "start_time": 7.5,
+        "duration": 7.5,
+        "narration_text": "The Miracle at Bell Labs. On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip. The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories.",
+        "visual_asset_path": "assets/images/asset_01_point_contact_transistor.svg",
+        "hero_frame_description": "Hero frame showcasing The Miracle at Bell Labs with backing asset assets/images/asset_01_point_contact_transistor.svg and kinetic typography.",
+        "entrance_animation": "gsap.from('.scene_2 .scene-content', { opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' })",
+        "transition_out": "Seamless push-slide transition to next scene",
+        "beats": [
+          {
+            "beat_id": "beat_2_1",
+            "start_time": 7.5,
+            "end_time": 11.25,
+            "duration": 3.75,
+            "text": "The Miracle at Bell Labs",
+            "visual_cue": "Header entrance for The Miracle at Bell Labs"
+          },
+          {
+            "beat_id": "beat_2_2",
+            "start_time": 11.25,
+            "end_time": 15.0,
+            "duration": 3.75,
+            "text": "The Miracle at Bell Labs. On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip. The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories.",
+            "visual_cue": "Historical replica photo of the 1947 point-contact transistor with germanium crystal and plastic wedge"
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_3",
+        "title": "100 Billion Strong",
+        "start_time": 15.0,
+        "duration": 7.5,
+        "narration_text": "100 Billion Strong. Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth. By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp.",
+        "visual_asset_path": "assets/images/asset_03_vacuum_tube_vs_transisto.svg",
+        "hero_frame_description": "Hero frame showcasing 100 Billion Strong with backing asset assets/images/asset_03_vacuum_tube_vs_transisto.svg and kinetic typography.",
+        "entrance_animation": "gsap.from('.scene_3 .scene-content', { opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' })",
+        "transition_out": "Seamless push-slide transition to next scene",
+        "beats": [
+          {
+            "beat_id": "beat_3_1",
+            "start_time": 15.0,
+            "end_time": 18.75,
+            "duration": 3.75,
+            "text": "100 Billion Strong",
+            "visual_cue": "Header entrance for 100 Billion Strong"
+          },
+          {
+            "beat_id": "beat_3_2",
+            "start_time": 18.75,
+            "end_time": 22.5,
+            "duration": 3.75,
+            "text": "100 Billion Strong. Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth. By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp.",
+            "visual_cue": "Macro photograph of modern silicon wafer microchip die with iridescent microscopic circuitry"
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_4",
+        "title": "Future Horizons & Scale 1",
+        "start_time": 22.5,
+        "duration": 7.5,
+        "narration_text": "Looking forward, The History of the Transistor continues to accelerate innovations across modern research and engineering domains.",
+        "visual_asset_path": "assets/images/asset_04_modern_silicon_wafer_sem.svg",
+        "hero_frame_description": "Hero frame showcasing 100 Billion Strong with backing asset assets/images/asset_04_modern_silicon_wafer_sem.svg and kinetic typography.",
+        "entrance_animation": "gsap.from('.scene_4 .scene-content', { opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' })",
+        "transition_out": "Final fade out",
+        "beats": [
+          {
+            "beat_id": "beat_4_1",
+            "start_time": 22.5,
+            "end_time": 26.25,
+            "duration": 3.75,
+            "text": "Future Horizons & Scale 1",
+            "visual_cue": "Header entrance for Future Horizons & Scale 1"
+          },
+          {
+            "beat_id": "beat_4_2",
+            "start_time": 26.25,
+            "end_time": 30.0,
+            "duration": 3.75,
+            "text": "Looking forward, The History of the Transistor continues to accelerate innovations across modern research and engineering domains.",
+            "visual_cue": "Visual roadmap and scaling analysis for The History of the Transistor"
+          }
+        ]
+      }
+    ]
+  }
+}

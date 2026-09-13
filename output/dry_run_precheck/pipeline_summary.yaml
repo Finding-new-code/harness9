@@ -1,0 +1,66 @@
+schema_version: 1.0.0
+run_id: run_1789310949_artificial_intel
+topic: Artificial Intelligence
+start_time: '2026-09-13T14:49:09.344893+00:00'
+end_time: '2026-09-13T14:49:15.636792+00:00'
+total_duration_seconds: 6.292
+status: SUCCESS
+output_directory: G:\Finding-new-code\harness9\output\dry_run_precheck
+stages:
+- stage_name: research
+  success: true
+  execution_time_seconds: 0.013763666152954102
+  artifacts:
+  - research_dossier.json
+  - research_dossier.yaml
+  metrics:
+    claims_count: 4
+    talking_points_count: 3
+- stage_name: assets
+  success: true
+  execution_time_seconds: 0.06564760208129883
+  artifacts:
+  - asset_ledger.json
+  - asset_ledger.yaml
+  - assets/images/asset_01_artificial_intelligence_.svg
+  - assets/images/asset_02_artificial_intelligence_.svg
+  - assets/images/asset_03_artificial_intelligence_.svg
+  - assets/images/asset_04_artificial_intelligence_.svg
+  metrics:
+    total_assets: 4
+    licenses:
+      CC0-1.0 (Public Domain): 4
+- stage_name: script_voiceover
+  success: true
+  execution_time_seconds: 4.529118537902832
+  artifacts:
+  - BRIEF.md
+  - DESIGN.md
+  - SCRIPT.md
+  - STORYBOARD.md
+  - assets/audio/narration.wav
+  - assets/transcript.json
+  metrics:
+    scenes_count: 4
+    audio_duration: 70.26489795918367
+    audio_provider: windows_sapi
+- stage_name: hyperframes_render
+  success: true
+  execution_time_seconds: 1.682363510131836
+  artifacts:
+  - index.html
+  - styles.css
+  - main.js
+  - renders/final.mp4
+  metrics:
+    video_duration: 5.0
+    video_size_bytes: 1118406
+    width: 1920
+    height: 1080
+    fps: 30
+metrics:
+  format: '16:9'
+  target_duration_seconds: 5
+  offline_mode: true
+  voice: default
+final_video_path: renders/final.mp4

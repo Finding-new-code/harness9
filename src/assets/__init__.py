@@ -1,5 +1,14 @@
 """src.assets — Milestone 2: Asset Discovery, Rights Ledger & Local Freezing (R2)."""
 
+from src.assets.deduplication import (
+    AssetDeduplicator,
+    DeduplicationResult,
+    compute_bytes_sha256,
+    compute_dhash,
+    compute_dhash_hex,
+    hamming_distance,
+    hamming_distance_hex,
+)
 from src.assets.discovery import (
     AssetDiscoveryEngine,
     CandidateAsset,
@@ -57,4 +66,12 @@ __all__ = [
     "Dimensions",
     "CreatorInfo",
     "LicenseInfo",
+    "AssetDeduplicator",
+    "DeduplicationResult",
+    "compute_bytes_sha256",
+    "compute_dhash",
+    "compute_dhash_hex",
+    "hamming_distance",
+    "hamming_distance_hex",
 ]
+

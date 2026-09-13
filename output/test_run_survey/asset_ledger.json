@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "proj_the_history_of_the_transistor",
+  "generated_at": "2026-09-04T09:05:14.021829+00:00",
+  "total_assets": 4,
+  "license_summary": {
+    "CC0-1.0 (Public Domain)": 4
+  },
+  "assets": [
+    {
+      "asset_id": "asset_01",
+      "claim_id_refs": [
+        "claim_01"
+      ],
+      "scene_target": "scene_1",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_01_point_contact_transistor.svg",
+      "file_size_bytes": 7153,
+      "file_sha256": "5887a02eba100b0af76ab47ef9dbd00d3c0589ad71d6beb142586c29c86d62f8",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_01_point_contact_transistor.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\test_run_survey\\assets\\images\\asset_01_point_contact_transistor.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-04T09:05:14.026830+00:00"
+    },
+    {
+      "asset_id": "asset_02",
+      "claim_id_refs": [
+        "claim_02"
+      ],
+      "scene_target": "scene_2",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_02_bardeen_brattain_shockle.svg",
+      "file_size_bytes": 7152,
+      "file_sha256": "a31a02e01301caf2c67a768c1f10c33593669b78bdc57ba9078283094cdcb8ae",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_02_bardeen_brattain_shockle.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\test_run_survey\\assets\\images\\asset_02_bardeen_brattain_shockle.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-04T09:05:14.527218+00:00"
+    },
+    {
+      "asset_id": "asset_03",
+      "claim_id_refs": [
+        "claim_03"
+      ],
+      "scene_target": "scene_3",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_03_vacuum_tube_vs_transisto.svg",
+      "file_size_bytes": 7142,
+      "file_sha256": "aea68e7dc71d7bd30deae768babedb86ec599488314404b7dc410f13ffac9661",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_03_vacuum_tube_vs_transisto.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\test_run_survey\\assets\\images\\asset_03_vacuum_tube_vs_transisto.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-04T09:05:14.530217+00:00"
+    },
+    {
+      "asset_id": "asset_04",
+      "claim_id_refs": [
+        "claim_04"
+      ],
+      "scene_target": "scene_4",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_04_modern_silicon_wafer_sem.svg",
+      "file_size_bytes": 7150,
+      "file_sha256": "74b1c829ed13802463e96c64f59b7dde2c2716ad846b6e03530440438b0cd50c",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_04_modern_silicon_wafer_sem.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\test_run_survey\\assets\\images\\asset_04_modern_silicon_wafer_sem.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-04T09:05:14.531219+00:00"
+    }
+  ]
+}

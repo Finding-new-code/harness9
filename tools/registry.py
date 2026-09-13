@@ -1333,3 +1333,51 @@ def tool_result(data=None, **kwargs) -> str:
     if data is not None:
         return json.dumps(data, ensure_ascii=False)
     return json.dumps(kwargs, ensure_ascii=False)
+
+
+# ---------------------------------------------------------------------------
+# Harness 9 Content Production Service Gate (Rung 3 Footprint Ladder)
+# ---------------------------------------------------------------------------
+
+_h9_availability_override: Optional[bool] = None
+
+
+def set_h9_available(available: Optional[bool]) -> None:
+    """Explicitly override H9 availability (useful for testing and dynamic toggling)."""
+    global _h9_availability_override
+    _h9_availability_override = available
+    invalidate_check_fn_cache()
+
+
+def check_h9_available() -> bool:
+    """Service check function gating the 'h9_content' toolset.
+
+    Adheres to Rung 3 of the Hermes Footprint Ladder: returns True only when
+    H9 content production runtime is enabled/available, ensuring 0 core schema
+    token overhead when inactive.
+    """
+    if _h9_availability_override is not None:
+        return _h9_availability_override
+
+    import os
+    env_flag = os.environ.get("H9_ENABLED", os.environ.get("HERMES_H9_ENABLED", ""))
+    if env_flag:
+        return env_flag.lower() in ("1", "true", "yes", "enabled")
+
+    # Check if H9 runtime package is available
+    try:
+        import src.h9_runtime  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def register_h9_content_tools(reg: Optional[ToolRegistry] = None) -> None:
+    """Register H9 content production tools into the target registry under 'h9_content'."""
+    try:
+        from tools.h9_content_tools import register_tools
+        target = reg or registry
+        register_tools(target)
+    except Exception as exc:
+        logger.debug("Deferred registration of h9_content tools: %s", exc)
+

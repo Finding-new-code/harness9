@@ -1,0 +1,66 @@
+schema_version: 1.0.0
+run_id: run_1788191487_the_quantum_hall
+topic: The Quantum Hall Effect
+start_time: '2026-08-31T15:51:27.053567+00:00'
+end_time: '2026-08-31T15:51:47.022153+00:00'
+total_duration_seconds: 19.969
+status: SUCCESS
+output_directory: G:\Finding-new-code\harness9\output\audit_test_quantum
+stages:
+- stage_name: research
+  success: true
+  execution_time_seconds: 0.15546441078186035
+  artifacts:
+  - research_dossier.json
+  - research_dossier.yaml
+  metrics:
+    claims_count: 4
+    talking_points_count: 3
+- stage_name: assets
+  success: true
+  execution_time_seconds: 0.28191590309143066
+  artifacts:
+  - asset_ledger.json
+  - asset_ledger.yaml
+  - assets/images/asset_01_the_quantum_hall_effect_.svg
+  - assets/images/asset_02_the_quantum_hall_effect_.svg
+  - assets/images/asset_03_the_quantum_hall_effect_.svg
+  - assets/images/asset_04_the_quantum_hall_effect_.svg
+  metrics:
+    total_assets: 4
+    licenses:
+      CC0-1.0 (Public Domain): 4
+- stage_name: script_voiceover
+  success: true
+  execution_time_seconds: 5.142845869064331
+  artifacts:
+  - BRIEF.md
+  - DESIGN.md
+  - SCRIPT.md
+  - STORYBOARD.md
+  - assets/audio/narration.wav
+  - assets/transcript.json
+  metrics:
+    scenes_count: 4
+    audio_duration: 69.2408163265306
+    audio_provider: windows_sapi
+- stage_name: hyperframes_render
+  success: true
+  execution_time_seconds: 14.099202632904053
+  artifacts:
+  - index.html
+  - styles.css
+  - main.js
+  - renders/final.mp4
+  metrics:
+    video_duration: 15.0
+    video_size_bytes: 2392338
+    width: 1920
+    height: 1080
+    fps: 30
+metrics:
+  format: '16:9'
+  target_duration_seconds: 15
+  offline_mode: true
+  voice: default
+final_video_path: renders/final.mp4

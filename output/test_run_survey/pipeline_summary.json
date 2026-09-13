@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "run_1788512712_the_history_of_t",
+  "topic": "The History of the Transistor",
+  "start_time": "2026-09-04T09:05:12.710651+00:00",
+  "end_time": "2026-09-04T09:05:47.348589+00:00",
+  "total_duration_seconds": 34.638,
+  "status": "SUCCESS",
+  "output_directory": "G:\\Finding-new-code\\harness9\\output\\test_run_survey",
+  "stages": [
+    {
+      "stage_name": "research",
+      "success": true,
+      "execution_time_seconds": 0.6343088150024414,
+      "artifacts": [
+        "research_dossier.json",
+        "research_dossier.yaml"
+      ],
+      "metrics": {
+        "claims_count": 4,
+        "talking_points_count": 3
+      }
+    },
+    {
+      "stage_name": "assets",
+      "success": true,
+      "execution_time_seconds": 2.1280224323272705,
+      "artifacts": [
+        "asset_ledger.json",
+        "asset_ledger.yaml",
+        "assets/images/asset_01_point_contact_transistor.svg",
+        "assets/images/asset_02_bardeen_brattain_shockle.svg",
+        "assets/images/asset_03_vacuum_tube_vs_transisto.svg",
+        "assets/images/asset_04_modern_silicon_wafer_sem.svg"
+      ],
+      "metrics": {
+        "total_assets": 4,
+        "licenses": {
+          "CC0-1.0 (Public Domain)": 4
+        }
+      }
+    },
+    {
+      "stage_name": "script_voiceover",
+      "success": true,
+      "execution_time_seconds": 8.979438781738281,
+      "artifacts": [
+        "BRIEF.md",
+        "DESIGN.md",
+        "SCRIPT.md",
+        "STORYBOARD.md",
+        "assets/audio/narration.wav",
+        "assets/transcript.json"
+      ],
+      "metrics": {
+        "scenes_count": 4,
+        "audio_duration": 30.0,
+        "audio_provider": "harmonic_synthesizer"
+      }
+    },
+    {
+      "stage_name": "hyperframes_render",
+      "success": true,
+      "execution_time_seconds": 22.221299409866333,
+      "artifacts": [
+        "index.html",
+        "styles.css",
+        "main.js",
+        "renders/final.mp4"
+      ],
+      "metrics": {
+        "video_duration": 30.0,
+        "video_size_bytes": 4389068,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30
+      }
+    }
+  ],
+  "metrics": {
+    "format": "16:9",
+    "target_duration_seconds": 30,
+    "offline_mode": true,
+    "voice": "default"
+  },
+  "final_video_path": "renders/final.mp4"
+}

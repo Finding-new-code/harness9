@@ -31,8 +31,8 @@ class AssetDownloadError(Exception):
     pass
 
 
-class AssetSizeExceededError(AssetDownloadError):
-    """Raised when asset file size exceeds 25MB limit."""
+class AssetSizeExceededError(AssetDownloadError, ValueError):
+    """Raised when asset file size exceeds limit."""
     pass
 
 
@@ -164,6 +164,59 @@ def download_stream(
                 time.sleep(0.5 * (2 ** (attempt - 1)))
 
     raise AssetDownloadError(f"Failed to download asset from {url} after {max_retries} attempts: {last_error}")
+
+
+def download_stream_sandboxed(
+    url: str,
+    target_path: Optional[Union[str, Path]] = None,
+    execution_runtime: Optional[Any] = None,
+    max_size_bytes: int = MAX_ASSET_SIZE_BYTES,
+    timeout_sec: int = DEFAULT_DOWNLOAD_TIMEOUT,
+    destination_path: Optional[Union[str, Path]] = None,
+    max_bytes: Optional[int] = None,
+    **kwargs: Any,
+) -> Tuple[Path, str, int, str]:
+    """Stream download media inside sandbox environment respecting network & CWD confinement."""
+    effective_path = destination_path or target_path
+    if not effective_path:
+        raise ValueError("Must provide destination_path or target_path")
+
+    effective_max = max_bytes if max_bytes is not None else max_size_bytes
+
+    if execution_runtime is not None and hasattr(execution_runtime, "validate_path"):
+        out_path = execution_runtime.validate_path(effective_path)
+    else:
+        out_path = Path(effective_path).resolve()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    import requests
+    try:
+        response = requests.get(url, stream=True, timeout=timeout_sec)
+        total_bytes = 0
+        chunks = []
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                total_bytes += len(chunk)
+                if total_bytes > effective_max:
+                    raise AssetSizeExceededError(
+                        f"Asset at {url} exceeded {effective_max} bytes during download stream"
+                    )
+                chunks.append(chunk)
+
+        data = b"".join(chunks)
+        if execution_runtime is not None and hasattr(execution_runtime, "write_file"):
+            written_path = execution_runtime.write_file(out_path, data)
+            sha = compute_file_sha256(written_path)
+            return Path(written_path), sha, len(data), "application/octet-stream"
+        else:
+            out_path.write_bytes(data)
+            sha = compute_file_sha256(out_path)
+            return out_path, sha, len(data), "application/octet-stream"
+    except AssetSizeExceededError:
+        raise
+    except Exception as exc:
+        logger.warning(f"Download stream error: {exc}")
+        raise AssetDownloadError(f"Failed to download asset from {url}: {exc}")
 
 
 def sanitize_filename(name: str) -> str:

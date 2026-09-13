@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The History of the Transistor — HyperFrames Composition</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- GSAP Core & Plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Root Composition Canvas -->
+  <div data-composition-id="root" data-start="0" data-duration="30" data-width="1920" data-height="1080">
+    
+    <!-- Visual Stage Layers -->
+    <div id="stage" class="stage-container">
+    <!-- Scene 1: scene_1 -->
+    <div class="scene" id="scene_1" data-start="0.0" data-duration="7.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_01_point_contact_transistor.svg" alt="The Vacuum Tube Bottleneck" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 01 • HARNESS 9</div>
+        <h2 class="scene-title">The Vacuum Tube Bottleneck</h2>
+        <p class="scene-narration">The Vacuum Tube Bottleneck. Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes. Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits.</p>
+      </div>
+    </div>
+    <!-- Scene 2: scene_2 -->
+    <div class="scene" id="scene_2" data-start="7.5" data-duration="7.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_01_point_contact_transistor.svg" alt="The Miracle at Bell Labs" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 02 • HARNESS 9</div>
+        <h2 class="scene-title">The Miracle at Bell Labs</h2>
+        <p class="scene-narration">The Miracle at Bell Labs. On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip. The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories.</p>
+      </div>
+    </div>
+    <!-- Scene 3: scene_3 -->
+    <div class="scene" id="scene_3" data-start="15.0" data-duration="7.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_03_vacuum_tube_vs_transisto.svg" alt="100 Billion Strong" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 03 • HARNESS 9</div>
+        <h2 class="scene-title">100 Billion Strong</h2>
+        <p class="scene-narration">100 Billion Strong. Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth. By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp.</p>
+      </div>
+    </div>
+    <!-- Scene 4: scene_4 -->
+    <div class="scene" id="scene_4" data-start="22.5" data-duration="7.5">
+      <div class="scene-background">
+        <img class="hero-image" src="assets/images/asset_04_modern_silicon_wafer_sem.svg" alt="Future Horizons &amp; Scale 1" />
+        <div class="scrim-overlay"></div>
+      </div>
+      <div class="scene-content">
+        <div class="badge-tag">PART 04 • HARNESS 9</div>
+        <h2 class="scene-title">Future Horizons &amp; Scale 1</h2>
+        <p class="scene-narration">Looking forward, The History of the Transistor continues to accelerate innovations across modern research and engineering domains.</p>
+      </div>
+    </div>
+    </div>
+
+    <!-- Kinetic Captions Container -->
+    <div id="captions-layer" class="captions-overlay">
+      <div id="caption-box" class="caption-text"></div>
+    </div>
+
+    <!-- Decoupled Audio Narration Track -->
+    <audio id="narration-audio" data-start="0" data-duration="30.0" data-track-index="1" data-volume="1.0" src="assets/audio/narration.wav"></audio>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

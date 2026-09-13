@@ -15,10 +15,23 @@ from src.orchestrator.cli import (
     main,
     build_parser,
 )
+from src.orchestrator.state_machine import (
+    ProductionState,
+    ProductionStateMachine,
+    StateTransitionError,
+    TransitionRecord,
+    StateTransitionRecord,
+)
 
 __all__ = [
     "Pipeline",
     "run_pipeline",
     "main",
     "build_parser",
+    "ProductionState",
+    "ProductionStateMachine",
+    "StateTransitionError",
+    "TransitionRecord",
+    "StateTransitionRecord",
 ]
+

@@ -3,5 +3,5 @@ render_path: output\test_verification_run\renders\final.mp4
 status: success
 target_duration_seconds: 30
 topic: The History of the Transistor
-total_assets: 4
-verified_at: '2026-08-31T05:29:20Z'
+total_assets: 3
+verified_at: '2026-08-31T15:48:34Z'

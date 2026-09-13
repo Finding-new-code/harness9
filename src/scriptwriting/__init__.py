@@ -36,6 +36,23 @@ from src.scriptwriting.pipeline import (
     ScriptwritingPipeline,
     ScriptwritingResult,
 )
+from src.scriptwriting.voice_director import (
+    AudioNarration,
+    BaseDirectorTTSProvider,
+    ElevenLabsProvider,
+    HarmonicWAVSynthProvider,
+    OpenAIAudioProvider,
+    VoiceDirector,
+    VoiceProfile,
+    WindowsSAPIProvider,
+    clamp_wpm,
+    strip_emotion_tags,
+)
+from src.scriptwriting.voice_qa import (
+    VoiceQA,
+    VoiceQAReport,
+    load_wav_samples,
+)
 
 __all__ = [
     "ScriptGenerator",
@@ -58,4 +75,18 @@ __all__ = [
     "TranscriptResult",
     "ScriptwritingPipeline",
     "ScriptwritingResult",
+    "VoiceDirector",
+    "VoiceProfile",
+    "AudioNarration",
+    "BaseDirectorTTSProvider",
+    "ElevenLabsProvider",
+    "OpenAIAudioProvider",
+    "WindowsSAPIProvider",
+    "HarmonicWAVSynthProvider",
+    "clamp_wpm",
+    "strip_emotion_tags",
+    "VoiceQA",
+    "VoiceQAReport",
+    "load_wav_samples",
 ]
+

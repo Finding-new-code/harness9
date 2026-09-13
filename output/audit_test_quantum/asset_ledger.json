@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "proj_the_quantum_hall_effect",
+  "generated_at": "2026-08-31T15:51:27.499188+00:00",
+  "total_assets": 4,
+  "license_summary": {
+    "CC0-1.0 (Public Domain)": 4
+  },
+  "assets": [
+    {
+      "asset_id": "asset_01",
+      "claim_id_refs": [
+        "claim_01"
+      ],
+      "scene_target": "scene_1",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_01_the_quantum_hall_effect_.svg",
+      "file_size_bytes": 4944,
+      "file_sha256": "19519368857d724a9653902d5614e2017e551fbfa13417eef6c338e99f4feb06",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_01_the_quantum_hall_effect_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\audit_test_quantum\\assets\\images\\asset_01_the_quantum_hall_effect_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-08-31T15:51:27.632046+00:00"
+    },
+    {
+      "asset_id": "asset_02",
+      "claim_id_refs": [
+        "claim_02"
+      ],
+      "scene_target": "scene_2",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_02_the_quantum_hall_effect_.svg",
+      "file_size_bytes": 4955,
+      "file_sha256": "2aeb4f28cd4ec18c7f60be490f9c25ca51b5d8738ca3546ee512a3b3ae1823f7",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_02_the_quantum_hall_effect_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\audit_test_quantum\\assets\\images\\asset_02_the_quantum_hall_effect_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-08-31T15:51:27.634051+00:00"
+    },
+    {
+      "asset_id": "asset_03",
+      "claim_id_refs": [
+        "claim_03"
+      ],
+      "scene_target": "scene_3",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_03_the_quantum_hall_effect_.svg",
+      "file_size_bytes": 4959,
+      "file_sha256": "d9b3cc5f207b5a37353ec97b5b40edfc9ef4a473f674a4802d636dd023f28aa8",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_03_the_quantum_hall_effect_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\audit_test_quantum\\assets\\images\\asset_03_the_quantum_hall_effect_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-08-31T15:51:27.635053+00:00"
+    },
+    {
+      "asset_id": "asset_04",
+      "claim_id_refs": [
+        "claim_04"
+      ],
+      "scene_target": "scene_4",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_04_the_quantum_hall_effect_.svg",
+      "file_size_bytes": 4944,
+      "file_sha256": "ca2a4d48566d18e0427bdeebdeaf85d6622cce06afb8cd7c5792e11d16650bcf",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_04_the_quantum_hall_effect_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\audit_test_quantum\\assets\\images\\asset_04_the_quantum_hall_effect_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-08-31T15:51:27.637063+00:00"
+    }
+  ]
+}

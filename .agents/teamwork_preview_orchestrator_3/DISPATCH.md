@@ -1,0 +1,8 @@
+## 2026-09-04T17:44:14Z
+
+Deliver all remaining and undone tasks for the Hermes x Harness 9 Runtime Coupling on branch dev in g:\Finding-new-code\harness9:
+1. Milestone 2 (Active): Hermes Capability Bridge (src/h9_runtime/bridge.py) allowing H9 domain modules to request Hermes services. Expose H9 content capabilities (h9.research, h9.discover_assets, h9.generate_script, h9.render) as native Hermes model tools registered into Hermes tool registry (tools/h9_content_tools.py).
+2. Milestone 3: Native Hermes Skills & Production IR Seam (skills/h9-research/, skills/h9-content-planning/, skills/h9-production/, skills/h9-hyperframes/ using SKILL.md conventions, and typed Production IR seam between narrative planning and HyperFrames compilation).
+3. Milestone 4: Provider, Memory & Subagent Integration (route H9 model requests through Hermes provider abstraction by logical capability roles; interface creator/project memory with Hermes memory infrastructure without competing persistence; demonstrate delegation of multi-source research synthesis to isolated Hermes subagent returning structured ResearchDossier).
+4. Milestone 5: Sandbox, Permission & MCP Integration (enforce Hermes permission and sandbox execution boundaries on all H9 operations; enable H9 to consume Hermes MCP capabilities via native Hermes tool/runtime layer).
+5. Milestone 6: Acceptance & Regression Verification Suite (integration test suite covering 8 required acceptance dimensions A through H, zero regressions across existing Hermes and H9 test suites, and final integration audit report at docs/architecture/hermes-h9-integration-audit.md).

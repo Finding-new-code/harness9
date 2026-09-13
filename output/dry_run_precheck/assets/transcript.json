@@ -1,0 +1,1447 @@
+{
+  "schema_version": "1.0.0",
+  "total_duration": 70.265,
+  "total_words": 130,
+  "scenes": [
+    {
+      "scene_id": "scene_1",
+      "start": 0.0,
+      "end": 17.566,
+      "duration": 17.566,
+      "text": "The Genesis of Artificial Intelligence. Every great technological revolution starts with a challenge. For Artificial Intelligence, it began with a daring new approach. The foundational principles of Artificial Intelligence were established through seminal experimental breakthroughs and early theoretical formulations.",
+      "word_count": 39,
+      "groups": [
+        {
+          "text": "The Genesis of",
+          "start": 0.0,
+          "end": 0.742,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Artificial Intelligence. Every",
+          "start": 0.742,
+          "end": 2.696,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "great technological revolution",
+          "start": 2.696,
+          "end": 4.452,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "starts with a",
+          "start": 4.452,
+          "end": 5.012,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "challenge. For Artificial",
+          "start": 5.012,
+          "end": 6.512,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Intelligence, it began",
+          "start": 6.512,
+          "end": 7.769,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "with a daring",
+          "start": 7.769,
+          "end": 8.405,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "new approach. The",
+          "start": 8.405,
+          "end": 9.359,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "foundational principles of",
+          "start": 9.359,
+          "end": 10.843,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "Artificial Intelligence were",
+          "start": 10.843,
+          "end": 12.539,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "established through seminal",
+          "start": 12.539,
+          "end": 13.977,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "experimental breakthroughs and",
+          "start": 13.977,
+          "end": 15.582,
+          "scene_id": "scene_1",
+          "word_count": 3
+        },
+        {
+          "text": "early theoretical formulations.",
+          "start": 15.582,
+          "end": 17.566,
+          "scene_id": "scene_1",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_2",
+      "start": 17.566,
+      "end": 35.132,
+      "duration": 17.566,
+      "text": "The Architecture of Artificial Intelligence. Behind its outward simplicity lies an intricate system designed for precision, speed, and continuous scaling. At its functional core, Artificial Intelligence operates by transforming input energy or signals through structured physical and algorithmic mechanisms.",
+      "word_count": 39,
+      "groups": [
+        {
+          "text": "The Architecture of",
+          "start": 17.566,
+          "end": 18.677,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Artificial Intelligence. Behind",
+          "start": 18.677,
+          "end": 20.706,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "its outward simplicity",
+          "start": 20.706,
+          "end": 21.994,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "lies an intricate",
+          "start": 21.994,
+          "end": 23.041,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "system designed for",
+          "start": 23.041,
+          "end": 24.071,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "precision, speed, and",
+          "start": 24.071,
+          "end": 25.343,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "continuous scaling. At",
+          "start": 25.343,
+          "end": 26.76,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "its functional core,",
+          "start": 26.76,
+          "end": 27.951,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "Artificial Intelligence operates",
+          "start": 27.951,
+          "end": 30.045,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "by transforming input",
+          "start": 30.045,
+          "end": 31.139,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "energy or signals",
+          "start": 31.139,
+          "end": 32.105,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "through structured physical",
+          "start": 32.105,
+          "end": 33.555,
+          "scene_id": "scene_2",
+          "word_count": 3
+        },
+        {
+          "text": "and algorithmic mechanisms.",
+          "start": 33.555,
+          "end": 35.132,
+          "scene_id": "scene_2",
+          "word_count": 3
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_3",
+      "start": 35.132,
+      "end": 52.699,
+      "duration": 17.566,
+      "text": "Transforming the Modern World. Today, Artificial Intelligence quietly powers the systems we rely on daily, laying the groundwork for tomorrow's breakthroughs. Today, Artificial Intelligence serves as a critical technological pillar across modern computing, manufacturing, and global digital infrastructure.",
+      "word_count": 38,
+      "groups": [
+        {
+          "text": "Transforming the Modern",
+          "start": 35.132,
+          "end": 36.304,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "World. Today, Artificial",
+          "start": 36.304,
+          "end": 37.93,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Intelligence quietly powers",
+          "start": 37.93,
+          "end": 39.638,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "the systems we",
+          "start": 39.638,
+          "end": 40.354,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "rely on daily,",
+          "start": 40.354,
+          "end": 41.281,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "laying the groundwork",
+          "start": 41.281,
+          "end": 42.468,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "for tomorrow's breakthroughs.",
+          "start": 42.468,
+          "end": 44.094,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "Today, Artificial Intelligence",
+          "start": 44.094,
+          "end": 46.111,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "serves as a",
+          "start": 46.111,
+          "end": 46.729,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "critical technological pillar",
+          "start": 46.729,
+          "end": 48.421,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "across modern computing,",
+          "start": 48.421,
+          "end": 49.755,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "manufacturing, and global",
+          "start": 49.755,
+          "end": 51.202,
+          "scene_id": "scene_3",
+          "word_count": 3
+        },
+        {
+          "text": "digital infrastructure.",
+          "start": 51.202,
+          "end": 52.699,
+          "scene_id": "scene_3",
+          "word_count": 2
+        }
+      ]
+    },
+    {
+      "scene_id": "scene_4",
+      "start": 52.699,
+      "end": 70.265,
+      "duration": 17.566,
+      "text": "Looking forward, Artificial Intelligence continues to accelerate innovations across modern research and engineering domains.",
+      "word_count": 14,
+      "groups": [
+        {
+          "text": "Looking forward, Artificial",
+          "start": 52.699,
+          "end": 56.606,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "Intelligence continues to",
+          "start": 56.606,
+          "end": 60.249,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "accelerate innovations across",
+          "start": 60.249,
+          "end": 64.574,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "modern research and",
+          "start": 64.574,
+          "end": 67.002,
+          "scene_id": "scene_4",
+          "word_count": 3
+        },
+        {
+          "text": "engineering domains.",
+          "start": 67.002,
+          "end": 70.265,
+          "scene_id": "scene_4",
+          "word_count": 2
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "text": "The Genesis of",
+      "start": 0.0,
+      "end": 0.742,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Artificial Intelligence. Every",
+      "start": 0.742,
+      "end": 2.696,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "great technological revolution",
+      "start": 2.696,
+      "end": 4.452,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "starts with a",
+      "start": 4.452,
+      "end": 5.012,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "challenge. For Artificial",
+      "start": 5.012,
+      "end": 6.512,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Intelligence, it began",
+      "start": 6.512,
+      "end": 7.769,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "with a daring",
+      "start": 7.769,
+      "end": 8.405,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "new approach. The",
+      "start": 8.405,
+      "end": 9.359,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "foundational principles of",
+      "start": 9.359,
+      "end": 10.843,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "Artificial Intelligence were",
+      "start": 10.843,
+      "end": 12.539,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "established through seminal",
+      "start": 12.539,
+      "end": 13.977,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "experimental breakthroughs and",
+      "start": 13.977,
+      "end": 15.582,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "early theoretical formulations.",
+      "start": 15.582,
+      "end": 17.566,
+      "scene_id": "scene_1",
+      "word_count": 3
+    },
+    {
+      "text": "The Architecture of",
+      "start": 17.566,
+      "end": 18.677,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Artificial Intelligence. Behind",
+      "start": 18.677,
+      "end": 20.706,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "its outward simplicity",
+      "start": 20.706,
+      "end": 21.994,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "lies an intricate",
+      "start": 21.994,
+      "end": 23.041,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "system designed for",
+      "start": 23.041,
+      "end": 24.071,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "precision, speed, and",
+      "start": 24.071,
+      "end": 25.343,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "continuous scaling. At",
+      "start": 25.343,
+      "end": 26.76,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "its functional core,",
+      "start": 26.76,
+      "end": 27.951,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Artificial Intelligence operates",
+      "start": 27.951,
+      "end": 30.045,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "by transforming input",
+      "start": 30.045,
+      "end": 31.139,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "energy or signals",
+      "start": 31.139,
+      "end": 32.105,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "through structured physical",
+      "start": 32.105,
+      "end": 33.555,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "and algorithmic mechanisms.",
+      "start": 33.555,
+      "end": 35.132,
+      "scene_id": "scene_2",
+      "word_count": 3
+    },
+    {
+      "text": "Transforming the Modern",
+      "start": 35.132,
+      "end": 36.304,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "World. Today, Artificial",
+      "start": 36.304,
+      "end": 37.93,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Intelligence quietly powers",
+      "start": 37.93,
+      "end": 39.638,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "the systems we",
+      "start": 39.638,
+      "end": 40.354,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "rely on daily,",
+      "start": 40.354,
+      "end": 41.281,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "laying the groundwork",
+      "start": 41.281,
+      "end": 42.468,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "for tomorrow's breakthroughs.",
+      "start": 42.468,
+      "end": 44.094,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "Today, Artificial Intelligence",
+      "start": 44.094,
+      "end": 46.111,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "serves as a",
+      "start": 46.111,
+      "end": 46.729,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "critical technological pillar",
+      "start": 46.729,
+      "end": 48.421,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "across modern computing,",
+      "start": 48.421,
+      "end": 49.755,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "manufacturing, and global",
+      "start": 49.755,
+      "end": 51.202,
+      "scene_id": "scene_3",
+      "word_count": 3
+    },
+    {
+      "text": "digital infrastructure.",
+      "start": 51.202,
+      "end": 52.699,
+      "scene_id": "scene_3",
+      "word_count": 2
+    },
+    {
+      "text": "Looking forward, Artificial",
+      "start": 52.699,
+      "end": 56.606,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "Intelligence continues to",
+      "start": 56.606,
+      "end": 60.249,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "accelerate innovations across",
+      "start": 60.249,
+      "end": 64.574,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "modern research and",
+      "start": 64.574,
+      "end": 67.002,
+      "scene_id": "scene_4",
+      "word_count": 3
+    },
+    {
+      "text": "engineering domains.",
+      "start": 67.002,
+      "end": 70.265,
+      "scene_id": "scene_4",
+      "word_count": 2
+    }
+  ],
+  "words": [
+    {
+      "word": "The",
+      "start": 0.0,
+      "end": 0.167,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Genesis",
+      "start": 0.167,
+      "end": 0.606,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 0.606,
+      "end": 0.742,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Artificial",
+      "start": 0.742,
+      "end": 1.423,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Intelligence.",
+      "start": 1.423,
+      "end": 2.317,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Every",
+      "start": 2.317,
+      "end": 2.696,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "great",
+      "start": 2.696,
+      "end": 2.998,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "technological",
+      "start": 2.998,
+      "end": 3.771,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "revolution",
+      "start": 3.771,
+      "end": 4.452,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "starts",
+      "start": 4.452,
+      "end": 4.71,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "with",
+      "start": 4.71,
+      "end": 4.906,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 4.906,
+      "end": 5.012,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "challenge.",
+      "start": 5.012,
+      "end": 5.664,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "For",
+      "start": 5.664,
+      "end": 5.83,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Artificial",
+      "start": 5.83,
+      "end": 6.512,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Intelligence,",
+      "start": 6.512,
+      "end": 7.329,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "it",
+      "start": 7.329,
+      "end": 7.466,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "began",
+      "start": 7.466,
+      "end": 7.769,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "with",
+      "start": 7.769,
+      "end": 7.965,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "a",
+      "start": 7.965,
+      "end": 8.071,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "daring",
+      "start": 8.071,
+      "end": 8.405,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "new",
+      "start": 8.405,
+      "end": 8.571,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "approach.",
+      "start": 8.571,
+      "end": 9.192,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 9.192,
+      "end": 9.359,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "foundational",
+      "start": 9.359,
+      "end": 10.176,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "principles",
+      "start": 10.176,
+      "end": 10.706,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "of",
+      "start": 10.706,
+      "end": 10.843,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Artificial",
+      "start": 10.843,
+      "end": 11.524,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "Intelligence",
+      "start": 11.524,
+      "end": 12.266,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "were",
+      "start": 12.266,
+      "end": 12.539,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "established",
+      "start": 12.539,
+      "end": 13.175,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "through",
+      "start": 13.175,
+      "end": 13.538,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "seminal",
+      "start": 13.538,
+      "end": 13.977,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "experimental",
+      "start": 13.977,
+      "end": 14.719,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "breakthroughs",
+      "start": 14.719,
+      "end": 15.416,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "and",
+      "start": 15.416,
+      "end": 15.582,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "early",
+      "start": 15.582,
+      "end": 15.961,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "theoretical",
+      "start": 15.961,
+      "end": 16.673,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "formulations.",
+      "start": 16.673,
+      "end": 17.566,
+      "scene_id": "scene_1"
+    },
+    {
+      "word": "The",
+      "start": 17.566,
+      "end": 17.743,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Architecture",
+      "start": 17.743,
+      "end": 18.532,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "of",
+      "start": 18.532,
+      "end": 18.677,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Artificial",
+      "start": 18.677,
+      "end": 19.402,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Intelligence.",
+      "start": 19.402,
+      "end": 20.352,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Behind",
+      "start": 20.352,
+      "end": 20.706,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "its",
+      "start": 20.706,
+      "end": 20.883,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "outward",
+      "start": 20.883,
+      "end": 21.35,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "simplicity",
+      "start": 21.35,
+      "end": 21.994,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "lies",
+      "start": 21.994,
+      "end": 22.284,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "an",
+      "start": 22.284,
+      "end": 22.429,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "intricate",
+      "start": 22.429,
+      "end": 23.041,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "system",
+      "start": 23.041,
+      "end": 23.395,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "designed",
+      "start": 23.395,
+      "end": 23.894,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "for",
+      "start": 23.894,
+      "end": 24.071,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "precision,",
+      "start": 24.071,
+      "end": 24.763,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "speed,",
+      "start": 24.763,
+      "end": 25.166,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 25.166,
+      "end": 25.343,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "continuous",
+      "start": 25.343,
+      "end": 26.068,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "scaling.",
+      "start": 26.068,
+      "end": 26.615,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "At",
+      "start": 26.615,
+      "end": 26.76,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "its",
+      "start": 26.76,
+      "end": 26.937,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "functional",
+      "start": 26.937,
+      "end": 27.581,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "core,",
+      "start": 27.581,
+      "end": 27.951,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Artificial",
+      "start": 27.951,
+      "end": 28.676,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Intelligence",
+      "start": 28.676,
+      "end": 29.465,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "operates",
+      "start": 29.465,
+      "end": 30.045,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "by",
+      "start": 30.045,
+      "end": 30.189,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "transforming",
+      "start": 30.189,
+      "end": 30.817,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "input",
+      "start": 30.817,
+      "end": 31.139,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "energy",
+      "start": 31.139,
+      "end": 31.574,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "or",
+      "start": 31.574,
+      "end": 31.719,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "signals",
+      "start": 31.719,
+      "end": 32.105,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "through",
+      "start": 32.105,
+      "end": 32.492,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "structured",
+      "start": 32.492,
+      "end": 33.055,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "physical",
+      "start": 33.055,
+      "end": 33.555,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "and",
+      "start": 33.555,
+      "end": 33.732,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "algorithmic",
+      "start": 33.732,
+      "end": 34.408,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "mechanisms.",
+      "start": 34.408,
+      "end": 35.132,
+      "scene_id": "scene_2"
+    },
+    {
+      "word": "Transforming",
+      "start": 35.132,
+      "end": 35.767,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 35.767,
+      "end": 35.946,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Modern",
+      "start": 35.946,
+      "end": 36.304,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "World.",
+      "start": 36.304,
+      "end": 36.71,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Today,",
+      "start": 36.71,
+      "end": 37.198,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Artificial",
+      "start": 37.198,
+      "end": 37.93,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Intelligence",
+      "start": 37.93,
+      "end": 38.727,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "quietly",
+      "start": 38.727,
+      "end": 39.28,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "powers",
+      "start": 39.28,
+      "end": 39.638,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 39.638,
+      "end": 39.817,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "systems",
+      "start": 39.817,
+      "end": 40.207,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "we",
+      "start": 40.207,
+      "end": 40.354,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "rely",
+      "start": 40.354,
+      "end": 40.646,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "on",
+      "start": 40.646,
+      "end": 40.793,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "daily,",
+      "start": 40.793,
+      "end": 41.281,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "laying",
+      "start": 41.281,
+      "end": 41.72,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "the",
+      "start": 41.72,
+      "end": 41.899,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "groundwork",
+      "start": 41.899,
+      "end": 42.468,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "for",
+      "start": 42.468,
+      "end": 42.647,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "tomorrow's",
+      "start": 42.647,
+      "end": 43.184,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "breakthroughs.",
+      "start": 43.184,
+      "end": 44.094,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Today,",
+      "start": 44.094,
+      "end": 44.582,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Artificial",
+      "start": 44.582,
+      "end": 45.314,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Intelligence",
+      "start": 45.314,
+      "end": 46.111,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "serves",
+      "start": 46.111,
+      "end": 46.469,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "as",
+      "start": 46.469,
+      "end": 46.616,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "a",
+      "start": 46.616,
+      "end": 46.729,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "critical",
+      "start": 46.729,
+      "end": 47.234,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "technological",
+      "start": 47.234,
+      "end": 48.063,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "pillar",
+      "start": 48.063,
+      "end": 48.421,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "across",
+      "start": 48.421,
+      "end": 48.779,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "modern",
+      "start": 48.779,
+      "end": 49.137,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "computing,",
+      "start": 49.137,
+      "end": 49.755,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "manufacturing,",
+      "start": 49.755,
+      "end": 50.666,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "and",
+      "start": 50.666,
+      "end": 50.844,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "global",
+      "start": 50.844,
+      "end": 51.202,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "digital",
+      "start": 51.202,
+      "end": 51.674,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "infrastructure.",
+      "start": 51.674,
+      "end": 52.699,
+      "scene_id": "scene_3"
+    },
+    {
+      "word": "Looking",
+      "start": 52.699,
+      "end": 53.799,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "forward,",
+      "start": 53.799,
+      "end": 54.899,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Artificial",
+      "start": 54.899,
+      "end": 56.606,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "Intelligence",
+      "start": 56.606,
+      "end": 58.466,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "continues",
+      "start": 58.466,
+      "end": 59.907,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "to",
+      "start": 59.907,
+      "end": 60.249,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "accelerate",
+      "start": 60.249,
+      "end": 61.956,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "innovations",
+      "start": 61.956,
+      "end": 63.739,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "across",
+      "start": 63.739,
+      "end": 64.574,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "modern",
+      "start": 64.574,
+      "end": 65.409,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "research",
+      "start": 65.409,
+      "end": 66.585,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "and",
+      "start": 66.585,
+      "end": 67.002,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "engineering",
+      "start": 67.002,
+      "end": 68.785,
+      "scene_id": "scene_4"
+    },
+    {
+      "word": "domains.",
+      "start": 68.785,
+      "end": 70.265,
+      "scene_id": "scene_4"
+    }
+  ]
+}

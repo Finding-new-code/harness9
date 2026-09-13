@@ -77,7 +77,10 @@ def get_ffmpeg_version() -> Optional[str]:
     return None
 
 
-def probe_media_file(file_path: Union[str, Path]) -> Dict[str, Any]:
+def probe_media_file(
+    file_path: Union[str, Path],
+    execution_runtime: Optional[Any] = None,
+) -> Dict[str, Any]:
     """
     Probe media file streams, duration, codecs, and dimensions using ffprobe.
     Falls back to binary inspection if ffprobe is unavailable.
@@ -101,43 +104,59 @@ def probe_media_file(file_path: Union[str, Path]) -> Dict[str, Any]:
         "streams": [],
     }
 
-    if is_ffprobe_available():
+    cmd = [
+        "ffprobe",
+        "-v", "quiet",
+        "-print_format", "json",
+        "-show_format",
+        "-show_streams",
+        str(path),
+    ]
+
+    raw_stdout: Optional[str] = None
+    if execution_runtime is not None:
         try:
-            cmd = [
-                "ffprobe",
-                "-v", "quiet",
-                "-print_format", "json",
-                "-show_format",
-                "-show_streams",
-                str(path),
-            ]
+            exec_res = execution_runtime.execute_command(cmd, timeout_seconds=15.0)
+            if exec_res.exit_code == 0 and exec_res.stdout:
+                raw_stdout = exec_res.stdout
+        except Exception as e:
+            logger.debug(f"ffprobe via execution_runtime failed for {path}: {e}")
+    elif is_ffprobe_available():
+        try:
             res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=10)
             if res.returncode == 0 and res.stdout:
-                data = json.loads(res.stdout)
-                fmt = data.get("format", {})
-                info["duration_seconds"] = float(fmt.get("duration", 0.0))
-                
-                streams = data.get("streams", [])
-                info["streams"] = streams
-                for s in streams:
-                    codec_type = s.get("codec_type")
-                    if codec_type == "video":
-                        info["has_video"] = True
-                        info["video_codec"] = s.get("codec_name")
-                        info["width"] = s.get("width")
-                        info["height"] = s.get("height")
-                        r_fps = s.get("r_frame_rate", "30/1")
-                        if "/" in r_fps:
-                            num, den = r_fps.split("/")
-                            if float(den) > 0:
-                                info["fps"] = float(num) / float(den)
-                    elif codec_type == "audio":
-                        info["has_audio"] = True
-                        info["audio_codec"] = s.get("codec_name")
-                        info["sample_rate"] = int(s.get("sample_rate", 44100))
-                return info
+                raw_stdout = res.stdout
         except Exception as e:
             logger.debug(f"ffprobe execution failed for {path}: {e}")
+
+    if raw_stdout:
+        try:
+            data = json.loads(raw_stdout)
+            fmt = data.get("format", {})
+            info["duration_seconds"] = float(fmt.get("duration", 0.0))
+            
+            streams = data.get("streams", [])
+            info["streams"] = streams
+            for s in streams:
+                codec_type = s.get("codec_type")
+                if codec_type == "video":
+                    info["has_video"] = True
+                    info["video_codec"] = s.get("codec_name")
+                    info["width"] = s.get("width")
+                    info["height"] = s.get("height")
+                    r_fps = s.get("r_frame_rate", "30/1")
+                    if "/" in r_fps:
+                        num, den = r_fps.split("/")
+                        if float(den) > 0:
+                            info["fps"] = float(num) / float(den)
+                elif codec_type == "audio":
+                    info["has_audio"] = True
+                    info["audio_codec"] = s.get("codec_name")
+                    info["sample_rate"] = int(s.get("sample_rate", 44100))
+            return info
+        except Exception as e:
+            logger.debug(f"Failed parsing ffprobe JSON output: {e}")
+
 
     # Binary fallback inspection for MP4 / WAV
     raw_header = path.read_bytes()[:1024]
@@ -163,16 +182,18 @@ def render_video_with_ffmpeg(
     width: int = 1920,
     height: int = 1080,
     crf: int = 20,
-    preset: str = "medium",
+    preset: str = "ultrafast",
     pix_fmt: str = "yuv420p",
+    execution_runtime: Optional[Any] = None,
 ) -> Path:
     """
     Render frame sequence and audio track into a standard H.264/AAC MP4 video using FFmpeg.
+    When execution_runtime is provided, executes inside the configured Hermes sandbox environment.
     """
     out_path = Path(output_mp4).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    if not is_ffmpeg_available():
+    if execution_runtime is None and not is_ffmpeg_available():
         logger.warning("FFmpeg not available on PATH; generating valid fallback MP4 container")
         return create_fallback_mp4(out_path, duration=duration, width=width, height=height)
 
@@ -188,17 +209,15 @@ def render_video_with_ffmpeg(
         cmd.extend(["-framerate", str(fps), "-i", input_str])
 
     # Audio input
-    has_audio = False
     if audio_path and Path(audio_path).exists():
         cmd.extend(["-i", str(audio_path)])
-        has_audio = True
     else:
         # Generate silent audio track
         cmd.extend(["-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100"])
-        has_audio = True
 
     # Encoding parameters
     cmd.extend([
+        "-s", f"{width}x{height}",
         "-c:v", "libx264",
         "-pix_fmt", pix_fmt,
         "-preset", preset,
@@ -210,6 +229,32 @@ def render_video_with_ffmpeg(
         "-movflags", "+faststart",
         str(out_path),
     ])
+
+    if execution_runtime is not None:
+        try:
+            exec_res = execution_runtime.execute_command(
+                cmd,
+                cwd=out_path.parent,
+                timeout_seconds=120.0,
+            )
+            if exec_res.timed_out:
+                logger.warning("FFmpeg render timed out in execution sandbox")
+                return create_fallback_mp4(out_path, duration=duration, width=width, height=height)
+            if exec_res.exit_code != 0:
+                logger.warning(f"FFmpeg render returned error {exec_res.exit_code}: {exec_res.stderr}")
+                return _render_lavfi_color_fallback(
+                    out_path,
+                    audio_path=audio_path,
+                    duration=duration,
+                    fps=fps,
+                    width=width,
+                    height=height,
+                    execution_runtime=execution_runtime,
+                )
+            return out_path
+        except Exception as e:
+            logger.warning(f"FFmpeg execution failed via sandbox: {e}")
+            return create_fallback_mp4(out_path, duration=duration, width=width, height=height)
 
     try:
         res = subprocess.run(
@@ -238,6 +283,7 @@ def _render_lavfi_color_fallback(
     fps: int = 30,
     width: int = 1920,
     height: int = 1080,
+    execution_runtime: Optional[Any] = None,
 ) -> Path:
     """Fallback to generating video using FFmpeg lavfi color generator."""
     cmd = [
@@ -260,6 +306,19 @@ def _render_lavfi_color_fallback(
         "-movflags", "+faststart",
         str(output_mp4),
     ])
+
+    if execution_runtime is not None:
+        try:
+            exec_res = execution_runtime.execute_command(
+                cmd,
+                cwd=output_mp4.parent,
+                timeout_seconds=60.0,
+            )
+            if exec_res.exit_code == 0 and output_mp4.exists():
+                return output_mp4
+        except Exception:
+            pass
+        return create_fallback_mp4(output_mp4, duration=duration, width=width, height=height)
 
     try:
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=60)

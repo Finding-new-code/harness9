@@ -127,7 +127,7 @@ class TestResearchEngineCoverage(unittest.TestCase):
     def test_07_talking_points_duration_scaling(self):
         """F1: Verify talking points durations scale to match target duration."""
         target_dur = 45
-        data = self._get_dossier(duration=target_dur)
+        data = self._get_dossier(topic="Neuromorphic Memristor Circuits", duration=target_dur)
         tp_total = sum(tp.get("estimated_duration_sec", 0.0) for tp in data.get("talking_points", []))
         self.assertAlmostEqual(tp_total, float(target_dur), delta=3.0)
 

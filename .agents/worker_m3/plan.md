@@ -1,0 +1,2 @@
+# Worker M3 Plan: HyperFrames Adapter & Reusable Component Registry
+Target: Implement adapters/hyperframes/ adapter interface and src/hyperframes/components/ with 7+ parameterized blocks (reference collage, split-screen, quote highlight, timeline reveal, statistic reveal, comparison panel, creator bottom collage), HTML/CSS/GSAP generation, composition linter, and tests/test_hyperframes_components.py.

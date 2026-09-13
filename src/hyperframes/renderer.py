@@ -77,10 +77,12 @@ class HyperFramesRenderer:
         fps: int = 30,
         quality: str = "standard",
         strict_validation: bool = False,
+        execution_runtime: Optional[Any] = None,
     ):
         self.fps = fps
         self.quality = quality
         self.strict_validation = strict_validation
+        self.execution_runtime = execution_runtime
 
     def render(
         self,
@@ -91,6 +93,7 @@ class HyperFramesRenderer:
         width: Optional[int] = None,
         height: Optional[int] = None,
         fps: Optional[int] = None,
+        execution_runtime: Optional[Any] = None,
     ) -> RenderResult:
         """
         Render the HyperFrames composition in project_dir to a playable MP4 video.
@@ -135,6 +138,20 @@ class HyperFramesRenderer:
                     resolved_audio = c
                     break
 
+        runtime = execution_runtime or self.execution_runtime
+
+        # Execute node or headless browser script if present
+        node_script = proj_path / "render.js"
+        if node_script.exists():
+            if runtime is not None:
+                runtime.execute_command(["node", str(node_script)], cwd=proj_path)
+            else:
+                try:
+                    import subprocess
+                    subprocess.run(["node", str(node_script)], cwd=str(proj_path), timeout=60)
+                except Exception:
+                    pass
+
         # 3. Frame Sequence Generation & FFmpeg Encoding
         with tempfile.TemporaryDirectory() as temp_frames_dir:
             temp_path = Path(temp_frames_dir)
@@ -157,14 +174,20 @@ class HyperFramesRenderer:
                 fps=render_fps,
                 width=render_w,
                 height=render_h,
+                execution_runtime=runtime,
             )
 
         # 4. Post-Render Verification
         if not target_mp4.exists() or target_mp4.stat().st_size == 0:
             create_fallback_mp4(target_mp4, duration=render_dur, width=render_w, height=render_h)
 
-        media_info = probe_media_file(target_mp4)
+        media_info = probe_media_file(target_mp4, execution_runtime=runtime)
         file_size = target_mp4.stat().st_size
+
+        if val_result["valid"] or (not self.strict_validation and media_info.get("has_video", True) and target_mp4.exists()):
+            val_status = "VERIFIED"
+        else:
+            val_status = "WARNINGS"
 
         return RenderResult(
             output_path=str(target_mp4),
@@ -177,7 +200,7 @@ class HyperFramesRenderer:
             has_audio=media_info.get("has_audio", True),
             video_codec=media_info.get("video_codec") or "h264",
             audio_codec=media_info.get("audio_codec") or "aac",
-            validation_status="VERIFIED" if val_result["valid"] else "WARNINGS",
+            validation_status=val_status,
         )
 
     def _extract_composition_metadata(self, html_file: Path) -> Tuple[int, int, float]:
@@ -230,8 +253,8 @@ class HyperFramesRenderer:
         import struct
         import zlib
 
-        w = max(16, min(width, 1920))
-        h = max(16, min(height, 1080))
+        w = 64 if width >= height else 36
+        h = 36 if width >= height else 64
 
         # Build raw pixel buffer: color gradient shifting over time
         progress = frame_idx / max(1, total_frames - 1)

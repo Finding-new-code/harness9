@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "proj_artificial_intelligence",
+  "generated_at": "2026-09-13T14:49:09.360663+00:00",
+  "total_assets": 4,
+  "license_summary": {
+    "CC0-1.0 (Public Domain)": 4
+  },
+  "assets": [
+    {
+      "asset_id": "asset_01",
+      "claim_id_refs": [
+        "claim_01"
+      ],
+      "scene_target": "scene_1",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_01_artificial_intelligence_.svg",
+      "file_size_bytes": 4725,
+      "file_sha256": "02b8a0934f6deba8b6c838a117f5529c54abd506002e1feddf06f9b7220c5f77",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_01_artificial_intelligence_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\dry_run_precheck\\assets\\images\\asset_01_artificial_intelligence_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-13T14:49:09.374804+00:00"
+    },
+    {
+      "asset_id": "asset_02",
+      "claim_id_refs": [
+        "claim_02"
+      ],
+      "scene_target": "scene_2",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_02_artificial_intelligence_.svg",
+      "file_size_bytes": 4736,
+      "file_sha256": "4cf2bb37c6edf1e93580f16ae9f0b60e13397b9c9524c0ed81f98f93cec65b63",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_02_artificial_intelligence_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\dry_run_precheck\\assets\\images\\asset_02_artificial_intelligence_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-13T14:49:09.376576+00:00"
+    },
+    {
+      "asset_id": "asset_03",
+      "claim_id_refs": [
+        "claim_03"
+      ],
+      "scene_target": "scene_3",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_03_artificial_intelligence_.svg",
+      "file_size_bytes": 4740,
+      "file_sha256": "15320f263a2d48743ee6c8dea710e1742b502cd21f89ade23fdd125f05adac03",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_03_artificial_intelligence_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\dry_run_precheck\\assets\\images\\asset_03_artificial_intelligence_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-13T14:49:09.378109+00:00"
+    },
+    {
+      "asset_id": "asset_04",
+      "claim_id_refs": [
+        "claim_04"
+      ],
+      "scene_target": "scene_4",
+      "media_type": "image/svg+xml",
+      "local_path": "assets/images/asset_04_artificial_intelligence_.svg",
+      "file_size_bytes": 4725,
+      "file_sha256": "10a2c8de6c3352815e998d29cd2744a4dae7b7f7ad1a29db0b89c760e0a1878c",
+      "source_provider": "procedural_generator",
+      "source_url": "procedural://vector/asset_04_artificial_intelligence_.svg",
+      "verification_status": "FALLBACK_GENERATED",
+      "absolute_path": "G:\\Finding-new-code\\harness9\\output\\dry_run_precheck\\assets\\images\\asset_04_artificial_intelligence_.svg",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9"
+      },
+      "creator": {
+        "name": "Harness 9 Procedural Asset Engine",
+        "profile_url": "https://github.com/nousresearch/hermes-agent"
+      },
+      "license": {
+        "license_type": "CC0-1.0 (Public Domain)",
+        "attribution_text": "Procedural SVG Graphic by Harness 9 Engine (CC0)",
+        "attribution_required": false,
+        "commercial_use_allowed": true,
+        "modification_allowed": true,
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "downloaded_at": "2026-09-13T14:49:09.379106+00:00"
+    }
+  ]
+}

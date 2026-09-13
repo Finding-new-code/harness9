@@ -1,0 +1,26 @@
+{
+  "creator_id": "creator_alpha",
+  "display_name": "Alpha Creator",
+  "tone_of_voice": [
+    "authoritative",
+    "engaging",
+    "accessible"
+  ],
+  "target_audiences": [
+    "tech enthusiasts",
+    "general learners"
+  ],
+  "brand_colors": {
+    "primary": "#00d2ff",
+    "background": "#0a0e17",
+    "text": "#ffffff",
+    "accent": "#ff5252"
+  },
+  "default_format": "16:9",
+  "negative_rules": [
+    "Never use buzzwords like 'game-changer' or 'revolutionize'",
+    "Never use unverified hype statistics"
+  ],
+  "voice_preference": "default",
+  "metadata": {}
+}
