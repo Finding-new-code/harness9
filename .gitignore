@@ -22,6 +22,7 @@ act/
 .env.test
 .hermes-docker/
 .notebooklm-home/
+.output/
 .notebooklm-cli-venv/
 .notebooklm-playwright/
 .pip-cache/

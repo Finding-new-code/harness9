@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bundle Verification — HyperFrames Composition</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- GSAP Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Root Composition Canvas -->
+  <div data-composition-id="root" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+    
+    <!-- Visual Stage Layers -->
+    <div id="stage" class="stage-container">
+    <!-- Scene Container 1: s1 -->
+    <div class="scene" id="s1" data-start="0.0" data-duration="10.0">
+      <div class="scene-background">
+        <img class="hero-image" src="" alt="Scene 1" />
+        <div class="scrim-overlay"></div>
+      </div>
+    <!-- Block: reference_collage_hook [s1] -->
+    <div class="hf-block reference-collage-hook" id="s1-collage" data-block-id="reference_collage_hook">
+      <div class="collage-header">
+        <div class="collage-badge">BREAKTHROUGH • HARNESS 9</div>
+        <h1 class="collage-headline">The Accidental Breakthrough</h1>
+        
+      </div>
+      <div class="collage-grid collage-count-3">
+        <div class="collage-item collage-item-1">
+          <div class="collage-card">
+            <img class="collage-img" src="assets/images/asset_01.svg" alt="Reference 1" />
+            <div class="collage-card-glow"></div>
+          </div>
+        </div>
+        <div class="collage-item collage-item-2">
+          <div class="collage-card">
+            <img class="collage-img" src="assets/images/asset_02.svg" alt="Reference 2" />
+            <div class="collage-card-glow"></div>
+          </div>
+        </div>
+        <div class="collage-item collage-item-3">
+          <div class="collage-card">
+            <img class="collage-img" src="assets/images/asset_03.svg" alt="Reference 3" />
+            <div class="collage-card-glow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Kinetic Captions Container -->
+    <div id="captions-layer" class="captions-overlay">
+      <div id="caption-box" class="caption-text"></div>
+    </div>
+
+    <!-- Decoupled Audio Narration Track -->
+    <audio id="narration-audio" data-start="0" data-duration="10.0" data-track-index="1" data-volume="1.0" src="assets/audio/narration.wav"></audio>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

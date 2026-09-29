@@ -296,3 +296,168 @@ expires_at_utc: 1788200000.0
 delegation_depth: 1
 signature: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 ```
+
+---
+
+## 5. Epistemic Verification Layer Schemas (Extended Contracts)
+
+**Package:** `src/models/contracts.py`, `src/epistemic/`  
+**Cross-References:** `docs/epistemic/EPISTEMIC_ARCHITECTURE.md`, `docs/epistemic/EVIDENCE_GRAPH.md`, `docs/epistemic/FACT_CHECKING_SPEC.md`
+
+### 5.1 Epistemic Enumerations
+
+```python
+class EpistemicStatus(str, Enum):
+    """11 discrete machine-readable verification statuses."""
+    VERIFIED = "verified"                    # Confirmed by >=2 independent high-tier sources
+    SUPPORTED = "supported"                  # Entailed by >=1 reliable source without contradiction
+    PARTIALLY_SUPPORTED = "partially_supported" # Core fact supported, but details/numbers diverge
+    CONTESTED = "contested"                  # Legitimate scholarly or empirical dispute exists
+    CONTRADICTED = "contradicted"            # Refuted by authoritative counter-evidence
+    UNSUPPORTED = "unsupported"              # No cited evidence entails the assertion
+    UNVERIFIABLE = "unverifiable"            # Cannot be empirically or textually tested
+    OUTDATED = "outdated"                    # Was historically true, but superseded by newer data
+    MISLEADING = "misleading"                # True in isolation, but contextually deceptive
+    OPINION = "opinion"                      # Subjective or evaluative judgment
+    PREDICTION = "prediction"                # Forward-looking forecast
+
+class ClaimType(str, Enum):
+    """Typology of factual claims dictating verification policy."""
+    EVENT_FACT = "event_fact"                # Empirical historical or physical event
+    CAUSAL_INTERPRETATION = "causal_interpretation" # Explanatory theory for why an event occurred
+    SCHOLARLY_INTERPRETATION = "scholarly_interpretation" # Historiographical paradigm
+    NUMERICAL_METRIC = "numerical_metric"    # Quantitative measurement, count, dimension
+    DIRECT_QUOTE = "direct_quote"            # Exact speech or written statement
+    SCIENTIFIC_LAW = "scientific_law"        # Empirically validated physical or biological rule
+    CURRENT_EVENT = "current_event"          # Contemporary news occurrence
+    DEFINITIONAL = "definitional"            # Terminology or semantic definition
+
+class ConsensusState(str, Enum):
+    """8-state historiographical and scientific consensus classifications."""
+    STRONG_CONSENSUS = "STRONG_CONSENSUS"    # Overwhelming agreement across modern scholarship
+    BROAD_CONSENSUS = "BROAD_CONSENSUS"      # General specialist agreement; negligible dissent
+    MAJORITY_INTERPRETATION = "MAJORITY_INTERPRETATION" # Dominant academic view; recognized alternatives
+    MINORITY_INTERPRETATION = "MINORITY_INTERPRETATION" # Credible academic counter-thesis
+    ACTIVE_DEBATE = "ACTIVE_DEBATE"          # Substantial, ongoing academic debate
+    CONTESTED = "CONTESTED"                  # Direct dispute between primary records
+    UNRESOLVED = "UNRESOLVED"                # Insufficient surviving evidence to decide
+    INSUFFICIENT_LITERATURE = "INSUFFICIENT_LITERATURE" # Topic lacks adequate peer-reviewed study
+
+class SourceTier(int, Enum):
+    """13-tier hierarchical source taxonomy ranking epistemic authority."""
+    PRIMARY_SOURCE = 1                       # Archival records, treaties, raw datasets
+    PEER_REVIEWED_JOURNAL = 2                # Refereed academic journals (Nature, Science)
+    ACADEMIC_PRESS_BOOK = 3                  # University press monographs (Oxford, Cambridge)
+    HISTORICAL_DOCUMENT_CRITICAL_EDITION = 4 # Scholarly edited historical editions
+    GOVERNMENT_RECORD_STATISTICAL_AGENCY = 5 # Census, BLS, NIST, NASA technical reports
+    PREPRINT_SCHOLARLY = 6                   # arXiv, bioRxiv preprints (must be hedged)
+    SPECIALIZED_SCHOLARLY_DATABASE = 7       # PDB, UniProt, ChEMBL, curated repositories
+    REPUTABLE_NEWS_INVESTIGATIVE = 8         # Reuters, AP, BBC, NYT investigative desks
+    GENERAL_ENCYCLOPEDIC = 9                 # Britannica, Stanford Enc Phil, Wikipedia (non-sole)
+    CORPORATE_WHITE_PAPER = 10               # Vendor specifications, technical manuals
+    BLOG_OPINION_COMMENTARY = 11             # Expert blogs, Substack (opinions only)
+    SOCIAL_MEDIA_FORUM = 12                  # Twitter, Reddit, forums (untrusted)
+    UNVERIFIED = 13                          # Anonymous aggregators, hallucinations (rejected)
+```
+
+### 5.2 Extended Production Contracts
+
+```yaml
+# Extended SourceRecord
+source_id: "src_bell_labs_1947"
+title: "The Point-Contact Transistor"
+url: "https://www.bell-labs.com/about/history/transistor/"
+publisher: "Nokia Bell Labs"
+author: "Bell Labs Historical Archives"
+published_date: "1947-12-23"
+reliability_score: 1.0
+tier: 1                                      # SourceTier.PRIMARY_SOURCE
+domain_authority: 0.98
+doi: null
+peer_reviewed: false
+archived_url: "https://web.archive.org/web/..."
+content_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+retrieved_at: "2026-09-13T12:00:00Z"
+is_sanitized: true
+metadata: {}
+
+# Extended ClaimRecord
+claim_id: "claim_001"
+claim_text: "In December 1947, Bell Labs physicists John Bardeen and Walter Brattain created the first working point-contact transistor."
+category: "history"
+confidence_score: 0.98                       # Retrieval confidence
+epistemic_status: "verified"                 # EpistemicStatus.VERIFIED
+claim_type: "event_fact"                     # ClaimType.EVENT_FACT
+consensus_state: "STRONG_CONSENSUS"          # ConsensusState.STRONG_CONSENSUS
+primary_source: { ... }                      # Extended SourceRecord
+corroborating_sources: [ { ... } ]
+contradicting_sources: []
+evidence_links:
+  - evidence_unit_id: "eu_001"
+    source_id: "src_bell_labs_1947"
+    verbatim_excerpt: "On December 23, 1947, John Bardeen and Walter Brattain demonstrated the point-contact transistor."
+    char_offset_start: 1024
+    char_offset_end: 1145
+    entailment_relation: "SUPPORTS"
+    confidence: 1.0
+temporal_context:
+  valid_from: "1947-12-23"
+  valid_until: null
+  as_of_date: "2026-09-13"
+  is_time_sensitive: false
+  temporal_status: "historical"
+verifier_metadata:
+  strategy_used: "SOURCE_ENTAILMENT"
+  verifier_name: "H9EpistemicVerificationEngine"
+  verified_at: "2026-09-13T17:20:00Z"
+  verification_trace_id: "vtr_7a9f82d1"
+  entailment_score: 0.99
+  contradiction_score: 0.0
+```
+
+### 5.3 Evidence Graph DAG Schema
+
+```yaml
+# EvidenceGraphDocument
+graph_id: "eg_proj_transistor_001"
+project_id: "proj_transistor_001"
+nodes:
+  sources: [ { "node_id": "src_001", "tier": 1, "sha256": "..." } ]
+  passages: [ { "node_id": "pas_001", "source_id": "src_001", "char_start": 100, "char_end": 250 } ]
+  evidence_units: [ { "node_id": "eu_001", "passage_id": "pas_001", "statement": "...", "modality": "CERTAIN" } ]
+  claims: [ { "node_id": "claim_001", "epistemic_status": "verified", "consensus": "STRONG_CONSENSUS" } ]
+  script_sentences: [ { "node_id": "sent_001", "scene_id": "scene_1", "text": "..." } ]
+  visual_elements: [ { "node_id": "vis_001", "block_type": "STATISTIC_REVEAL", "parameter_key": "stat_number" } ]
+  verification_traces: [ { "node_id": "vtr_001", "strategy": "SOURCE_ENTAILMENT", "entailment_score": 0.99 } ]
+edges:
+  - { source: "src_001", target: "pas_001", relation: "PROVIDES" }
+  - { source: "pas_001", target: "eu_001", relation: "EXTRACTS_FROM" }
+  - { source: "eu_001", target: "claim_001", relation: "ENTAILS", weight: 1.0 }
+  - { source: "claim_001", target: "sent_001", relation: "GROUNDS" }
+  - { source: "claim_001", target: "vis_001", relation: "BINDS_TO" }
+```
+
+### 5.4 Numerical Data Contracts (Deterministic Lineage)
+
+```yaml
+# NumericalDataPoint
+x_value: 1947
+y_value: 1.0
+label: "First Point-Contact Transistor"
+uncertainty_range: null
+
+# NumericalDataset
+dataset_id: "ds_transistor_scaling_01"
+title: "Transistor Count Scaling in Semiconductor Computing (1947-2024)"
+x_label: "Year"
+y_label: "Transistor Count"
+x_unit: "year"
+y_unit: "count"
+data_points:
+  - { x_value: 1947, y_value: 1.0, label: "Bell Labs Point-Contact" }
+  - { x_value: 1971, y_value: 2300.0, label: "Intel 4004" }
+  - { x_value: 2024, y_value: 208000000000.0, label: "Modern AI Accelerator" }
+source_record: { ... }                       # SourceRecord
+dataset_sha256: "b4c2...64_chars"
+```
+

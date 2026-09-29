@@ -208,3 +208,61 @@ Author the comprehensive final integration audit report at `docs/architecture/he
 
 ### Documentation & Audit Report
 - [ ] `docs/architecture/hermes-h9-integration-audit.md` is authored, comprehensive, and accurate.
+
+## 2026-09-13T16:44:00Z
+
+Build the **Harness 9 Epistemic Verification Layer** across the research, claim, production contract, editorial, script, visual rendering, and lifecycle state machine systems on branch `dev` in `g:\Finding-new-code\harness9`. Enable Harness 9 to ground claims in machine-readable evidence graphs, enforce rigorous historical scholarship and consensus modeling, verify script and visual consistency, block publication of unsupported/contradicted claims, and expose verification capabilities natively through the Hermes runtime.
+
+Working directory: g:\Finding-new-code\harness9
+Integrity mode: development
+
+## Requirements
+
+### R1. Pre-Implementation Audit & Epistemic Architectural Specifications
+Inspect existing implementations in `src/research/`, `src/models/contracts.py`, `src/models/ir.py`, `src/orchestrator/state_machine.py`, `src/h9_runtime/`, `src/editorial/`, `src/content/`, `src/creator/`, `tests/test_h9_acceptance.py`, and `ContentBench`. Author the comprehensive baseline audit report at `docs/architecture/epistemic-verification-audit.md` before core modifications begin. Deliver formal specifications under `docs/epistemic/` (`EPISTEMIC_ARCHITECTURE.md`, `FACT_CHECKING_SPEC.md`, `HISTORICAL_SCHOLARSHIP_POLICY.md`, `EVIDENCE_GRAPH.md`, `CLAIM_VERIFICATION.md`, `VISUAL_FACT_CHECKING.md`, `FACTBENCH.md`), update core docs (`DATA_MODEL.md`, `WORKFLOW_SPEC.md`, `SECURITY_MODEL.md`, `CONTENTBENCH.md`), and record `docs/adrs/ADR-006-epistemic-verification.md`.
+
+### R2. Evidence Graph & Extended Claim Contracts
+Extend `ClaimRecord` in `src/models/contracts.py` with executable semantics: granular epistemic statuses (`verified`, `supported`, `partially_supported`, `contested`, `contradicted`, `unsupported`, `unverifiable`, `outdated`, `misleading`, `opinion`, `prediction`), structured source evidence links, source quality metrics, corroboration sets, temporal context, and verifier metadata. Implement a dedicated, machine-readable Evidence Graph abstraction connecting sources, passages, evidence units, claims, verification traces, script sentences, scenes, and visual elements. Establish a 13-tier source taxonomy from `PRIMARY_SOURCE` to `UNVERIFIED`.
+
+### R3. Multi-Strategy Verification Engine & Policy Dispatch
+Implement modular, explainable verification strategies (`SOURCE_ENTAILMENT`, `CROSS_SOURCE_CORROBORATION`, `CONTRADICTION_CHECK`, `QUOTE_CHECK`, `NUMERICAL_CHECK`, `TEMPORAL_CHECK`, `HISTORIOGRAPHICAL_CHECK`). Enforce claim-type-specific policy dispatch (scientific, numerical, quote, current-event, technical, historical). Implement the hard Historical Scholarship Policy: forbid single-source or popular web summaries from establishing historical facts or interpretations; explicitly model consensus states (`STRONG_CONSENSUS`, `BROAD_CONSENSUS`, `MAJORITY_INTERPRETATION`, `MINORITY_INTERPRETATION`, `ACTIVE_DEBATE`, `CONTESTED`, `UNRESOLVED`, `INSUFFICIENT_LITERATURE`); differentiate documented events from scholarly/causal interpretations; and calibrate consensus language in script generation without ever averaging contradictions away.
+
+### R4. Multi-Stage Pipeline & Visual/Numerical Integrity
+Implement post-script claim extraction and re-verification comparing script claims against the evidence graph to detect strengthened claims, altered numbers, omitted uncertainty, or fabricated quotes (enforcing strict quote verification and paraphrase rules). Implement visual fact-checking verifying rendered storyboard elements, timelines, charts, and counts against script narration. Guarantee numerical/data visualization integrity through a deterministic pipeline from source dataset to chart rendering.
+
+### R5. Lifecycle State Machine Gates, Hermes Runtime & Security Boundaries
+Integrate hard verification gates into the production lifecycle state machine (`RESEARCH_VERIFICATION`, `SCRIPT_FACT_CHECK`, `VISUAL_FACT_CHECK`, `FINAL_EPISTEMIC_QA`) supporting deterministic quality outcomes (`PASS`, `WARN`, `HUMAN_REVIEW`, `BLOCK`). Enforce the invariant that production cannot publish while mandatory factual gates fail. Expose verification capabilities as native Hermes model tools (`h9.extract_claims`, `h9.verify_claim`, `h9.verify_script`, `h9.verify_quote`, `h9.verify_numbers`, `h9.analyze_historical_consensus`, `h9.detect_contradictions`, `h9.verify_visual_claims`, `h9.epistemic_gate`). Sanitize retrieved web content as untrusted input to prevent prompt injection or authority escalation.
+
+### R6. Evaluation Benchmark (H9-FactBench), Adversarial Testing & Final Audit
+Build the `H9-FactBench` evaluation suite across 9 distinct categories (general, numerical, quotes, scientific, current-event, historical facts, contested historical interpretations, contradictory sources, visual consistency) provisioned with hybrid hermetic offline test fixtures for deterministic CI/CD plus live scholarly API connectors. Implement adversarial test suite `tests/test_epistemic_adversarial.py` (false consensus, citation laundering, authority spoofing, prompt injection). Ensure zero regressions across existing test suites (`tests/test_h9_acceptance.py`, unit, and integration suites). Author the final forensic audit report at `docs/architecture/epistemic-verification-final-audit.md`.
+
+## Acceptance Criteria
+
+### Architecture & Pre-Audit
+- [ ] Comprehensive pre-implementation audit completed and published at `docs/architecture/epistemic-verification-audit.md`.
+- [ ] Evidence Graph abstraction integrated and reconstructable from stored evidence.
+- [ ] Claim verification is strictly decoupled from research confidence.
+- [ ] `docs/epistemic/` specifications, updated core docs, and ADR-006 committed.
+
+### Epistemic Contracts & Verification Policies
+- [ ] `ClaimRecord` extended with executable semantics for epistemic status, evidence linking, temporal context, and consensus state.
+- [ ] Source taxonomy (13 tiers) implemented with claim-type-specific verification dispatch.
+- [ ] Historical scholarship policy strictly enforced: forbidden sole sources blocked, consensus states explicitly classified, event vs. interpretation distinguished.
+- [ ] Contradictions preserved without numeric averaging; conflicting evidence flagged as `CONTESTED` or `UNRESOLVED`.
+- [ ] Quote verifier enforces exact quote matching or mandates paraphrase.
+- [ ] Deterministic numerical data pipeline backs all charts and visual statistics.
+
+### Pipeline Gates & Visual Verification
+- [ ] Script claims independently re-extracted and audited against the evidence graph.
+- [ ] Visual fact-checker verifies rendered scene elements, metrics, and dates against narration claims.
+- [ ] Production state machine blocks publishing when mandatory epistemic gates fail (`BLOCK` / `HUMAN_REVIEW`).
+
+### Hermes Integration & Security
+- [ ] Native Hermes verification tools registered and invokable through the runtime bridge without bypassing sandbox or token permissions.
+- [ ] Retrieved content is strictly treated as untrusted data; prompt injections or authority overrides are neutralized.
+
+### Testing, Benchmarks & Zero Regression
+- [ ] `H9-FactBench` executed across all 9 categories and multidimensional epistemic metrics reported.
+- [ ] Adversarial suite `tests/test_epistemic_adversarial.py` passes cleanly.
+- [ ] Full regression suite including `tests/test_h9_acceptance.py` (44/44) passes with 0 regressions.
+- [ ] Final audit report published at `docs/architecture/epistemic-verification-final-audit.md`.

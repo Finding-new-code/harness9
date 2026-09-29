@@ -1,15 +1,17 @@
-# Progress — Explorer Survey 1
+# Progress — Explorer Survey 1 (Epistemic Verification Layer)
 
-- [x] Initialized workspace and recorded dispatch
-- [x] Investigated repository structure and files
-- [x] Investigated State Machine (17 states, lifecycle transitions, contracts)
-- [x] Investigated Production Schemas / Pydantic models (all 17 requested schemas)
-- [x] Investigated adapters/hermes/ structure and docs/HERMES_COMPATIBILITY.md
-- [x] Investigated Security Capability Token system (child_permission = parent ∩ role ∩ workflow)
-- [x] Investigated Engineering Documentation Suite and ADRs (ADR-001 through ADR-005)
-- [x] Investigated Test Infrastructure (existing tests, gaps, runners)
-- [x] Synthesized findings, gaps, interface contracts, and dependency graphs
-- [/] Generating handoff report (handoff.md)
-- [ ] Sending report back to parent agent
+- [x] Initialized workspace and recorded dispatch (2026-09-13T16:46:48Z)
+- [x] Read authoritative request file (ORIGINAL_REQUEST.md entry ## 2026-09-13T16:44:00Z)
+- [x] Inspected src/models/contracts.py (ClaimRecord, SourceRecord, ResearchDossier, Script, ScriptBeat, ContentOutline)
+- [x] Inspected src/models/ir.py, src/research/, src/editorial/, src/scriptwriting/, src/h9_runtime/
+- [x] Traced claim lifecycle across research, editorial, narrative planning, scriptwriting, and IR compilation
+- [x] Designed Evidence Graph abstraction ontology (nodes, edges, invariants, reconstructability)
+- [x] Formulated 13-tier source taxonomy (PRIMARY_SOURCE to UNVERIFIED) & verification policy dispatch
+- [x] Verified test suite baseline via uv run pytest (test_contracts.py 12/12, test_h9_acceptance.py 44/44)
+- [x] Analyzed backward compatibility constraints and safe contract extension mechanisms
+- [x] Authoring comprehensive handoff report (handoff.md)
+- [x] Updating BRIEFING.md with final state and decisions
+- [x] Sending completion notification message to parent agent
 
-Last visited: 2026-08-31T15:18:00Z
+Last visited: 2026-09-13T17:02:00Z
+

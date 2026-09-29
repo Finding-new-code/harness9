@@ -65,6 +65,15 @@ from src.models.contracts import (
     AnalyticsSnapshot,
     LearningCandidate,
     H9BaseModel,
+    EpistemicStatus,
+    SourceTier,
+    DEFAULT_TIER_WEIGHTS,
+    ConsensusState,
+    ClaimType,
+    QuoteExactness,
+    SourceQualityMetrics,
+    TemporalContext,
+    EvidenceUnitLink,
 )
 
 # ---------------------------------------------------------------------------
@@ -131,6 +140,16 @@ __all__ = [
     "AnalyticsSnapshot",
     "LearningCandidate",
     "H9BaseModel",
+    # Epistemic Contracts & Taxonomy (Milestone M2)
+    "EpistemicStatus",
+    "SourceTier",
+    "DEFAULT_TIER_WEIGHTS",
+    "ConsensusState",
+    "ClaimType",
+    "QuoteExactness",
+    "SourceQualityMetrics",
+    "TemporalContext",
+    "EvidenceUnitLink",
     # Legacy Dossier models
     "Claim",
     "Source",

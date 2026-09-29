@@ -1,50 +1,54 @@
-# BRIEFING — 2026-08-31T15:11:00Z
+# BRIEFING — 2026-09-13T17:00:00Z
 
 ## Mission
-Survey and analyze Requirements R4 (Voice Director, Voice QA & Asset Deduplication), R5 (Creator DNA, Creator Economics & Quality OS / ContentBench), and test harness / pytest / verify_pipeline.py for Harness 9.
+Investigate verification strategies, historical scholarship policy, visual/numerical pipelines, and evaluation benchmarks (FactBench & Adversarial tests) for Harness 9 Epistemic Verification Layer.
 
 ## 🔒 My Identity
 - Archetype: explorer
-- Roles: investigator, synthesizer
+- Roles: investigator, synthesis
 - Working directory: g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3
-- Original parent: 93dabe60-a275-4f9f-b980-610feecf618f
-- Milestone: survey_phase
+- Original parent: 15528e12-b20e-4a6f-b0a1-c1e61282799e
+- Milestone: Harness 9 Epistemic Verification Survey & Architecture
 
 ## 🔒 Key Constraints
-- Read-only investigation — do NOT implement or modify source code
-- Produce structured handoff report in handoff.md with 5 components
-- Communicate via send_message to parent (93dabe60-a275-4f9f-b980-610feecf618f)
+- Read-only investigation — do NOT implement production source code changes in src/ or tests/
+- Write reports and analysis only in own directory .agents/teamwork_preview_explorer_survey_3/
+- Adhere to the Handoff Protocol (Observation, Logic Chain, Caveats, Conclusion, Verification Method)
 
 ## Current Parent
-- Conversation ID: 93dabe60-a275-4f9f-b980-610feecf618f
-- Updated: 2026-08-31T15:11:00Z
+- Conversation ID: 15528e12-b20e-4a6f-b0a1-c1e61282799e
+- Updated: 2026-09-13T17:00:00Z
 
 ## Investigation State
 - **Explored paths**:
-  - `src/scriptwriting/voice_director.py`, `voice_qa.py`, `tts.py`, `aligner.py`, `pipeline.py`
-  - `src/assets/deduplication.py`, `freezer.py`, `ledger.py`, `pipeline.py`
-  - `src/creator/dna.py`, `memory.py`, `economics.py`, `__init__.py`
-  - `src/evaluation/contentbench.py`, `__init__.py`
-  - `src/models/contracts.py`, `summary.py`, `dossier.py`, `ledger.py`, `script.py`
-  - `verify_pipeline.py`, `pyproject.toml`
-  - `tests/test_voice_director.py`, `test_voice_qa.py`, `test_deduplication.py`, `test_creator_dna.py`, `test_economics.py`, `test_contentbench.py`, `test_contracts.py`, `test_e2e_pipeline.py`, `test_e2e_comprehensive.py`
-  - `docs/CREATOR_MEMORY.md`, `docs/CONTENTBENCH.md`, `docs/DATA_MODEL.md`
+  - `g:/Finding-new-code/harness9/.agents/ORIGINAL_REQUEST.md` (specifically entry ## 2026-09-13T16:44:00Z)
+  - `src/research/scoring.py`, `src/research/engine.py`, `src/research/providers.py`
+  - `src/editorial/scorecard.py`, `src/editorial/angle_generator.py`
+  - `src/evaluation/contentbench.py`
+  - `src/scriptwriting/voice_qa.py`, `src/scriptwriting/generator.py`
+  - `src/models/contracts.py`, `src/models/dossier.py`, `src/models/ir.py`
+  - `src/orchestrator/state_machine.py`
+  - `src/security/tokens.py`
+  - `src/h9_runtime/bridge.py`, `tools/h9_content_tools.py`
+  - `tests/test_h9_acceptance.py` (verified 44/44 tests pass in .venv)
+  - `tests/test_contentbench.py`, `tests/test_research_adversarial.py`
 - **Key findings**:
-  - Complete multi-provider `VoiceDirector` with 4 backends, 12-emotion acoustic modulation, dynamic WPM clamping $[90, 220]$, character casting.
-  - Automated `VoiceQA` with 4 strict quantitative acoustic gates (clipping $<0.01\%$, dead air $\le 300$ms, loudness variance $\le 2.5$dBFS, sync drift $\le 0.20$s) converting to `EvaluationReport`.
-  - 2-Tier `AssetDeduplicator` using byte-exact SHA-256 and perceptual dHash with Hamming distance threshold $\le 4$.
-  - 6-Component `CreatorDNA` cognitive architecture (`BrandConstitution`, `CreatorPreferences`, `CreatorSkills`, `CreatorExamples`, `PerformanceMemory`, `NegativeMemory`) with trapezoidal AVD calculation and negative prompt directives.
-  - `CreatorEconomicsEngine` with 5 itemized cost categories (`LLM`, `RESEARCH`, `TTS`, `RENDER`, `STORAGE`) and `ProductionCostLedger`.
-  - 4-Layer `ContentBench` Quality OS ($S_{\text{research}}$, $S_{\text{script}}$, $S_{\text{video}}$, $S_{\text{cost}}$) with exact composite formula $0.25 S_{\text{research}} + 0.30 S_{\text{script}} + 0.30 S_{\text{video}} + 0.15 S_{\text{cost}}$.
-  - `verify_pipeline.py` 6-checkpoint automated acceptance verification harness and 108+ Pytest E2E/combinatorial/boundary test suites.
-- **Unexplored areas**: None within the survey scope focus.
+  - Existing verification is purely heuristic confidence scoring (`w_auth * A + w_corrob * C + w_clarity * Q - P_conflict`), conflating retrieval ranking with epistemic truth.
+  - Corroboration score merely counts distinct root domains; no semantic entailment or cross-source corroboration exists.
+  - No consensus state modeling, no historical scholarship policy (popular web sources can be treated as authoritative), and contradictions are reduced to a simple penalty rather than preserved.
+  - No post-script claim extraction or visual fact-checking (rendered IR elements vs narration).
+  - No deterministic pipeline connecting datasets to visual charts.
+  - `test_h9_acceptance.py` passes 44/44, but contains zero epistemic verification checks; adversarial testing (`tests/test_epistemic_adversarial.py`) is entirely missing.
+- **Unexplored areas**: None within scope; full architecture synthesized.
 
 ## Key Decisions Made
-- Completed deep inspection of R4, R5, test harness, and verification mechanisms.
-- Produced self-contained 5-component handoff report at `g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3\handoff.md`.
+- Designed the 7-strategy modular verification engine with typed policy dispatch.
+- Formulated the 8-state consensus model and historical scholarship policy rules.
+- Designed the post-script claim extraction, visual fact checker, and deterministic numerical pipeline.
+- Designed `H9-FactBench` across 9 categories (hybrid offline fixtures + live scholarly connectors).
+- Designed the 5-vector epistemic adversarial test suite (`test_epistemic_adversarial.py`).
 
 ## Artifact Index
-- `g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3\DISPATCH.md` — Dispatch log
-- `g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3\BRIEFING.md` — Persistent briefing memory
-- `g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3\progress.md` — Liveness heartbeat
-- `g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_3\handoff.md` — Comprehensive survey handoff report
+- DISPATCH.md — Incoming prompt and dispatch records
+- BRIEFING.md — Persistent working memory
+- handoff.md — Comprehensive technical handoff report

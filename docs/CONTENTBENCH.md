@@ -44,7 +44,11 @@ Evaluates the factual rigor and evidentiary backing in the `ResearchDossier`.
 4. **Conflict & Hallucination Penalty**: Deductions for uncorroborated assertions or internal contradictions.
 
 ### 2.2 Mathematical Formulation
+In baseline mode:
 $$S_{\text{research}} = 0.35 \times \min\left(1.0, \frac{\text{Claims}}{3.0}\right) + 0.35 \times \overline{\text{Authority}} + 0.30 \times \text{CorroborationRatio} - \text{Penalty}$$
+
+With the **Epistemic Verification Layer** enabled, Layer 1 incorporates the rigorous H9-FactBench grounding score ($S_{\text{factbench}}$):
+$$S_{\text{research}} = 0.60 \times S_{\text{factbench}} + 0.40 \times \left[ 0.50 \times \min\left(1.0, \frac{\text{Claims}}{3.0}\right) + 0.50 \times \overline{\text{Authority}} \right]$$
 
 ---
 
@@ -65,16 +69,16 @@ $$S_{\text{script}} = 0.30 \times \text{HookScore} + 0.25 \times \text{PacingSco
 
 ## 4. Layer 3: Video & Composition Evaluation ($S_{\text{video}}$)
 
-Evaluates the acoustic signal, visual composition, and animation synchronization.
+Evaluates the acoustic signal, visual composition, animation synchronization, and factual audio-visual alignment.
 
 ### 4.1 Evaluated Dimensions
 1. **VoiceQA Acoustic Score**: Waveform inspection verifying zero clipping events ($<0.01\%$), zero dead air gaps ($>300\text{ms}$), and loudness consistency ($\Delta \text{RMS} \le 2.5\text{ dBFS}$).
 2. **Speech-Beat Synchronization**: Drift offset between narration audio segment and storyboard visual transition ($\le 0.20\text{s}$).
-3. **Visual Relevance & Quality**: Semantic match between scene description and frozen image/vector asset.
+3. **Visual-Narrative Factual Alignment ($S_{\text{vis}}$)**: Zero discrepancy between on-screen text/metrics and concurrent spoken voiceover narration; verified `NumericalDataset` lineage for charts.
 4. **Composition Linter Compliance**: Binary verification of zero broken local paths, zero remote `http://` URLs, and finite GSAP animation timelines.
 
 ### 4.2 Mathematical Formulation
-$$S_{\text{video}} = 0.30 \times S_{\text{voice\_qa}} + 0.30 \times S_{\text{sync}} + 0.20 \times S_{\text{visual}} + 0.20 \times S_{\text{lint}}$$
+$$S_{\text{video}} = 0.25 \times S_{\text{voice\_qa}} + 0.25 \times S_{\text{sync}} + 0.25 \times S_{\text{vis}} + 0.25 \times S_{\text{lint}}$$
 
 ---
 
@@ -117,3 +121,40 @@ ContentBench includes 5 standardized evaluation scenarios executed during regres
 3. **`CB-S3: Apollo Guidance Computer`**: Creator-brand monologue enforcing strict Brand Constitution negative constraints.
 4. **`CB-S4: CRISPR-Cas9 Mechanisms`**: Molecular biology breakdown requiring strict source authority citations.
 5. **`CB-S5: James Webb Space Telescope`**: 9:16 vertical short-form format with safe-zone margin checks.
+
+---
+
+## 8. H9-FactBench: Epistemic Grounding Benchmark Suite
+
+**Package:** `src/evaluation/factbench/`, `docs/epistemic/FACTBENCH.md`  
+**Cross-References:** `docs/epistemic/EPISTEMIC_ARCHITECTURE.md`, `docs/epistemic/CLAIM_VERIFICATION.md`
+
+**H9-FactBench** upgrades ContentBench with a standardized, multidimensional evaluation suite assessing factual accuracy, historiographical consensus, numerical precision, and visual consistency across 9 distinct categories:
+
+### 8.1 The 9 Benchmark Categories
+1. **`general_factual`**: Core encyclopedic and geographical assertions; tests baseline NLI entailment.
+2. **`numerical_integrity`**: Dimensional analysis, SI unit conversion, and mathematical consistency.
+3. **`quote_veracity`**: Character-level Levenshtein matching against primary text and paraphrase enforcement.
+4. **`scientific_mechanisms`**: Causal hypotheses vs verified physical/biological laws in peer-reviewed literature.
+5. **`current_events_temporal`**: Freshness auditing and temporal bounding anchors (`as_of_date`).
+6. **`historical_facts`**: Archival event verification; enforcement of the prohibition on sole web sources.
+7. **`contested_historical_interpretations`**: Historiographical consensus state classification (8 states) and rhetoric calibration.
+8. **`contradictory_sources`**: Mutually exclusive propositions; enforcement of the non-averaging invariant.
+9. **`visual_script_consistency`**: Storyboard visual parameter reconciliation against concurrent spoken voiceover.
+
+### 8.2 Hybrid Evaluation Architecture
+- **Hermetic Offline Mode (`--mode=offline`)**: Deterministic execution against curated local JSON fixtures in `tests/fixtures/factbench/` with zero network access for CI/CD pipelines.
+- **Live Scholarly Mode (`--mode=live`)**: Connects to open scholarly APIs (OpenAlex, Europe PMC, arXiv, Crossref) for dynamic benchmarking against real-world literature.
+
+### 8.3 Epistemic Composite Score ($S_{\text{factbench}}$)
+$$S_{\text{factbench}} = 0.25 \cdot P_{\text{verif}} + 0.20 \cdot R_{\text{contra}} + 0.20 \cdot S_{\text{hist}} + 0.20 \cdot S_{\text{vis}} + 0.15 \cdot S_{\text{num}}$$
+
+Where:
+- $P_{\text{verif}}$: Precision of verified claims.
+- $R_{\text{contra}}$: Recall of detected contradictions.
+- $S_{\text{hist}}$: Historiographical consensus calibration accuracy.
+- $S_{\text{vis}}$: Visual-narrative alignment ratio.
+- $S_{\text{num}}$: Numerical accuracy index.
+
+When integrated into ContentBench, an overall grade of **A+ Exemplar** or **A Broadcast Standard** strictly requires $S_{\text{factbench}} \ge 0.85$ and zero unresolved `BLOCK` gate failures.
+

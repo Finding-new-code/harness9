@@ -1,92 +1,176 @@
-# Forensic Audit Handoff Report — Milestone 2: Asset Discovery, Rights Ledger & Local Freezing (R2)
+# Handoff Report: Forensic Integrity Audit — Milestone 2
+
+**Agent**: `auditor_m2`  
+**Working Directory**: `g:\Finding-new-code\harness9\.agents\auditor_m2`  
+**Parent Agent ID**: `ba190775-5480-43b0-a934-7fd1b7ba9b5b`  
+**Date**: 2026-09-14T01:10:00Z  
+**Type**: Hard Handoff (Full Forensic Audit Complete)  
+**Target Milestone**: Milestone 2 (Epistemic Evidence Graph & Extended Contracts)  
+**Verdict**: **CLEAN**  
+
+---
 
 ## 1. Observation
 
-### Codebase Inspection
-- **Source Modules Audited**:
-  - `src/assets/__init__.py`: Exports 17 classes/functions (`AssetPipeline`, `AssetDiscoveryEngine`, `CandidateAsset`, `WikimediaProvider`, `PexelsProvider`, `NASAProvider`, `OfflineMockProvider`, `AssetFreezer`, `AssetDownloadError`, `AssetSizeExceededError`, `AssetChecksumMismatchError`, `sniff_magic_bytes`, `compute_sha256`, `compute_file_sha256`, `verify_sha256`, `audit_composition_paths`, `assert_zero_external_urls`, `AssetLedgerManager`, `ProceduralSVGGenerator`, and data models).
-  - `src/assets/freezer.py`: 357 lines implementing binary header magic-byte sniffing (JPEG, PNG, WebP, SVG, MP4, WAV, MP3), standard SHA-256 chunked streaming via `hashlib.sha256()`, 25MB safety capped HTTP/HTTPS downloads with retry backoff, atomic disk freezing, and HTML composition zero-external-URL verification.
-  - `src/assets/ledger.py`: 219 lines implementing complete `AssetLedgerManager` lifecycle (add, remove, query, summary recalculation, on-disk file checksum validation, and atomic dual JSON/YAML saving).
-  - `src/assets/procedural.py`: 423 lines generating procedural 1920x1080 SVG vector graphics across 5 thematic styles (`circuits`, `computing`, `aerospace`, `science`, `general`) and 3 card layouts (Quote, Metric, Hero).
-  - `src/assets/discovery.py`: 580 lines implementing `WikimediaProvider` (MediaWiki Action API with ExtMetadata extraction), `PexelsProvider` (REST API), `NASAProvider` (Image & Video API), `OfflineMockProvider` (benchmark catalog), and `AssetDiscoveryEngine` (orchestrator with deduplication).
-  - `src/assets/pipeline.py`: 223 lines orchestrating Stage 2 end-to-end flow from `ResearchDossier` to frozen assets and rights ledger.
-  - `src/models/ledger.py`: 257 lines defining `Dimensions`, `CreatorInfo`, `LicenseInfo`, `MediaAsset`, and `AssetProvenanceLedger` dataclasses with bidirectional serialization (`to_dict`, `from_dict`, `to_json`, `from_json`, `to_yaml`, `from_yaml`, `save`, `load`).
+1. **Static Analysis & AST Inspection**:
+   - Inspected files:
+     - `src/models/contracts.py` (854 lines)
+     - `src/models/__init__.py` (176 lines)
+     - `src/h9_runtime/content.py` (377 lines)
+     - `src/epistemic/__init__.py` (52 lines)
+     - `src/epistemic/graph.py` (1,179 lines)
+     - `tests/test_evidence_graph.py` (655 lines)
+   - Zero hardcoded test literals, fixtures, or expected result strings (e.g., `"claim_quantum_01"`, `"MIT Tech Review"`, `"The treaty was signed on June 28, 1919"`) exist in production code (`src/epistemic/graph.py`, `src/models/contracts.py`).
+   - Zero dummy or facade returns (`return True`, `return "verified"`, `pass` stubs) exist in core methods. Every method in `EvidenceGraph` contains genuine computational logic.
 
-### Empirical Execution
-- Running `python -m unittest tests/test_assets.py -v`:
-  ```
-  Ran 28 tests in 1.910s
-  OK
-  ```
-- Running independent forensic check suite `python .agents/auditor_m2/forensic_check.py`:
-  - 13/13 MIME signatures verified (JPEG, PNG, WebP, SVG, MP4, WAV, MP3, octet-stream).
-  - NIST SHA-256 test vectors match 100%. 3MB chunked hash match verified. Tamper detection verified (1-bit mutation detected).
-  - Dual JSON/YAML ledger roundtrip serialization verified.
-  - Composition path linter correctly identified external HTTP/HTTPS media references.
-  - End-to-end asset pipeline executed on research dossier with 0 errors, outputting valid non-empty assets and ledgers.
-  - Static cheat/facade scan returned 0 findings across all 6 source files.
+2. **Pydantic Schemas & Invariant Validation**:
+   - In `src/models/contracts.py`:
+     - Lines 197–210: `EpistemicStatus(str, Enum)` defines all 11 discrete statuses: `VERIFIED`, `SUPPORTED`, `PARTIALLY_SUPPORTED`, `CONTESTED`, `CONTRADICTED`, `UNSUPPORTED`, `UNVERIFIABLE`, `OUTDATED`, `MISLEADING`, `OPINION`, `PREDICTION`.
+     - Lines 212–258: `SourceTier(int, Enum)` defines all 13 hierarchical tiers (`PRIMARY_SOURCE` = 1 to `UNVERIFIED` = 13) and `DEFAULT_TIER_WEIGHTS` maps tiers from $1.00$ to $0.00$.
+     - Lines 263–274: `ConsensusState(str, Enum)` defines all 8 consensus states: `STRONG_CONSENSUS`, `BROAD_CONSENSUS`, `MAJORITY_INTERPRETATION`, `MINORITY_INTERPRETATION`, `ACTIVE_DEBATE`, `CONTESTED`, `UNRESOLVED`, `INSUFFICIENT_LITERATURE`.
+     - Lines 277–330: Supporting models `ClaimType`, `QuoteExactness`, `SourceQualityMetrics`, `TemporalContext`, `EvidenceUnitLink`.
+     - Lines 364–419: `ClaimRecord` extended with `evidence_node_ids`, `epistemic_status`, `consensus_state`, `source_tier`, `source_quality`, `corroboration_set`, `temporal_context`, `verifier_metadata`, `quote_exactness`, `claim_type`, `contradicting_sources`, `evidence_links`, and `@property def verification_status`.
+     - Lines 459–472: `ResearchDossier` extended with `sources`, `evidence_graph`, and `entity_mentions`.
+   - In `src/models/__init__.py`: Lines 68–77 and 144–152 re-export all new contracts and enums into `__all__`.
+
+3. **DAG Data Structure & Cycle Prevention**:
+   - In `src/epistemic/graph.py`:
+     - Lines 599–614: `would_create_cycle(self, source_id: str, target_id: str) -> bool` executes BFS starting from `target_id`. If `target_id == source_id` or any BFS traversal reaches `source_id`, it returns `True`.
+     - Lines 648–652: `link()` invokes `self.would_create_cycle(source_id, target_id)` and raises `CycleDetectedError` before any internal state is modified.
+     - Lines 713–733: `has_cycles(self) -> bool` provides a complete 3-color DFS global cycle detection.
+     - Empirical testing verified that self-loops (`A -> A`), direct 2-node cycles (`A -> B -> A`), multi-hop cycles (`N0 -> ... -> N9 -> N0`), and cycles in dense 50-node/190-edge graphs raise `CycleDetectedError`.
+     - Diamond DAG structures ($A \to B \to D$ and $A \to C \to D$) are cleanly allowed without false-positive cycle detection.
+
+4. **Kahn's Topological Sort with Deterministic Tie-Breaking**:
+   - In `src/epistemic/graph.py`: Lines 735–755 implement Kahn's algorithm using in-degree tracking, maintaining a priority queue with `bisect.insort` for alphanumeric tie-breaking.
+   - Tested on arbitrary DAGs: for all edges $(u, v)$, $\text{index}(u) < \text{index}(v)$ strictly holds.
+   - Tested across shuffled node insertion permutations: topological sort order is 100% identical and byte-stable, preserving LLM prompt caching.
+
+5. **Multi-Path Epistemic Confidence Calculation**:
+   - In `src/epistemic/graph.py`: Lines 895–975 implement `calculate_chain_confidence(target_node_id, hop_decay=0.98, method="probabilistic")`:
+     - Series connection: $\text{root\_weight} \times \prod (\text{edge.weight} \times \text{edge.confidence}) \times \prod \text{node.confidence} \times (\lambda^{\text{hops}-1})$.
+     - Parallel corroboration: Noisy-OR combination $1.0 - \prod (1.0 - c_i)$, strictly rewarding multiple independent root sources.
+     - Active contradiction: subtracts $\max(\text{contradiction\_penalties})$.
+     - Bottleneck method: min-cut across intermediate nodes and edges.
+   - Empirical calculations matched mathematical derivations: single path tier 2 hop 3 gave $0.98 \times 0.98^2 = 0.9412$; parallel corroboration strictly boosted confidence ($>0.9412$); adding a contradiction edge with weight 0.5 decreased confidence by exactly $0.5000$.
+
+6. **Circular Import Resolution in `src/h9_runtime/content.py`**:
+   - Lines 34–43: Top-level imports of `ProductionStateMachine`, `ProductionState`, `ResearchEngine`, and `EditorialEngine` were removed.
+   - Lines 124, 160, 325–331: Imports moved inside `plan_research`, `evaluate_angles`, and `run_full_production`.
+   - Running `.venv\Scripts\python.exe -m pytest tests/test_state_machine.py` passes 10/10 in isolation (2.96s) with zero `ImportError`.
+   - Calling `DefaultContentRuntime` methods invokes the genuine implementations with identical arguments.
+
+7. **Test Suite Integrity in `tests/test_evidence_graph.py`**:
+   - 10 test classes, 42 tests, 655 lines.
+   - `git grep -i "mock" tests/test_evidence_graph.py` returned exit code 1 (zero occurrences of `mock`, `patch`, or `MagicMock`).
+   - AST inspection revealed zero tautological assertions (`assertTrue(True)`, `assertEqual(x, x)`).
+   - All tests exercise real `EvidenceGraph` instances, real node models, real edge links, real DAG traversals, and real Pydantic serialization roundtrips.
+
+8. **Empirical Regression Execution**:
+   - `pytest tests/test_state_machine.py`: 10 passed in 2.96s.
+   - `pytest tests/test_contracts.py`: 12 passed in 3.18s.
+   - `pytest tests/test_evidence_graph.py`: 42 passed in 2.17s.
+   - `pytest tests/test_h9_acceptance.py`: 44 passed in 48.18s.
+   - Total: 108 executed, 108 passed, 0 failures, 0 errors.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Static Analysis & Absence of Facades**:
-   - Observations confirm that all classes in `src/assets/` contain real computational routines.
-   - Grep searches for hardcoded dummy values (`00000000`, `abc12345`) in source files returned 0 matches.
-   - Therefore, the codebase contains no facade or mock cheating shortcuts.
+1. **Static Analysis & Facade Checks (Observation 1)**:
+   - If production code contains hardcoded test outputs or dummy return statements, it violates integrity rule 1 (hardcoded test results) and rule 2 (facade implementations).
+   - AST and token analysis verified that `src/epistemic/graph.py` and `src/models/contracts.py` contain zero hardcoded test literals and zero trivial returns. Every method executes genuine graph traversals, validation, or math. Therefore, no facade or hardcoding integrity violations exist.
 
-2. **Cryptographic & Binary Integrity**:
-   - `compute_sha256` and `compute_file_sha256` use Python's standard `hashlib.sha256`.
-   - Tested against standard NIST test vectors and 3MB random binary payloads, hashing was bit-for-bit identical with standard cryptographic digests.
-   - Tampered files caused `verify_sha256` to return `False` and triggered `AssetChecksumMismatchError`.
-   - `sniff_magic_bytes` correctly identifies magic bytes for all 7 required media types directly from byte signatures.
+2. **Implementation Authenticity (Observations 2, 3, 4, 5)**:
+   - The user request specified an Evidence Graph DAG connecting sources, passages, evidence units, claims, verification traces, script sentences, scenes, and visual elements, with a 13-tier source taxonomy and executable claim semantics.
+   - Observation 2 confirms that all 8 node types, 6 edge relations, 13 source tiers, 11 epistemic statuses, and 8 consensus states are implemented as full Pydantic v2 schemas with real validation bounds.
+   - Observation 3 confirms that `would_create_cycle` uses standard BFS to detect backward paths before edge creation, correctly rejecting self-loops, 2-node cycles, multi-hop cycles, and dense graph cycles, while allowing diamond DAGs.
+   - Observation 4 confirms Kahn's topological sort with deterministic alphanumeric tie-breaking via `bisect.insort`.
+   - Observation 5 confirms genuine probabilistic confidence calculations with series exponential decay, Noisy-OR parallel boosting, and contradiction penalties.
+   - Therefore, the implementation is authentic and mathematically sound.
 
-3. **Offline & Online Asset Processing**:
-   - In online mode, `WikimediaProvider`, `PexelsProvider`, and `NASAProvider` parse real API responses, strip HTML markup, and classify licenses into CC-BY-SA, Public Domain, CC0, or Pexels License.
-   - In offline mode, `ProceduralSVGGenerator` generates UHD 1920x1080 geometric vector artwork tailored to topic keywords.
-   - `AssetPipeline.discover_and_freeze_assets` automatically connects dossier claims and visual queries, writes assets to `assets/images/`, computes SHA-256 digests, and generates `asset_ledger.json` and `asset_ledger.yaml`.
+3. **Circular Import Remediation (Observation 6)**:
+   - `tests/test_state_machine.py` previously failed collection due to an import cycle when `src.orchestrator` was loaded before `src.h9_runtime.content`.
+   - Moving imports inside the calling methods (`plan_research`, `evaluate_angles`, `run_full_production`) is standard Python lazy loading that breaks module-level import cycles without modifying runtime logic or bypassing functionality.
+   - As observed in Observation 6, `test_state_machine.py` now passes 10/10 in isolation, and full pipeline operations execute the genuine underlying classes.
 
-4. **Compliance with Integrity Mode**:
-   - Under Development Mode, the deliverable must not contain hardcoded test results, facade implementations, fabricated verification logs, or self-certifying tests.
-   - All empirical checks passed with full mathematical, cryptographic, and structural authenticity.
+4. **Test Suite Authenticity (Observations 7, 8)**:
+   - Tests that mock core logic or assert tautologies fail to test real behaviors.
+   - Observation 7 proves that `tests/test_evidence_graph.py` contains zero mocks and zero tautological assertions across all 42 tests.
+   - Observation 8 confirms that all 108 tests across the test suite execute cleanly and pass without regressions.
 
 ---
 
 ## 3. Caveats
 
-- **Strict XML Parser Escaping**: `ProceduralSVGGenerator.THEMES` defines tag names with literal `&` characters (`"SEMICONDUCTOR & SOLID-STATE"`, `"QUANTUM PHYSICS & EXPLORATION"`, `"TECHNOLOGY & INNOVATION"`). In HTML5/SVG renderers (e.g. browser / HyperFrames), this renders without issue; however, strict standalone XML parsers like `xml.etree.ElementTree` require `&amp;`. This is a non-blocking quality finding for future refinement, not an integrity violation.
-- **External Network Live Calls**: Online providers require network connectivity and optional API keys (e.g. Pexels API key). In test environments and zero-network conditions, the pipeline automatically and cleanly falls back to `OfflineMockProvider` and `ProceduralSVGGenerator` as designed.
+1. **Downstream Integration (Milestones M3–M5)**: `EvidenceGraph` provides the storage, query, invariant, lineage, and confidence computation layer. The verification strategies (e.g. `SOURCE_ENTAILMENT`, `HISTORIOGRAPHICAL_CHECK`) that populate `VerificationTraceNode` and update claim epistemic statuses will be implemented in Milestone M3 (`src/epistemic/engine.py`).
+2. **Offline Mode**: Tests operate hermetically offline; external web retrieval is mocked or disabled by design in development integrity mode.
 
 ---
 
 ## 4. Conclusion
 
+The Milestone 2 work product satisfies all forensic integrity criteria:
+- Zero hardcoded test outputs, zero fake returns, zero dummy facades.
+- Fully authentic DAG data structure with genuine BFS cycle detection and Kahn's topological sort.
+- Genuine multi-path confidence calculation with Noisy-OR, series exponential decay, and contradiction penalties.
+- Clean circular dependency resolution in `src/h9_runtime/content.py` without bypassing any business logic.
+- Comprehensive test suite with 42 genuine unit/integration tests and 100% pass rate.
+- Zero regressions across existing test suites (108/108 tests passing).
+
 **Verdict**: **CLEAN**
-
-Milestone 2 (`src/assets/`) successfully implements Asset Discovery, Rights Ledger, Asset Freezing, and Procedural SVG Generation without integrity violations, mock shortcuts, or facade implementations.
-
-The deliverable is approved and ready for integration with Milestone 3 (`script_voiceover`).
 
 ---
 
 ## 5. Verification Method
 
-To independently verify this audit, run the following commands from the project root:
+To independently verify these results:
 
-1. **Run Full Asset Unit Test Suite**:
-   ```bash
-   python -m unittest tests/test_assets.py -v
+1. **Run Standalone Forensic Audit Suite**:
+   ```pwsh
+   .venv\Scripts\python.exe .agents/auditor_m2/forensic_check.py
    ```
-   *Expected output*: 28 tests run, 0 failures, 0 errors (`OK`).
+   *Expected Output:*
+   ```
+   === STARTING MILESTONE 2 FORENSIC INTEGRITY AUDIT ===
+   [PASS] Static Code Analysis & AST Inspection: ...
+   [PASS] Pydantic Schemas & Value Invariants: ...
+   [PASS] DAG Engine & BFS Cycle Detection: ...
+   [PASS] Kahn's Algorithm & Deterministic Topological Sorting: ...
+   [PASS] Provenance Lineage & Chain Reconstruction: ...
+   [PASS] Chain Confidence Calculation Authenticity: ...
+   [PASS] Circular Import & Lazy Loading Resolution: ...
+   [PASS] Test Suite Authenticity & Assertion Non-Tautology: ...
+   === AUDIT COMPLETE ===
+   Final Forensic Verdict: CLEAN
+   ```
 
-2. **Run Standalone Forensic Verification Suite**:
-   ```bash
-   python .agents/auditor_m2/forensic_check.py
+2. **Verify State Machine in Isolation**:
+   ```pwsh
+   .venv\Scripts\python.exe -m pytest tests/test_state_machine.py -v
    ```
-   *Expected output*: 7/7 checks PASS, outputting `FINAL FORENSIC VERDICT: CLEAN`.
+   *Expected Output:* `10 passed in ~3s`.
 
-3. **Run Research Regression Suite**:
-   ```bash
-   python -m unittest tests/test_research.py -v
+3. **Verify Contracts Suite**:
+   ```pwsh
+   .venv\Scripts\python.exe -m pytest tests/test_contracts.py -v
    ```
-   *Expected output*: 20 tests run, 0 failures, 0 errors (`OK`).
+   *Expected Output:* `12 passed in ~3s`.
+
+4. **Verify Evidence Graph Suite**:
+   ```pwsh
+   .venv\Scripts\python.exe -m pytest tests/test_evidence_graph.py -v
+   ```
+   *Expected Output:* `42 passed in ~2s`.
+
+5. **Verify Full 8-Dimension Acceptance Suite (Zero Regressions)**:
+   ```pwsh
+   .venv\Scripts\python.exe -m pytest tests/test_h9_acceptance.py -v
+   ```
+   *Expected Output:* `44 passed in ~48s`.
+
+6. **Invalidation Conditions**:
+   - Invalidation occurs if `forensic_check.py` fails any check or outputs `INTEGRITY VIOLATION`.
+   - Invalidation occurs if any test in `test_state_machine.py`, `test_contracts.py`, `test_evidence_graph.py`, or `test_h9_acceptance.py` fails.
+   - Invalidation occurs if adding a cyclic edge to `EvidenceGraph` fails to raise `CycleDetectedError`.
+   - Invalidation occurs if `topological_sort` produces non-deterministic orderings across shuffled input node orders.

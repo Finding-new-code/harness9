@@ -34,13 +34,6 @@ from src.models.contracts import (
     ScriptScene,
     ScriptBeat,
 )
-from src.orchestrator.state_machine import (
-    ProductionState,
-    ProductionStateMachine,
-)
-from src.research.engine import ResearchEngine
-from src.editorial import EditorialEngine
-
 logger = logging.getLogger(__name__)
 
 
@@ -128,6 +121,8 @@ class DefaultContentRuntime:
         duration: int = 30,
     ) -> ResearchDossier:
         """Execute research synthesis returning a validated ResearchDossier."""
+        from src.research.engine import ResearchEngine
+
         engine = ResearchEngine()
         ws = self._get_session_workspace(session_id)
         dossier_obj = engine.synthesize_research(
@@ -162,6 +157,8 @@ class DefaultContentRuntime:
         creator_id: Optional[str] = None,
     ) -> Tuple[List[EditorialAngle], EditorialAngle]:
         """Generate candidate angles and select winning angle."""
+        from src.editorial import EditorialEngine
+
         editorial = EditorialEngine()
         candidates, winner, _, _ = editorial.process_editorial(dossier=dossier)
         return candidates, winner
@@ -325,6 +322,12 @@ class DefaultContentRuntime:
         ws = self._get_session_workspace(session_id)
         renders_dir = self._get_session_renders(session_id)
 
+        from src.orchestrator.state_machine import (
+            ProductionState,
+            ProductionStateMachine,
+        )
+        from src.orchestrator.pipeline import Pipeline
+
         sm = ProductionStateMachine(run_id=brief.project_id)
 
         try:
@@ -341,7 +344,6 @@ class DefaultContentRuntime:
             )
 
             # Execute pipeline
-            from src.orchestrator.pipeline import Pipeline
             pipeline = Pipeline(
                 topic=brief.topic,
                 output_dir=ws,

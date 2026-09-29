@@ -1,44 +1,48 @@
-# BRIEFING — 2026-08-31T15:13:00Z
+# BRIEFING — 2026-09-13T17:01:00Z
 
 ## Mission
-Survey and analyze requirements R2 (Editorial Intelligence & Multi-Angle Decision Engine) and R3 (HyperFrames Adapter, Extension Pack & Reusable Component Registry) across the Harness 9 codebase.
+Investigate the production lifecycle state machine, runtime bridge, Hermes tools, and security boundaries for the Harness 9 Epistemic Verification Layer.
 
 ## 🔒 My Identity
-- Archetype: explorer
-- Roles: investigation, synthesis
+- Archetype: Teamwork explorer
+- Roles: read-only investigation, survey explorer 2
 - Working directory: g:\Finding-new-code\harness9\.agents\teamwork_preview_explorer_survey_2
-- Original parent: 93dabe60-a275-4f9f-b980-610feecf618f
-- Milestone: survey
+- Original parent: 15528e12-b20e-4a6f-b0a1-c1e61282799e
+- Milestone: Epistemic Verification Layer Architecture & Survey
 
 ## 🔒 Key Constraints
-- Read-only investigation — do NOT implement or modify source code
-- Focus strictly on R2 and R3 requirements, contracts, existing files, test suites, and gaps
-- Self-contained 5-component handoff report to handoff.md
+- Read-only investigation — do NOT implement
+- Do NOT modify codebase source files
+- All findings written to handoff.md in working directory
+- Message parent with concise completion notice
 
 ## Current Parent
-- Conversation ID: 93dabe60-a275-4f9f-b980-610feecf618f
-- Updated: 2026-08-31T15:13:00Z
+- Conversation ID: 15528e12-b20e-4a6f-b0a1-c1e61282799e
+- Updated: not yet
 
 ## Investigation State
 - **Explored paths**:
-  - `src/editorial/` (`__init__.py`, `angle_generator.py`, `scorecard.py`, `selector.py`, `hook_generator.py`, `narrative_planner.py`)
-  - `adapters/hyperframes/` (`__init__.py`, `adapter.py`, `registry.py`)
-  - `src/hyperframes/` (`generator.py`, `renderer.py`, `validator.py`, and 7 component blocks in `components/`)
-  - `src/models/contracts.py` (Pydantic v2 data models for R2/R3)
-  - `tests/test_editorial.py`, `tests/test_hyperframes.py`, `tests/test_hyperframes_components.py`
-  - `docs/HYPERFRAMES_INTEGRATION.md`, `docs/WORKFLOW_SPEC.md`, `docs/API_CONTRACTS.md`, `HARNESS9.md`
+  - `src/orchestrator/state_machine.py`, `src/orchestrator/pipeline.py`, `src/orchestrator/__init__.py`
+  - `src/h9_runtime/content.py`, `src/h9_runtime/bridge.py`, `src/h9_runtime/tools.py`, `src/h9_runtime/execution.py`, `src/h9_runtime/agent.py`
+  - `tools/h9_content_tools.py`, `tools/registry.py`
+  - `src/security/tokens.py`, `src/security/guard.py`
+  - `src/research/engine.py`
+  - `tests/test_state_machine.py`, `tests/test_h9_acceptance.py`, `tests/test_h9_m5_sandbox_permission_mcp.py`
 - **Key findings**:
-  - Complete mapping of existing R2 and R3 implementations, schemas, interfaces, and unit tests.
-  - Identified 4 specific test failure / edge cases in `test_hyperframes_components.py` and `BaseComponent.validate()` property merging.
-  - Formulated full dependency graphs, interface contracts, and gap matrix.
-- **Unexplored areas**: None within R2/R3 survey scope.
+  1. 17-state machine operates deterministically via `VALID_TRANSITIONS` table; has 17 canonical sequential states and 3 control states (`PAUSED_FOR_HUMAN`, `FAILED`, `CANCELLED`).
+  2. Four verification gates (`RESEARCH_VERIFICATION`, `SCRIPT_FACT_CHECK`, `VISUAL_FACT_CHECK`, `FINAL_EPISTEMIC_QA`) map naturally between lifecycle phases and must enforce deterministic verdicts (`PASS`, `WARN`, `HUMAN_REVIEW`, `BLOCK`). `FINAL_EPISTEMIC_QA` must gate `h9.publish` and state `COMPLETED`.
+  3. Native Hermes model tools in `tools/h9_content_tools.py` follow the Footprint Ladder (Rung 3 service-gated `check_fn=check_h9_available`), dual dotted/underscore registration (`h9.tool` + `h9_tool`), and pre-execution capability token enforcement. Concrete schemas designed for 9 new epistemic tools.
+  4. Security model enforces least-privilege token derivation ($P_{child} = P_{parent} \cap P_{role} \cap P_{workflow}$), HMAC-SHA256 signatures, TTL expiration, and cascading lineage revocation. Untrusted web content requires strict data/instruction boundary encapsulation (`<untrusted_source>`), token-level isolation, and sanitization to prevent prompt injection and authority escalation.
+  5. Empirical test verification: `test_h9_m5_sandbox_permission_mcp.py` (19/19 passed), `test_h9_acceptance.py` (44/44 passed), `test_state_machine.py` (10/10 passed). Identified a circular import cycle between `src.orchestrator` and `src.h9_runtime.content` triggered when `src.orchestrator` is imported first.
+- **Unexplored areas**: None within assigned scope.
 
 ## Key Decisions Made
-- Executed unit test suites using `.venv` Python environment.
-- Documented complete 5-component handoff report in `handoff.md`.
+- Fully documented the 4 verification gates and their transition hooks.
+- Defined complete parameter schemas and handler contracts for all 9 new epistemic model tools.
+- Formulated untrusted content sanitization architecture and capability permission token additions.
+- Diagnosed circular import root cause and recommended deferring `Pipeline` import in `content.py`.
 
 ## Artifact Index
-- `.agents/teamwork_preview_explorer_survey_2/DISPATCH.md` — Incoming dispatch logs
-- `.agents/teamwork_preview_explorer_survey_2/progress.md` — Progress tracker
-- `.agents/teamwork_preview_explorer_survey_2/BRIEFING.md` — Situational awareness
-- `.agents/teamwork_preview_explorer_survey_2/handoff.md` — Final survey handoff report
+- handoff.md — Final 5-component technical handoff report
+- DISPATCH.md — Initial dispatch log
+- progress.md — Liveness and step tracker

@@ -1,57 +1,62 @@
-# BRIEFING — 2026-08-31T05:31:35Z
+# BRIEFING — 2026-09-14T01:06:15+05:30
 
 ## Mission
-Objective and adversarial review of Milestone 2 (Asset Discovery, Rights Ledger & Local Freezing - R2) implementation in `src/assets/`.
+Review and adversarially challenge Milestone 2 deliverables implemented by worker_m2 (contracts.py, src/models/__init__.py, content.py, tests).
 
 ## 🔒 My Identity
-- Archetype: reviewer_critic
+- Archetype: reviewer-critic
 - Roles: reviewer, critic
 - Working directory: g:\Finding-new-code\harness9\.agents\reviewer_1_m2
-- Original parent: 3652ed15-e3cb-4673-894d-9c4cbb85fd38
-- Milestone: Milestone 2 (Asset Discovery, Rights Ledger & Local Freezing - R2)
+- Original parent: ba190775-5480-43b0-a934-7fd1b7ba9b5b
+- Milestone: Milestone 2: Evidence Contracts & Research Graph Models
 - Instance: 1 of 1
 
 ## 🔒 Key Constraints
 - Review-only — do NOT modify implementation code
-- Report any integrity violations (hardcoding, facades, shortcuts, fakes) as REQUEST_CHANGES with Critical finding
-- Run tests via python -m unittest tests/test_assets.py -v
-- Deliver report.md and handoff.md in working directory
-- Send message to parent upon completion
+- Integrity check: actively check for hardcoding, facades, shortcuts, fake verification
+- Strict verification before approval
+- Communicate via send_message to parent agent
 
 ## Current Parent
-- Conversation ID: 3652ed15-e3cb-4673-894d-9c4cbb85fd38
-- Updated: 2026-08-31T05:31:35Z
+- Conversation ID: ba190775-5480-43b0-a934-7fd1b7ba9b5b
+- Updated: not yet
 
 ## Review Scope
-- **Files to review**: `src/assets/discovery.py`, `src/assets/freezer.py`, `src/assets/ledger.py`, `src/assets/procedural.py`, `src/assets/pipeline.py`, `tests/test_assets.py`
-- **Interface contracts**: `PROJECT.md`, `ORIGINAL_REQUEST.md`
-- **Review criteria**: Correctness, Schema conformance, Magic byte sniffing, SHA-256 calculation, Procedural SVG generator, Test coverage & edge case robustness
+- **Files to review**: src/models/contracts.py, src/models/__init__.py, src/h9_runtime/content.py, tests/test_contracts.py, tests/test_state_machine.py
+- **Interface contracts**: g:\Finding-new-code\harness9\.agents\ORIGINAL_REQUEST.md, g:\Finding-new-code\harness9\.agents\teamwork_preview_orchestrator_8\PROJECT.md
+- **Review criteria**: correctness, completeness, quality, backwards compatibility, circular import resolution, test coverage
 
 ## Review Checklist
 - **Items reviewed**:
-  - `src/assets/discovery.py` (Wikimedia, Pexels, NASA, OfflineMock, Engine)
-  - `src/assets/freezer.py` (magic bytes, streaming download, SHA-256, path auditor)
-  - `src/assets/ledger.py` (AssetLedgerManager, dual JSON/YAML, validation)
-  - `src/assets/procedural.py` (5 domain themes, card generators, XML escaping)
-  - `src/assets/pipeline.py` (AssetPipeline integration)
-  - `tests/test_assets.py` (28 unit & boundary tests)
+  - `src/models/contracts.py`: EpistemicStatus (11), SourceTier (13 + weights), ConsensusState (8), Supporting Models (SourceQualityMetrics, TemporalContext, QuoteExactness, EvidenceUnitLink, ClaimType), Extended ClaimRecord, SourceRecord, ResearchDossier, backwards-compatible defaults, verification_status property
+  - `src/models/__init__.py`: exports of all new epistemic models and enums
+  - `src/h9_runtime/content.py`: lazy import resolution of Pipeline, EditorialEngine, ResearchEngine, ProductionStateMachine
+  - `tests/test_state_machine.py`: isolated pass (10/10)
+  - `tests/test_contracts.py`: contracts pass (12/12)
+  - `tests/test_evidence_graph.py`: evidence graph pass (42/42)
+  - Circular import matrix: permutations A, B, C, D verified
+  - Adversarial contract checks: all passed
 - **Verdict**: APPROVE
-- **Unverified claims**: None
+- **Unverified claims**: none remaining; all claims verified independently
 
 ## Attack Surface
 - **Hypotheses tested**:
-  - File tampering triggers SHA-256 validation error -> Confirmed PASS
-  - Over 25MB file download rejection -> Confirmed PASS
-  - Zero-network offline fallback -> Confirmed PASS
-  - Empty visual queries resilience -> Confirmed PASS
-  - Special character / XML injection in SVG -> Confirmed PASS
-  - External URL detection in composition -> Confirmed PASS
-- **Vulnerabilities found**: None
-- **Untested angles**: None
+  - Circular import triggering under arbitrary import ordering -> PASSED
+  - Out-of-range bounds on SourceQualityMetrics & EvidenceUnitLink -> PASSED (ValidationError properly raised)
+  - Missing weights in DEFAULT_TIER_WEIGHTS -> PASSED (all 13 tiers present and mapped)
+  - Serialization roundtripping to/from JSON and YAML for extended records -> PASSED
+  - Backward compatibility of ClaimRecord, SourceRecord, ResearchDossier when constructed with legacy arguments -> PASSED
+  - Dynamic update of epistemic_status reflecting in verification_status -> PASSED
+- **Vulnerabilities found**: None.
+- **Untested angles**: All core contract requirements and circular import paths tested.
 
 ## Key Decisions Made
-- Confirmed full correctness and integrity of Milestone 2. Issued formal APPROVE verdict.
+- Confirmed zero integrity violations (no facades, no hardcoded answers, no bypasses).
+- Verified full backward compatibility and strict type safety.
+- Prepared APPROVE verdict.
 
 ## Artifact Index
-- g:\Finding-new-code\harness9\.agents\reviewer_1_m2\report.md — Detailed review report
-- g:\Finding-new-code\harness9\.agents\reviewer_1_m2\handoff.md — 5-component handoff report
+- DISPATCH.md — dispatch record
+- BRIEFING.md — persistent state
+- progress.md — liveness heartbeat
+- handoff.md — final review report

@@ -144,3 +144,83 @@ The Harness 9 production workflow is governed by a deterministic, non-skipping s
 1. **Deterministic Retry**: If a stage fails due to transient compute or network error, the state machine permits up to 3 automatic retries before transitioning to `FAILED`.
 2. **Human-in-the-Loop Gate**: If `auto_approve=False`, the state machine halts at `ANGLE_SELECTED` or `SCRIPT_COMPLETED` and enters `PAUSED_FOR_HUMAN`, generating an interactive inspection payload.
 3. **Rollback Safety**: State regressions are only permitted along defined remediation paths (e.g. `VOICE_GENERATED` $\to$ `SCRIPTING_IN_PROGRESS` for audio pacing correction). Arbitrary backward jumps are forbidden.
+
+---
+
+## 5. Epistemic Verification Gates & Publishing Lock Invariants
+
+**Package:** `src/orchestrator/state_machine.py`, `src/epistemic/`, `src/h9_runtime/bridge.py`  
+**Cross-References:** `docs/epistemic/EPISTEMIC_ARCHITECTURE.md`, `docs/epistemic/FACT_CHECKING_SPEC.md`, `docs/adrs/ADR-006-epistemic-verification.md`
+
+To guarantee that ungrounded, hallucinated, or contradicted content is never rendered or distributed, the state machine evaluates **4 Epistemic Verification Gates** as mandatory transition checkpoints between canonical states.
+
+```
+[RESEARCH_IN_PROGRESS] ──► [RESEARCH_VERIFICATION Gate] ──► [RESEARCH_COMPLETED]
+                                        │ (BLOCK)
+                                        ▼ [FAILED / RETRY]
+
+[SCRIPTING_IN_PROGRESS] ──► [SCRIPT_FACT_CHECK Gate] ─────► [SCRIPT_COMPLETED]
+                                        │ (BLOCK / REVIEW)
+                                        ▼ [PAUSED_FOR_HUMAN / LOOPBACK]
+
+[COMPOSITION_GENERATED] ──► [VISUAL_FACT_CHECK Gate] ─────► [RENDER_IN_PROGRESS]
+                                        │ (BLOCK)
+                                        ▼ [FAILED / LOOPBACK]
+
+[RENDER_COMPLETED]      ──► [FINAL_EPISTEMIC_QA Gate] ───► [COMPLETED]
+                                        │ (BLOCK / REVIEW)
+                                        ▼ [PUBLISHING LOCKED]
+```
+
+### 5.1 Gate Placement & Evaluation Scopes
+
+| Gate Name | Transition Checkpoint | Verification Scope & Focus | Block Conditions |
+|---|---|---|---|
+| **`RESEARCH_VERIFICATION`** | `RESEARCH_IN_PROGRESS` $\to$ `RESEARCH_COMPLETED` | Evaluates Evidence Graph completeness; enforces 13-tier taxonomy; verifies primary/academic source thresholds; blocks sole web sources for history; classifies consensus state. | Contradicted claims in dossier; sole web sources for historical facts; $<3$ verified claims. |
+| **`SCRIPT_FACT_CHECK`** | `SCRIPTING_IN_PROGRESS` $\to$ `SCRIPT_COMPLETED` | Deconstructs script sentences; audits narration against Evidence Graph; detects claim strengthening, altered numbers, or omitted caveats; enforces verbatim quote match or paraphrase. | Fabricated direct quotes; numerical distortion $>0.1\%$; uncalibrated consensus rhetoric; ungrounded assertions. |
+| **`VISUAL_FACT_CHECK`** | `COMPOSITION_GENERATED` $\to$ `RENDER_IN_PROGRESS` | Audits Production IR visual blocks (`STATISTIC_REVEAL`, `TIMELINE_REVEAL`, `QUOTE_HIGHLIGHT`); reconciles on-screen text/metrics against spoken voiceover; verifies chart dataset lineage. | Visual-audio number/date mismatch; ungrounded charts lacking `NumericalDataset` lineage; timeline anachronisms. |
+| **`FINAL_EPISTEMIC_QA`** | `RENDER_COMPLETED` $\to$ `COMPLETED` | Comprehensive quality audit across Research, Script, Video, and Economics dimensions; acts as mandatory publishing prerequisite. | Any unresolved `BLOCK` or `HUMAN_REVIEW` status across preceding gates; composite score $<0.80$. |
+
+### 5.2 Deterministic Gate Outcomes
+
+Every gate evaluation yields one of four deterministic outcomes:
+1. **`PASS`**: All factual, historiographical, numerical, and visual criteria satisfied. Production advances to the succeeding canonical state.
+2. **`WARN`**: Minor non-critical discrepancies detected (e.g. non-substantive formatting variations, minor date ambiguity noted in scholarly literature). Production advances; caveats are appended to `TransitionRecord.metadata["epistemic_warnings"]`.
+3. **`HUMAN_REVIEW`**: Contested historical debate without clear consensus, ambiguous translation, or borderline paraphrase detected. State machine transitions to `PAUSED_FOR_HUMAN`, generating an audit payload for creator sign-off.
+4. **`BLOCK`**: Critical factual failure (refuted claim, altered statistic, fabricated quote, visual-audio contradiction, prompt injection payload). The transition is rejected (`EpistemicGateBlockError`).
+
+### 5.3 Automated Remediation & Loopback Paths
+
+When a gate returns `BLOCK`, the state machine triggers defined remediation loopbacks:
+- `SCRIPT_FACT_CHECK` failure $\to$ automatically loops back to `SCRIPTING_IN_PROGRESS` with specific prompt feedback (e.g. *"Convert quote to paraphrase; restore hedging on claim 03"*).
+- `VISUAL_FACT_CHECK` failure $\to$ loops back to `COMPOSITION_GENERATED` to re-bind visual parameters to verified dataset coordinates.
+- `RESEARCH_VERIFICATION` failure $\to$ loops back to `RESEARCH_PLANNED` to query additional primary or academic sources.
+
+### 5.4 The Hard Publishing Lock Invariant
+
+**Publishing is unconditionally locked whenever mandatory factual gates fail.** This is enforced at two orthogonal defense layers:
+
+1. **State Machine Layer**:
+   ```python
+   # In ProductionStateMachine.transition_to(ProductionState.COMPLETED)
+   epistemic_gates = self._context.get("epistemic_gates", {})
+   final_qa = epistemic_gates.get("FINAL_EPISTEMIC_QA")
+   if not final_qa or final_qa.get("outcome") not in ("PASS", "WARN"):
+       raise StateTransitionError(
+           "Cannot transition to COMPLETED: Mandatory gate FINAL_EPISTEMIC_QA has not passed."
+       )
+   ```
+
+2. **Publishing Runtime Boundary (`h9.publish` & `bridge.publish()`)**:
+   ```python
+   def enforce_epistemic_publishing_gate(project_id: str, context: Dict[str, Any]) -> None:
+       gates = context.get("epistemic_gates", {})
+       final_qa = gates.get("FINAL_EPISTEMIC_QA")
+       if not final_qa or final_qa.get("outcome") not in ("PASS", "WARN"):
+           raise EpistemicGateBlockError(
+               f"Publishing blocked for project {project_id}: "
+               f"Mandatory gate FINAL_EPISTEMIC_QA outcome is {final_qa.get('outcome') if final_qa else 'MISSING'}."
+           )
+   ```
+This invariant guarantees that no autonomous workflow, CLI command, or native tool can distribute a video package containing unverified or contradicted claims.
+

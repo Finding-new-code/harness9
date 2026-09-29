@@ -1,23 +1,20 @@
-## 2026-08-31T05:28:00Z
+## 2026-09-13T19:32:16Z
+You are challenger_2_m2. Your working directory is g:\Finding-new-code\harness9\.agents\challenger_2_m2.
+Update your progress.md regularly.
 
-<USER_REQUEST>
-You are Challenger 2 for Milestone 2 (Asset Discovery, Rights Ledger & Local Freezing - R2).
-Your working directory is: g:\Finding-new-code\harness9\.agents\challenger_2_m2
-Project root: g:\Finding-new-code\harness9
-Original request: g:\Finding-new-code\harness9\ORIGINAL_REQUEST.md
-Project architecture & specs: g:\Finding-new-code\harness9\PROJECT.md
+MANDATORY FIRST STEP: Read g:\Finding-new-code\harness9\.agents\ORIGINAL_REQUEST.md before starting work.
+Also read:
+- g:\Finding-new-code\harness9\.agents\teamwork_preview_orchestrator_8\PROJECT.md
+- src/models/contracts.py
+- src/h9_runtime/content.py
+- tests/test_state_machine.py
+- tests/test_contracts.py
+- tests/test_h9_acceptance.py
 
-Your task:
-1. Empirically challenge data integrity and licensing provenance in `src/assets/ledger.py` and `src/assets/pipeline.py`.
-2. Write and execute test harnesses to verify:
-   - SHA-256 byte-level exactness: assert on-disk frozen files match ledger `file_sha256` 100%.
-   - License metadata completeness: assert every asset has non-empty `license_type`, `attribution_text`, `source_url`, and `creator`.
-   - JSON/YAML ledger roundtripping parity.
-3. Run tests and verify behavior.
-4. Output your verdict (APPROVE or REQUEST_CHANGES).
-
-Write report to: g:\Finding-new-code\harness9\.agents\challenger_2_m2\report.md
-And handoff to: g:\Finding-new-code\harness9\.agents\challenger_2_m2\handoff.md
-
-Send message to parent when finished.
-</USER_REQUEST>
+OBJECTIVE:
+Adversarially challenge backward compatibility and test isolation:
+1. Test isolated import of src.orchestrator.state_machine and src.orchestrator.pipeline in clean subprocesses.
+2. Run pytest tests/test_state_machine.py in isolation.
+3. Test backward compatibility: construct ClaimRecord, SourceRecord, and ResearchDossier using old minimal parameter sets and verify validation, serialization, and property access.
+4. Run pytest tests/test_contracts.py and pytest tests/test_h9_acceptance.py.
+5. Deliver your findings and verdict (APPROVE or REJECT) in handoff.md. Send your completion message via send_message.

@@ -192,8 +192,139 @@ class ResearchPlan(H9BaseModel):
 
 
 # ===========================================================================
-# 4. Source & Claim Records
+# 4. Epistemic Enums & Value Models (Milestone M2 / R2)
 # ===========================================================================
+class EpistemicStatus(str, Enum):
+    """11 discrete machine-readable verification statuses."""
+    VERIFIED = "verified"
+    SUPPORTED = "supported"
+    PARTIALLY_SUPPORTED = "partially_supported"
+    CONTESTED = "contested"
+    CONTRADICTED = "contradicted"
+    UNSUPPORTED = "unsupported"
+    UNVERIFIABLE = "unverifiable"
+    OUTDATED = "outdated"
+    MISLEADING = "misleading"
+    OPINION = "opinion"
+    PREDICTION = "prediction"
+
+
+class SourceTier(int, Enum):
+    """13-tier hierarchical source taxonomy ranking epistemic authority."""
+    PRIMARY_SOURCE = 1                       # Archival records, treaties, raw experimental datasets
+    PEER_REVIEWED_JOURNAL = 2                # Refereed academic journals (Nature, Science, Physical Review)
+    ACADEMIC_BOOK = 3                        # University press monographs (Oxford, Cambridge, MIT Press)
+    SCHOLARLY_CONFERENCE = 4                 # Peer-reviewed conference proceedings (IEEE, ACM, NeurIPS)
+    INSTITUTIONAL_REPORT = 5                 # Official statistical agencies (Census, BLS, NIST, NASA, WHO)
+    ARCHIVAL_DOCUMENT = 6                    # Preserved historical collections, diaries, correspondence
+    REFERENCE_WORK = 7                       # Authoritative encyclopedias, dictionaries, handbooks
+    EXPERT_ANALYSIS = 8                      # Recognized domain expert analyses, think tank policy papers
+    REPUTABLE_JOURNALISM = 9                 # Major news agency investigations (Reuters, AP, BBC, NYT)
+    TRADE_PUBLICATION = 10                   # Industry journals, technical vendor specifications
+    POPULAR_MEDIA = 11                       # Commercial news, popular science magazines, broadcast news
+    SELF_PUBLISHED = 12                      # Expert blogs, substacks, technical personal writeups
+    UNVERIFIED = 13                          # Anonymous forums, unvetted web pages, social media
+
+    # Aliases for specification cross-compatibility
+    ACADEMIC_PRESS_BOOK = 3
+    HISTORICAL_DOCUMENT_CRITICAL_EDITION = 6
+    GOVERNMENT_RECORD_STATISTICAL_AGENCY = 5
+    SPECIALIZED_SCHOLARLY_DATABASE = 7
+    REPUTABLE_NEWS_INVESTIGATIVE = 9
+    GENERAL_ENCYCLOPEDIC = 7
+    CORPORATE_WHITE_PAPER = 10
+    BLOG_OPINION_COMMENTARY = 12
+    SOCIAL_MEDIA_FORUM = 13
+
+    @property
+    def default_weight(self) -> float:
+        return DEFAULT_TIER_WEIGHTS.get(self, 0.5)
+
+
+DEFAULT_TIER_WEIGHTS: Dict[SourceTier, float] = {
+    SourceTier.PRIMARY_SOURCE: 1.00,
+    SourceTier.PEER_REVIEWED_JOURNAL: 0.98,
+    SourceTier.ACADEMIC_BOOK: 0.95,
+    SourceTier.SCHOLARLY_CONFERENCE: 0.90,
+    SourceTier.INSTITUTIONAL_REPORT: 0.88,
+    SourceTier.ARCHIVAL_DOCUMENT: 0.92,
+    SourceTier.REFERENCE_WORK: 0.80,
+    SourceTier.EXPERT_ANALYSIS: 0.75,
+    SourceTier.REPUTABLE_JOURNALISM: 0.70,
+    SourceTier.TRADE_PUBLICATION: 0.55,
+    SourceTier.POPULAR_MEDIA: 0.35,
+    SourceTier.SELF_PUBLISHED: 0.20,
+    SourceTier.UNVERIFIED: 0.00,
+}
+
+
+class ConsensusState(str, Enum):
+    """8-state historiographical and scientific consensus classifications."""
+    STRONG_CONSENSUS = "STRONG_CONSENSUS"
+    BROAD_CONSENSUS = "BROAD_CONSENSUS"
+    MAJORITY_INTERPRETATION = "MAJORITY_INTERPRETATION"
+    MINORITY_INTERPRETATION = "MINORITY_INTERPRETATION"
+    ACTIVE_DEBATE = "ACTIVE_DEBATE"
+    CONTESTED = "CONTESTED"
+    UNRESOLVED = "UNRESOLVED"
+    INSUFFICIENT_LITERATURE = "INSUFFICIENT_LITERATURE"
+
+
+class ClaimType(str, Enum):
+    """Typology of factual claims dictating verification strategy dispatch."""
+    EVENT_FACT = "event_fact"
+    CAUSAL_INTERPRETATION = "causal_interpretation"
+    SCHOLARLY_INTERPRETATION = "scholarly_interpretation"
+    NUMERICAL_METRIC = "numerical_metric"
+    DIRECT_QUOTE = "direct_quote"
+    SCIENTIFIC_LAW = "scientific_law"
+    CURRENT_EVENT = "current_event"
+    DEFINITIONAL = "definitional"
+
+
+class QuoteExactness(str, Enum):
+    """Fidelity level of direct quote transcription."""
+    EXACT = "exact"                                  # Levenshtein distance <= 0.02
+    ELLIPSES = "ellipses"                            # Levenshtein distance <= 0.15 with standard editorial omission
+    PARAPHRASE = "paraphrase"                        # Reformulated indirect discourse
+    DISTORTED = "distorted"                          # Fabricated or inaccurate quotation marks
+    NOT_APPLICABLE = "not_applicable"                # Claim is not a direct quote
+
+
+class SourceQualityMetrics(H9BaseModel):
+    """Aggregated quality and authority metrics of backing information sources."""
+    domain_authority: float = Field(default=0.8, ge=0.0, le=1.0)
+    reliability_score: float = Field(default=0.8, ge=0.0, le=1.0)
+    tier_weight: float = Field(default=0.8, ge=0.0, le=1.0)
+    is_peer_reviewed: bool = False
+    is_primary: bool = False
+    independence_score: float = Field(default=1.0, ge=0.0, le=1.0)
+    citation_count: Optional[int] = None
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class TemporalContext(H9BaseModel):
+    """Chronological bounds, validity dates, and temporal freshness."""
+    valid_from: Optional[str] = None
+    valid_until: Optional[str] = None
+    as_of_date: Optional[str] = None
+    is_time_sensitive: bool = False
+    temporal_status: str = Field(default="historical")  # "historical", "current", "timeless", "obsolete"
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class EvidenceUnitLink(H9BaseModel):
+    """Structured passage-level link between a claim and an extracted evidence unit."""
+    evidence_unit_id: str = Field(..., min_length=1)
+    source_id: str = Field(..., min_length=1)
+    verbatim_excerpt: str = ""
+    char_offset_start: int = 0
+    char_offset_end: int = 0
+    entailment_relation: str = "SUPPORTS"  # "SUPPORTS", "CONTRADICTS", "HEDGES"
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
 class SourceRecord(H9BaseModel):
     """Citation and provenance metadata for an external information source."""
     title: str = Field(..., min_length=1)
@@ -203,9 +334,24 @@ class SourceRecord(H9BaseModel):
     published_date: Optional[str] = None
     reliability_score: float = Field(default=0.8, ge=0.0, le=1.0)
 
+    # Extended Epistemic Fields (Milestone M2 / R2)
+    source_id: Optional[str] = None
+    tier: SourceTier = Field(
+        default=SourceTier.PRIMARY_SOURCE,
+        description="Authority tier within 13-tier taxonomy"
+    )
+    doi: Optional[str] = None
+    peer_reviewed: bool = False
+    archived_url: Optional[str] = None
+    content_sha256: Optional[str] = None
+    retrieved_at: Optional[str] = None
+    is_sanitized: bool = True
+    domain_authority: float = Field(default=0.8, ge=0.0, le=1.0)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
 
 class ClaimRecord(H9BaseModel):
-    """Factual claim backed by primary and corroborating source records."""
+    """Factual claim backed by primary and corroborating source records with full epistemic provenance."""
     claim_id: str = Field(..., min_length=1)
     claim_text: str = Field(..., min_length=1)
     category: str = Field(default="general")
@@ -214,6 +360,63 @@ class ClaimRecord(H9BaseModel):
     corroborating_sources: List[SourceRecord] = Field(default_factory=list)
     visual_cue_suggestion: str = ""
     verification_notes: str = ""
+
+    # Extended Epistemic Fields (Milestone M2 / R2 - Required)
+    evidence_node_ids: List[str] = Field(
+        default_factory=list,
+        description="IDs of supporting nodes in the Evidence Graph DAG"
+    )
+    epistemic_status: EpistemicStatus = Field(
+        default=EpistemicStatus.SUPPORTED,
+        description="Granular epistemic verification status (11 states)"
+    )
+    consensus_state: ConsensusState = Field(
+        default=ConsensusState.BROAD_CONSENSUS,
+        description="Historiographical/scientific consensus classification (8 states)"
+    )
+    source_tier: SourceTier = Field(
+        default=SourceTier.PRIMARY_SOURCE,
+        description="Highest authoritative source tier backing this claim (13 tiers)"
+    )
+    source_quality: SourceQualityMetrics = Field(
+        default_factory=SourceQualityMetrics,
+        description="Aggregated quality and authority metrics of backing sources"
+    )
+    corroboration_set: List[str] = Field(
+        default_factory=list,
+        description="Independent source identifiers corroborating this claim"
+    )
+    temporal_context: TemporalContext = Field(
+        default_factory=TemporalContext,
+        description="Chronological bounds, validity dates, and temporal freshness"
+    )
+    verifier_metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Execution trace, strategy used, entailment/contradiction scores, and verifier identity"
+    )
+    quote_exactness: Optional[Union[QuoteExactness, float, str]] = Field(
+        default=None,
+        description="Quote fidelity: exact, ellipses, paraphrase, distorted, or Levenshtein score"
+    )
+
+    # Extended Grounding Fields
+    claim_type: ClaimType = Field(
+        default=ClaimType.EVENT_FACT,
+        description="Typology of factual claim dictating verification policy"
+    )
+    contradicting_sources: List[SourceRecord] = Field(
+        default_factory=list,
+        description="Counter-evidence or dissenting sources refuting or qualifying the claim"
+    )
+    evidence_links: List[EvidenceUnitLink] = Field(
+        default_factory=list,
+        description="Structured passage-level evidence links with character offsets"
+    )
+
+    @property
+    def verification_status(self) -> str:
+        """Backward-compatibility property returning uppercase status string."""
+        return self.epistemic_status.value.upper()
 
 
 # ===========================================================================
@@ -252,6 +455,20 @@ class ResearchDossier(H9BaseModel):
     statistics: List[StatisticRecord] = Field(default_factory=list)
     suggested_visual_queries: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    # Extended Epistemic Fields (Milestone M2 / R2)
+    sources: List[SourceRecord] = Field(
+        default_factory=list,
+        description="Consolidated list of all evaluated sources"
+    )
+    evidence_graph: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Serialized portable EvidenceGraphDocument DAG"
+    )
+    entity_mentions: List[str] = Field(
+        default_factory=list,
+        description="Extracted named entities for anachronism checking"
+    )
 
 
 # ===========================================================================
@@ -634,3 +851,17 @@ class ProductionHistoryRecord(H9BaseModel):
     payload_summary: Dict[str, Any] = Field(default_factory=dict)
     duration_ms: float = 0.0
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+# ===========================================================================
+# 14. Numerical Data & Visualization Contracts (Milestone M4)
+# ===========================================================================
+try:
+    from src.epistemic.numerical_pipeline import (
+        ChartType,
+        NumericalDataPoint,
+        NumericalDataset,
+    )
+except ImportError:
+    pass
+

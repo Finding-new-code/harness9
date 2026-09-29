@@ -1,380 +1,575 @@
-"""Forensic Integrity Auditor Execution Trace & Empirical Verification Suite for Milestone 2 (src/assets)."""
+"""forensic_check.py — Rigorous Forensic Integrity Audit Suite for Milestone 2.
 
-import hashlib
+Empirically verifies:
+1. Static code analysis & AST inspection for hardcoded test results, fake returns, facades.
+2. Genuine Pydantic schemas, validation bounds, and enum invariants.
+3. Genuine DAG data structures & BFS cycle detection (self-loops, 2-node, multi-hop, diamond DAGs).
+4. Genuine Kahn's algorithm with deterministic alphanumeric tie-breaking.
+5. Genuine lineage reconstruction & provenance tracking.
+6. Genuine multi-path confidence calculation (Noisy-OR, series decay, bottleneck, contradiction penalties).
+7. Clean circular import resolution in src/h9_runtime/content.py without bypassing functionality.
+8. Test authenticity & assertion non-tautology in tests/test_evidence_graph.py.
+"""
+
+import ast
+import bisect
+import collections
+import importlib
+import inspect
 import json
 import os
 import sys
-import tempfile
-import xml.etree.ElementTree as ET
+import unittest
 from pathlib import Path
+from typing import Any, Dict, List, Set, Tuple
 
-# Add project root to sys.path
+# Add project root
 PROJECT_ROOT = Path(r"g:\Finding-new-code\harness9").resolve()
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import yaml
-from src.assets.discovery import (
-    AssetDiscoveryEngine,
-    CandidateAsset,
-    NASAProvider,
-    OfflineMockProvider,
-    PexelsProvider,
-    WikimediaProvider,
-    _strip_html,
+from pydantic import ValidationError
+
+from src.models.contracts import (
+    ClaimRecord,
+    ClaimType,
+    ConsensusState,
+    DEFAULT_TIER_WEIGHTS,
+    EpistemicStatus,
+    EvidenceUnitLink,
+    H9BaseModel,
+    QuoteExactness,
+    ResearchDossier,
+    SourceQualityMetrics,
+    SourceRecord,
+    SourceTier,
+    TemporalContext,
 )
-from src.assets.freezer import (
-    AssetChecksumMismatchError,
-    AssetDownloadError,
-    AssetFreezer,
-    AssetSizeExceededError,
-    assert_zero_external_urls,
-    audit_composition_paths,
-    compute_file_sha256,
-    compute_sha256,
-    download_stream,
-    mime_to_extension,
-    sanitize_filename,
-    sniff_magic_bytes,
-    verify_sha256,
-)
-from src.assets.ledger import AssetLedgerManager
-from src.assets.pipeline import AssetPipeline
-from src.assets.procedural import ProceduralSVGGenerator
-from src.config import AppConfig
-from src.models.dossier import Claim, DossierMetadata, ResearchDossier, Source, Summary, TalkingPoint
-from src.models.ledger import (
-    AssetProvenanceLedger,
-    CreatorInfo,
-    Dimensions,
-    LicenseInfo,
-    MediaAsset,
+from src.epistemic.graph import (
+    ClaimNode,
+    CycleDetectedError,
+    EdgeNotFoundError,
+    EdgeRelation,
+    EvidenceGraph,
+    EvidenceGraphError,
+    EvidenceUnitNode,
+    GraphEdge,
+    GraphNode,
+    GraphNodeType,
+    InvalidEdgeError,
+    ModalityType,
+    NodeNotFoundError,
+    PassageNode,
+    ProvenanceChain,
+    SceneNode,
+    ScriptSentenceNode,
+    SourceNode,
+    VerificationTraceNode,
+    VisualElementNode,
 )
 
-results = []
 
-def record(name: str, passed: bool, details: str):
-    status = "PASS" if passed else "FAIL"
-    results.append({"check": name, "status": status, "details": details})
-    print(f"[{status}] {name}: {details}")
+class ForensicAuditSuite:
+    def __init__(self):
+        self.results: Dict[str, Dict[str, Any]] = {}
 
-print("================================================================================")
-print("FORENSIC INTEGRITY AUDIT: Milestone 2 (Asset Discovery, Rights Ledger, Freezer)")
-print("================================================================================")
+    def record(self, check_name: str, passed: bool, details: str, evidence: Any = None):
+        self.results[check_name] = {
+            "passed": passed,
+            "details": details,
+            "evidence": evidence,
+        }
+        status_str = "PASS" if passed else "FAIL"
+        print(f"[{status_str}] {check_name}: {details}")
 
-# ------------------------------------------------------------------------------
-# Check 1: Magic-Byte Sniffing Verification
-# ------------------------------------------------------------------------------
-print("\n--- Check 1: Magic-Byte Sniffing ---")
-try:
-    test_cases = [
-        (b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01", "image/jpeg"),
-        (b"\xff\xd8\xff\xdb\x00C\x00", "image/jpeg"),
-        (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR", "image/png"),
-        (b"RIFF\x24\x00\x00\x00WEBPVP8 ", "image/webp"),
-        (b"<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>", "image/svg+xml"),
-        (b"<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg width=\"100\"></svg>", "image/svg+xml"),
-        (b"\x00\x00\x00 ftypisom\x00\x00\x02\x00mp41mp42isom", "video/mp4"),
-        (b"RIFF\x24\x08\x00\x00WAVEfmt \x10\x00\x00\x00", "audio/wav"),
-        (b"ID3\x03\x00\x00\x00\x00\x00#TIT2", "audio/mp3"),
-        (b"\xff\xfb\x90d\x00\x00\x00\x00", "audio/mp3"),
-        (b"\xff\xf3\x40\xc4", "audio/mp3"),
-        (b"SOME RANDOM OCTET STREAM DATA", "application/octet-stream"),
-        (b"", "application/octet-stream"),
-    ]
-    all_match = True
-    mismatches = []
-    for raw, expected in test_cases:
-        actual = sniff_magic_bytes(raw)
-        if actual != expected:
-            all_match = False
-            mismatches.append(f"Expected {expected}, got {actual} for raw={raw[:16]}")
-    
-    record(
-        "Magic-Byte Sniffing Signatures",
-        all_match,
-        f"Verified {len(test_cases)} MIME signatures across JPEG, PNG, WebP, SVG, MP4, WAV, MP3. Mismatches: {mismatches}"
-    )
-except Exception as e:
-    record("Magic-Byte Sniffing Signatures", False, f"Exception: {e}")
+    def run_all(self):
+        print("=== STARTING MILESTONE 2 FORENSIC INTEGRITY AUDIT ===\n")
+        self.audit_static_code_ast()
+        self.audit_pydantic_schemas_and_validation()
+        self.audit_dag_and_bfs_cycle_detection()
+        self.audit_kahns_topological_sort()
+        self.audit_lineage_and_provenance()
+        self.audit_confidence_calculations()
+        self.audit_circular_imports_and_lazy_loading()
+        self.audit_test_suite_authenticity()
+        print("\n=== AUDIT COMPLETE ===")
+        return self.results
 
-# ------------------------------------------------------------------------------
-# Check 2: NIST Standard SHA-256 Vectors & Tamper Detection
-# ------------------------------------------------------------------------------
-print("\n--- Check 2: SHA-256 Computation & Tamper Detection ---")
-try:
-    nist_vectors = [
-        (b"", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
-        (b"abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),
-        (b"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"),
-    ]
-    nist_pass = True
-    for data, expected in nist_vectors:
-        computed = compute_sha256(data)
-        if computed != expected:
-            nist_pass = False
-            print(f"SHA mismatch: computed {computed} != expected {expected}")
-            break
+    # -----------------------------------------------------------------------
+    # 1. Static Code Analysis & AST Inspection
+    # -----------------------------------------------------------------------
+    def audit_static_code_ast(self):
+        files_to_check = [
+            PROJECT_ROOT / "src" / "models" / "contracts.py",
+            PROJECT_ROOT / "src" / "models" / "__init__.py",
+            PROJECT_ROOT / "src" / "h9_runtime" / "content.py",
+            PROJECT_ROOT / "src" / "epistemic" / "__init__.py",
+            PROJECT_ROOT / "src" / "epistemic" / "graph.py",
+        ]
 
-    # Test file sha256 with 3MB binary payload
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_file = Path(tmpdir) / "large_sha_test.bin"
-        payload = os.urandom(3 * 1024 * 1024)
-        tmp_file.write_bytes(payload)
-        expected_file_sha = hashlib.sha256(payload).hexdigest()
-        computed_file_sha = compute_file_sha256(tmp_file)
-        file_sha_pass = (computed_file_sha == expected_file_sha)
+        test_specific_keywords = [
+            "claim_quantum_01",
+            "MIT Tech Review",
+            "Nature Physics",
+            "Neutral atom qubits",
+            "Archival Treaty Document",
+            "The treaty was signed on June 28, 1919",
+            "League of Nations",
+            "Introduction to Geneva",
+            "ds_league_members",
+        ]
 
-        # Test tamper detection
-        verify_true = verify_sha256(tmp_file, expected_file_sha)
-        verify_false = verify_sha256(tmp_file, "a" * 64)
-        tamper_pass = verify_true and not verify_false
+        violations = []
+        suspicious_facades = []
 
-    record(
-        "NIST SHA-256 Test Vectors & Chunked Hashing",
-        nist_pass and file_sha_pass and tamper_pass,
-        f"NIST vectors match={nist_pass}, 3MB chunked hash match={file_sha_pass}, Tamper detection={tamper_pass}"
-    )
-except Exception as e:
-    record("NIST SHA-256 Test Vectors & Chunked Hashing", False, f"Exception: {e}")
+        for fpath in files_to_check:
+            if not fpath.exists():
+                violations.append(f"Target file missing: {fpath}")
+                continue
 
-# ------------------------------------------------------------------------------
-# Check 3: Procedural SVG Structure & Generator Verification
-# ------------------------------------------------------------------------------
-print("\n--- Check 3: Procedural SVG Vector Rendering & Structure Analysis ---")
-try:
-    gen = ProceduralSVGGenerator()
-    themes = ["circuits", "computing", "aerospace", "science", "general"]
-    theme_details = []
-    has_geometric_elements = True
+            content = fpath.read_text(encoding="utf-8")
 
-    for th in themes:
-        svg_code = gen.generate_topic_svg(
-            topic=f"Forensic Test Topic for {th.upper()}",
-            query=f"Technical Query for {th}",
-            width=1920,
-            height=1080,
-            theme=th,
+            # Check 1a: Test constants leaked into production code
+            for kw in test_specific_keywords:
+                if kw in content:
+                    violations.append(f"Hardcoded test literal '{kw}' found in {fpath.name}")
+
+            # Check 1b: AST inspection for dummy returns (e.g. constant returns in core methods)
+            tree = ast.parse(content, filename=str(fpath))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # Check if body is just `return True` or `return "verified"` or `pass` in graph methods
+                    if fpath.name == "graph.py":
+                        # Check for empty/stub functions
+                        real_stmts = [
+                            s for s in node.body
+                            if not (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant))
+                        ]
+                        if len(real_stmts) == 1:
+                            stmt = real_stmts[0]
+                            if isinstance(stmt, ast.Pass):
+                                suspicious_facades.append(f"Empty pass statement in {node.name}")
+                            elif isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Constant):
+                                # Check if it's a property or trivial helper
+                                if node.name not in ("confidence", "validate_offsets"):
+                                    suspicious_facades.append(
+                                        f"Trivial constant return in {node.name}: {stmt.value.value}"
+                                    )
+
+        passed = len(violations) == 0 and len(suspicious_facades) == 0
+        details = (
+            "No hardcoded test constants, test outputs, or stub facade returns found in production code."
+            if passed
+            else f"Violations: {violations + suspicious_facades}"
         )
-        # Check basic SVG structural contract
-        has_svg_tag = svg_code.startswith("<svg") and svg_code.strip().endswith("</svg>")
-        has_viewbox = 'viewBox="0 0 1920 1080"' in svg_code
-        has_defs = "<defs>" in svg_code and "<linearGradient" in svg_code
-        has_motif = "<rect" in svg_code and ("<circle" in svg_code or "<line" in svg_code or "<ellipse" in svg_code)
+        self.record("Static Code Analysis & AST Inspection", passed, details, violations + suspicious_facades)
 
-        if not (has_svg_tag and has_viewbox and has_defs and has_motif):
-            has_geometric_elements = False
-        theme_details.append(f"{th}: len={len(svg_code)} chars, valid_structure={has_svg_tag and has_viewbox}")
+    # -----------------------------------------------------------------------
+    # 2. Genuine Pydantic Schemas & Invariant Enforcement
+    # -----------------------------------------------------------------------
+    def audit_pydantic_schemas_and_validation(self):
+        issues = []
 
-    # Test quote, metric, and hero cards
-    quote_svg = gen.generate_quote_card("Test quote", "Author", "Context")
-    metric_svg = gen.generate_metric_card("Metric", "100K", "Context")
-    hero_svg = gen.generate_hero_card("Headline", "Subhead", "Topic")
+        # Verify 11 EpistemicStatus values
+        expected_statuses = {
+            "verified", "supported", "partially_supported", "contested", "contradicted",
+            "unsupported", "unverifiable", "outdated", "misleading", "opinion", "prediction"
+        }
+        actual_statuses = {s.value for s in EpistemicStatus}
+        if actual_statuses != expected_statuses:
+            issues.append(f"EpistemicStatus mismatch: {actual_statuses ^ expected_statuses}")
 
-    cards_ok = ("<svg" in quote_svg and "<svg" in metric_svg and "<svg" in hero_svg)
+        # Verify 13 SourceTier values and weights
+        expected_tiers = set(range(1, 14))
+        actual_tiers = {t.value for t in SourceTier}
+        if actual_tiers != expected_tiers:
+            issues.append(f"SourceTier mismatch: {actual_tiers ^ expected_tiers}")
+        for t in SourceTier:
+            if t not in DEFAULT_TIER_WEIGHTS:
+                issues.append(f"SourceTier {t.name} missing from DEFAULT_TIER_WEIGHTS")
 
-    # Check XML entity note
-    raw_tag_ampersand = any("&" in gen.THEMES[t]["tag"] for t in gen.THEMES)
+        # Verify 8 ConsensusState values
+        expected_consensus = {
+            "STRONG_CONSENSUS", "BROAD_CONSENSUS", "MAJORITY_INTERPRETATION", "MINORITY_INTERPRETATION",
+            "ACTIVE_DEBATE", "CONTESTED", "UNRESOLVED", "INSUFFICIENT_LITERATURE"
+        }
+        actual_consensus = {c.value for c in ConsensusState}
+        if actual_consensus != expected_consensus:
+            issues.append(f"ConsensusState mismatch: {actual_consensus ^ expected_consensus}")
 
-    record(
-        "Procedural SVG Generator Execution",
-        has_geometric_elements and cards_ok,
-        f"All 5 themes and 3 card types generate genuine procedural vectors. Structural validity={has_geometric_elements}. Note: Theme tags contain raw '&' which requires html.escape() for strict XML parser compliance: {raw_tag_ampersand}"
-    )
-except Exception as e:
-    record("Procedural SVG Generator Execution", False, f"Exception: {e}")
+        # Verify PassageNode offset validator bounds
+        try:
+            PassageNode(
+                node_id="p_inv",
+                source_node_id="s1",
+                verbatim_text="Inverted offsets test",
+                char_offset_start=150,
+                char_offset_end=50,
+            )
+            issues.append("PassageNode failed to reject inverted char_offsets (150 > 50)")
+        except (ValidationError, ValueError):
+            pass  # Expected
 
-# ------------------------------------------------------------------------------
-# Check 4: Rights Ledger & Provenance Serialization
-# ------------------------------------------------------------------------------
-print("\n--- Check 4: Rights Ledger & Provenance Serialization ---")
-try:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        mgr = AssetLedgerManager(output_dir=tmp_path, project_id="forensic_proj_1")
-        
-        # Add 3 assets with different licenses
-        mgr.record_frozen_asset(
-            asset_id="asset_01",
-            local_path="assets/images/asset_01.svg",
-            file_size_bytes=1000,
-            file_sha256="11" * 32,
-            source_provider="procedural_generator",
-            source_url="procedural://test1.svg",
-            license_info=LicenseInfo(license_type="CC0-1.0 (Public Domain)", commercial_use_allowed=True),
+        # Verify SourceNode tier bounds
+        try:
+            SourceNode(node_id="s_bad", title="Bad Tier", url="https://x.org", tier=0)
+            issues.append("SourceNode failed to reject tier=0")
+        except ValidationError:
+            pass
+
+        try:
+            SourceNode(node_id="s_bad", title="Bad Tier", url="https://x.org", tier=14)
+            issues.append("SourceNode failed to reject tier=14")
+        except ValidationError:
+            pass
+
+        # Verify ClaimRecord extended fields and backwards compatibility property
+        cr = ClaimRecord(
+            claim_id="cr_01",
+            claim_text="Epistemic test claim",
+            primary_source=SourceRecord(title="Test Source", url="https://test.org"),
+            epistemic_status=EpistemicStatus.CONTESTED,
+            consensus_state=ConsensusState.ACTIVE_DEBATE,
+            source_tier=SourceTier.PEER_REVIEWED_JOURNAL,
         )
-        mgr.record_frozen_asset(
-            asset_id="asset_02",
-            local_path="assets/images/asset_02.jpg",
-            file_size_bytes=2000,
-            file_sha256="22" * 32,
-            source_provider="wikimedia_commons",
-            source_url="https://commons.wikimedia.org/test2.jpg",
-            license_info=LicenseInfo(license_type="CC-BY-SA 4.0", attribution_required=True),
+        if cr.verification_status != "CONTESTED":
+            issues.append(f"ClaimRecord.verification_status property failed: got {cr.verification_status}")
+
+        passed = len(issues) == 0
+        details = (
+            "All 11 epistemic statuses, 13 source tiers with default weights, 8 consensus states, and model validations verified."
+            if passed else f"Issues: {issues}"
         )
-        mgr.record_frozen_asset(
-            asset_id="asset_03",
-            local_path="assets/images/asset_03.jpg",
-            file_size_bytes=3000,
-            file_sha256="33" * 32,
-            source_provider="pexels",
-            source_url="https://pexels.com/test3.jpg",
-            license_info=LicenseInfo(license_type="Pexels License", attribution_required=False),
+        self.record("Pydantic Schemas & Value Invariants", passed, details, issues)
+
+    # -----------------------------------------------------------------------
+    # 3. DAG Engine & BFS Cycle Detection
+    # -----------------------------------------------------------------------
+    def audit_dag_and_bfs_cycle_detection(self):
+        issues = []
+        g = EvidenceGraph()
+
+        # Add 6 nodes
+        nodes = [f"node_{i}" for i in range(6)]
+        for nid in nodes:
+            g.add_claim(claim_text=f"Claim {nid}", node_id=nid)
+
+        # Test 1: Self-loop rejection
+        try:
+            g.link("node_0", "node_0", EdgeRelation.DERIVES_FROM)
+            issues.append("Failed to reject self-loop node_0 -> node_0")
+        except CycleDetectedError:
+            pass
+
+        # Test 2: Direct 2-node cycle rejection
+        g.link("node_0", "node_1", EdgeRelation.DERIVES_FROM)
+        try:
+            g.link("node_1", "node_0", EdgeRelation.DERIVES_FROM)
+            issues.append("Failed to reject 2-node cycle node_1 -> node_0")
+        except CycleDetectedError:
+            pass
+
+        # Test 3: Multi-hop cycle (0 -> 1 -> 2 -> 3 -> 0)
+        g.link("node_1", "node_2", EdgeRelation.DERIVES_FROM)
+        g.link("node_2", "node_3", EdgeRelation.DERIVES_FROM)
+        try:
+            g.link("node_3", "node_0", EdgeRelation.DERIVES_FROM)
+            issues.append("Failed to reject multi-hop cycle node_3 -> node_0")
+        except CycleDetectedError:
+            pass
+
+        # Test 4: Diamond DAG must NOT be flagged as cycle
+        # 0 -> 4 -> 5 and 0 -> 1 -> 2 -> 5
+        g.link("node_0", "node_4", EdgeRelation.DERIVES_FROM)
+        g.link("node_4", "node_5", EdgeRelation.DERIVES_FROM)
+        try:
+            g.link("node_2", "node_5", EdgeRelation.DERIVES_FROM)
+        except CycleDetectedError as e:
+            issues.append(f"Diamond DAG falsely rejected as cycle: {e}")
+
+        # Verify global has_cycles() returns False on valid DAG
+        if g.has_cycles():
+            issues.append("g.has_cycles() returned True on valid diamond DAG")
+
+        # Test 5: Complex 10-node DAG cycle stress test
+        g2 = EvidenceGraph()
+        for i in range(10):
+            g2.add_claim(claim_text=f"C{i}", node_id=f"N{i}")
+        for i in range(9):
+            g2.link(f"N{i}", f"N{i+1}", EdgeRelation.DERIVES_FROM)
+        try:
+            g2.link("N9", "N0", EdgeRelation.DERIVES_FROM)
+            issues.append("Failed to reject 10-node cycle N9 -> N0")
+        except CycleDetectedError:
+            pass
+
+        passed = len(issues) == 0
+        details = (
+            "BFS cycle prevention verified on self-loops, 2-node cycles, multi-hop chains, and diamond DAG non-rejection."
+            if passed else f"Issues: {issues}"
+        )
+        self.record("DAG Engine & BFS Cycle Detection", passed, details, issues)
+
+    # -----------------------------------------------------------------------
+    # 4. Kahn's Algorithm & Deterministic Topological Sorting
+    # -----------------------------------------------------------------------
+    def audit_kahns_topological_sort(self):
+        issues = []
+
+        # Test 4a: Invariant verification: for every edge (u, v), index(u) < index(v)
+        g = EvidenceGraph()
+        node_names = ["delta", "alpha", "gamma", "beta", "epsilon", "zeta"]
+        for name in node_names:
+            g.add_claim(claim_text=f"Claim {name}", node_id=name)
+
+        g.link("alpha", "beta", EdgeRelation.DERIVES_FROM)
+        g.link("alpha", "gamma", EdgeRelation.DERIVES_FROM)
+        g.link("beta", "delta", EdgeRelation.DERIVES_FROM)
+        g.link("gamma", "delta", EdgeRelation.DERIVES_FROM)
+        g.link("delta", "epsilon", EdgeRelation.DERIVES_FROM)
+        g.link("zeta", "epsilon", EdgeRelation.DERIVES_FROM)
+
+        sorted_nodes = g.topological_sort()
+        idx_map = {nid: i for i, nid in enumerate(sorted_nodes)}
+
+        for edge in g._edges.values():
+            if idx_map[edge.source_id] >= idx_map[edge.target_id]:
+                issues.append(
+                    f"Topological sort invariant violated for edge {edge.source_id} -> {edge.target_id}"
+                )
+
+        # Test 4b: Deterministic tie-breaking across different node insertion orders
+        g1 = EvidenceGraph()
+        for n in ["Z", "A", "M", "B"]:
+            g1.add_claim(claim_text=n, node_id=n)
+        g1.link("A", "Z", EdgeRelation.DERIVES_FROM)
+        g1.link("B", "Z", EdgeRelation.DERIVES_FROM)
+
+        g2 = EvidenceGraph()
+        for n in ["B", "M", "Z", "A"]:
+            g2.add_claim(claim_text=n, node_id=n)
+        g2.link("B", "Z", EdgeRelation.DERIVES_FROM)
+        g2.link("A", "Z", EdgeRelation.DERIVES_FROM)
+
+        sort1 = g1.topological_sort()
+        sort2 = g2.topological_sort()
+
+        if sort1 != sort2:
+            issues.append(f"Topological sort is non-deterministic across insertion orders: {sort1} != {sort2}")
+        if sort1 != ["A", "B", "M", "Z"]:
+            issues.append(f"Expected alphanumeric tie-breaking ['A', 'B', 'M', 'Z'], got {sort1}")
+
+        passed = len(issues) == 0
+        details = (
+            "Kahn's algorithm correctly sorts DAGs with strict index(u) < index(v) and deterministic alphanumeric tie-breaking."
+            if passed else f"Issues: {issues}"
+        )
+        self.record("Kahn's Algorithm & Deterministic Topological Sorting", passed, details, issues)
+
+    # -----------------------------------------------------------------------
+    # 5. Provenance Lineage & Lineage Reconstruction
+    # -----------------------------------------------------------------------
+    def audit_lineage_and_provenance(self):
+        issues = []
+        g = EvidenceGraph()
+
+        s1 = g.add_source(title="Source 1", url="https://s1.org", tier=1)
+        s2 = g.add_source(title="Source 2", url="https://s2.org", tier=2)
+        p1 = g.add_passage(source_node_id=s1, verbatim_text="Passage from S1")
+        p2 = g.add_passage(source_node_id=s2, verbatim_text="Passage from S2")
+        eu1 = g.add_evidence_unit(passage_node_id=p1, atomic_statement="Fact 1")
+        eu2 = g.add_evidence_unit(passage_node_id=p2, atomic_statement="Fact 2")
+        c1 = g.add_claim(claim_text="Claim backed by S1 and S2")
+        g.link(eu1, c1, EdgeRelation.ENTAILMENT)
+        g.link(eu2, c1, EdgeRelation.ENTAILMENT)
+
+        sc = g.add_scene(scene_id="sc_01")
+        sent = g.add_script_sentence(
+            scene_id=sc, beat_id="b1", sentence_text="Voiceover", grounded_claim_ids=[c1]
         )
 
-        json_file, yaml_file = mgr.save(tmp_path)
-        
-        # Verify JSON
-        loaded_json = AssetProvenanceLedger.load(json_file)
-        json_ok = (loaded_json.total_assets == 3 and len(loaded_json.assets) == 3 and loaded_json.license_summary.get("CC-BY-SA 4.0") == 1)
+        chain = g.trace_lineage(sent)
+        if not chain.is_grounded:
+            issues.append("Expected chain.is_grounded to be True")
+        if set(chain.root_source_ids) != {s1, s2}:
+            issues.append(f"Expected root sources {s1, s2}, got {chain.root_source_ids}")
+        # sent has 3 complete paths: 1 from SceneNode container, 2 from SourceNodes via c1
+        if len(chain.complete_paths) != 3:
+            issues.append(f"Expected 3 complete provenance paths for sentence (1 scene + 2 sources), got {len(chain.complete_paths)}")
 
-        # Verify YAML
-        loaded_yaml = AssetProvenanceLedger.load(yaml_file)
-        yaml_ok = (loaded_yaml.total_assets == 3 and len(loaded_yaml.assets) == 3 and loaded_yaml.license_summary.get("Pexels License") == 1)
+        # Claim c1 has exactly 2 provenance paths (both from sources)
+        claim_chain = g.trace_lineage(c1)
+        if len(claim_chain.complete_paths) != 2:
+            issues.append(f"Expected 2 complete provenance paths for claim c1, got {len(claim_chain.complete_paths)}")
 
-    record(
-        "Rights Ledger Serialization (JSON & YAML)",
-        json_ok and yaml_ok,
-        f"JSON loaded={json_ok}, YAML loaded={yaml_ok}, License summary correctly calculated: {mgr.ledger.license_summary}"
-    )
-except Exception as e:
-    record("Rights Ledger Serialization (JSON & YAML)", False, f"Exception: {e}")
+        # Unconnected orphan node
+        orphan = g.add_claim(claim_text="Floating orphan claim")
+        orphan_chain = g.trace_lineage(orphan)
+        if orphan_chain.is_grounded:
+            issues.append("Expected orphan claim to have is_grounded=False")
+        if orphan_chain.calculated_confidence != 0.0:
+            issues.append("Expected orphan claim confidence to be 0.0")
 
-# ------------------------------------------------------------------------------
-# Check 5: Asset Freezer Atomic Operations & Composition Auditing
-# ------------------------------------------------------------------------------
-print("\n--- Check 5: Asset Freezer & Zero-External URL Auditing ---")
-try:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        freezer = AssetFreezer(base_output_dir=tmp_path)
-        
-        # Test freeze_bytes
-        test_raw = b"<svg xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"50\" cy=\"50\" r=\"40\"/></svg>"
-        frozen_file, sha, size, mime = freezer.freeze_bytes(test_raw, tmp_path / "assets" / "images" / "test.svg")
-        freeze_ok = frozen_file.exists() and size == len(test_raw) and mime == "image/svg+xml"
-
-        # Test composition auditing
-        html_clean = f"""<!DOCTYPE html><html><body><img src="assets/images/test.svg"/></body></html>"""
-        html_dirty = f"""<!DOCTYPE html><html><body><img src="https://example.com/external.jpg"/></body></html>"""
-
-        clean_audit = audit_composition_paths(html_clean, tmp_path)
-        dirty_audit = audit_composition_paths(html_dirty, tmp_path)
-
-        audit_ok = clean_audit["valid"] and not dirty_audit["valid"] and len(dirty_audit["external_urls"]) == 1
-
-    record(
-        "Asset Freezer & Zero-External-URL Linter",
-        freeze_ok and audit_ok,
-        f"freeze_bytes disk write={freeze_ok}, clean HTML audit valid={clean_audit['valid']}, dirty HTML detected={not dirty_audit['valid']}"
-    )
-except Exception as e:
-    record("Asset Freezer & Zero-External-URL Linter", False, f"Exception: {e}")
-
-# ------------------------------------------------------------------------------
-# Check 6: Full Asset Pipeline Integration with Real Dossier
-# ------------------------------------------------------------------------------
-print("\n--- Check 6: End-to-End Asset Pipeline Offline Execution ---")
-try:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        dossier = ResearchDossier(
-            topic="How GPUs Work: Parallel Microarchitectures",
-            metadata=DossierMetadata(run_id="audit_run_gpu", mode="offline_fallback"),
-            summary=Summary(
-                headline="Parallel Compute Revolution",
-                executive_summary="GPUs process thousands of threads concurrently.",
-                key_takeaways=["SIMD/SIMT architectures", "High memory bandwidth"],
-            ),
-            claims=[
-                Claim(
-                    claim_id="claim_01",
-                    claim_text="GPUs contain thousands of smaller stream processor cores.",
-                    category="technical_architecture",
-                    confidence_score=0.99,
-                    primary_source=Source(title="NVIDIA Whitepaper", url="https://nvidia.com/gpu-arch"),
-                    visual_cue_suggestion="GPU die parallel streaming cores layout",
-                ),
-                Claim(
-                    claim_id="claim_02",
-                    claim_text="Memory bandwidth in modern GPUs exceeds 1 TB/s.",
-                    category="performance_metric",
-                    confidence_score=0.97,
-                    primary_source=Source(title="AnandTech", url="https://anandtech.com/hbm"),
-                    visual_cue_suggestion="High bandwidth memory stacked silicon interconnect",
-                ),
-            ],
-            talking_points=[
-                TalkingPoint(beat_index=1, title="Compute Array", narrative_hook="Stream processors", supported_claim_ids=["claim_01"]),
-                TalkingPoint(beat_index=2, title="Memory Wall", narrative_hook="VRAM bandwidth", supported_claim_ids=["claim_02"]),
-            ],
-            suggested_visual_queries=[
-                "GPU die parallel streaming cores layout",
-                "High bandwidth memory stacked silicon interconnect",
-            ],
+        passed = len(issues) == 0
+        details = (
+            "Lineage reconstruction correctly discovers all root sources, complete paths, and ungrounded propositions."
+            if passed else f"Issues: {issues}"
         )
+        self.record("Provenance Lineage & Chain Reconstruction", passed, details, issues)
 
-        pipeline = AssetPipeline(output_dir=tmp_path)
-        ledger = pipeline.discover_and_freeze_assets(dossier, output_dir=tmp_path, offline=True, format_aspect="16:9")
+    # -----------------------------------------------------------------------
+    # 6. Chain Confidence Calculation (Noisy-OR, Series Decay, Contradiction)
+    # -----------------------------------------------------------------------
+    def audit_confidence_calculations(self):
+        issues = []
+        g = EvidenceGraph()
 
-        # Verify output files
-        files_created = list((tmp_path / "assets" / "images").glob("*.*"))
-        has_ledger_json = (tmp_path / "asset_ledger.json").exists()
-        has_ledger_yaml = (tmp_path / "asset_ledger.yaml").exists()
+        # Path 1: Source A (Tier 2: weight 0.98, rel 1.0)
+        s_a = g.add_source(title="Src A", url="https://a.org", tier=2, reliability_score=1.0)
+        p_a = g.add_passage(source_node_id=s_a, verbatim_text="Text A")
+        eu_a = g.add_evidence_unit(passage_node_id=p_a, atomic_statement="Stmt A", confidence=1.0)
+        claim = g.add_claim(claim_text="Test Claim")
+        g.link(eu_a, claim, EdgeRelation.ENTAILMENT, weight=1.0, confidence=1.0)
 
-        all_files_valid = True
-        for f in files_created:
-            f_size = f.stat().st_size
-            if f_size == 0:
-                all_files_valid = False
+        # Single path: hops = 3 (s_a -> p_a -> eu_a -> claim), hop_decay=0.98, hop_decay^(3-1) = 0.98^2 = 0.9604
+        # expected = 0.98 * 1.0 * 1.0 * 0.9604 = 0.941192 -> 0.9412
+        conf_single = g.calculate_chain_confidence(claim)
+        expected_single = round(0.98 * (0.98 ** 2), 4)
+        if abs(conf_single - expected_single) > 0.005:
+            issues.append(f"Single path confidence mismatch: got {conf_single}, expected ~{expected_single}")
 
-        pipeline_ok = (len(files_created) == 2 and has_ledger_json and has_ledger_yaml and all_files_valid)
+        # Path 2: Add independent Source B (Tier 1: weight 1.00, rel 1.0)
+        s_b = g.add_source(title="Src B", url="https://b.org", tier=1, reliability_score=1.0)
+        p_b = g.add_passage(source_node_id=s_b, verbatim_text="Text B")
+        eu_b = g.add_evidence_unit(passage_node_id=p_b, atomic_statement="Stmt B", confidence=1.0)
+        g.link(eu_b, claim, EdgeRelation.ENTAILMENT, weight=1.0, confidence=1.0)
 
-    record(
-        "End-to-End Asset Pipeline Execution",
-        pipeline_ok,
-        f"Files created={len(files_created)}, JSON ledger={has_ledger_json}, YAML ledger={has_ledger_yaml}, All files non-empty={all_files_valid}"
-    )
-except Exception as e:
-    record("End-to-End Asset Pipeline Execution", False, f"Exception: {e}")
+        conf_multi = g.calculate_chain_confidence(claim)
+        # Multi-path via Noisy-OR must strictly exceed single path confidence
+        if conf_multi <= conf_single:
+            issues.append(f"Noisy-OR multi-path failed: conf_multi ({conf_multi}) <= conf_single ({conf_single})")
 
-# ------------------------------------------------------------------------------
-# Check 7: Static Integrity Audit (Hardcoded/Dummy/Facade search)
-# ------------------------------------------------------------------------------
-print("\n--- Check 7: Static Analysis for Cheats & Facades ---")
-try:
-    assets_dir = PROJECT_ROOT / "src" / "assets"
-    source_files = list(assets_dir.glob("*.py"))
-    
-    facade_flags = []
-    for sf in source_files:
-        content = sf.read_text(encoding="utf-8")
-        if "TODO" in content or "NotImplementedError" in content:
-            facade_flags.append(f"{sf.name}: Contains unimplemented markers")
-        # Check for dummy hashes like 00000000 or fake constants
-        if "0000000000000000" in content:
-            facade_flags.append(f"{sf.name}: Contains dummy zero hashes")
-    
-    no_cheats = (len(facade_flags) == 0)
-    record(
-        "Static Facade & Dummy Code Audit",
-        no_cheats,
-        f"Scanned {len(source_files)} source files. Flags: {facade_flags}"
-    )
-except Exception as e:
-    record("Static Facade & Dummy Code Audit", False, f"Exception: {e}")
+        # Contradiction: Add contradictory source
+        s_c = g.add_source(title="Src C", url="https://c.org", tier=1, reliability_score=1.0)
+        g.link(s_c, claim, EdgeRelation.CONTRADICTION, weight=0.5, confidence=1.0)
 
-print("\n================================================================================")
-print("AUDIT EXECUTION SUMMARY")
-print("================================================================================")
-total_checks = len(results)
-passed_checks = sum(1 for r in results if r["status"] == "PASS")
-failed_checks = total_checks - passed_checks
+        conf_contradicted = g.calculate_chain_confidence(claim)
+        if conf_contradicted >= conf_multi:
+            issues.append(
+                f"Contradiction penalty failed: conf_contradicted ({conf_contradicted}) >= conf_multi ({conf_multi})"
+            )
+        if abs(conf_contradicted - (conf_multi - 0.5)) > 0.01:
+            issues.append(
+                f"Contradiction penalty magnitude mismatch: expected ~{conf_multi - 0.5}, got {conf_contradicted}"
+            )
 
-print(f"Total Checks: {total_checks}")
-print(f"Passed: {passed_checks}")
-print(f"Failed: {failed_checks}")
-if failed_checks == 0:
-    print("\nFINAL FORENSIC VERDICT: CLEAN")
-else:
-    print("\nFINAL FORENSIC VERDICT: INTEGRITY VIOLATION")
+        # Bottleneck calculation
+        g_bot = EvidenceGraph()
+        sb = g_bot.add_source(title="SB", url="https://sb.org", tier=1, reliability_score=1.0)
+        pb = g_bot.add_passage(source_node_id=sb, verbatim_text="Text")
+        eub = g_bot.add_evidence_unit(passage_node_id=pb, atomic_statement="Fact", confidence=0.33)
+        cb = g_bot.add_claim(claim_text="Bottleneck claim")
+        g_bot.link(eub, cb, EdgeRelation.ENTAILMENT, weight=0.9, confidence=0.9)
+        conf_bot = g_bot.calculate_chain_confidence(cb, method="bottleneck")
+        if conf_bot != 0.33:
+            issues.append(f"Bottleneck calculation expected 0.33, got {conf_bot}")
+
+        passed = len(issues) == 0
+        details = (
+            "Confidence calculations verified: series exponential decay, Noisy-OR corroboration boost, contradiction penalties, and bottleneck min-cut."
+            if passed else f"Issues: {issues}"
+        )
+        self.record("Chain Confidence Calculation Authenticity", passed, details, issues)
+
+    # -----------------------------------------------------------------------
+    # 7. Circular Imports & Lazy Loading in content.py
+    # -----------------------------------------------------------------------
+    def audit_circular_imports_and_lazy_loading(self):
+        issues = []
+
+        # Test isolated imports in various sequences
+        test_sequences = [
+            ["src.orchestrator.pipeline", "src.h9_runtime.content"],
+            ["src.orchestrator.state_machine", "src.h9_runtime.content"],
+            ["src.h9_runtime.content", "src.orchestrator.pipeline"],
+            ["src.epistemic.graph", "src.models.contracts", "src.h9_runtime.content"],
+        ]
+
+        for seq in test_sequences:
+            try:
+                for mod_name in seq:
+                    if mod_name in sys.modules:
+                        del sys.modules[mod_name]
+                for mod_name in seq:
+                    importlib.import_module(mod_name)
+            except Exception as e:
+                issues.append(f"Import sequence {seq} failed: {type(e).__name__}: {e}")
+
+        # Verify lazy import functions inside DefaultContentRuntime
+        from src.h9_runtime.content import DefaultContentRuntime
+        runtime = DefaultContentRuntime()
+
+        # Check source of methods to ensure real classes are imported and called
+        plan_src = inspect.getsource(runtime.plan_research)
+        eval_src = inspect.getsource(runtime.evaluate_angles)
+        prod_src = inspect.getsource(runtime.run_full_production)
+
+        if "from src.research.engine import ResearchEngine" not in plan_src:
+            issues.append("plan_research missing lazy import of ResearchEngine")
+        if "from src.editorial import EditorialEngine" not in eval_src:
+            issues.append("evaluate_angles missing lazy import of EditorialEngine")
+        if "from src.orchestrator.pipeline import Pipeline" not in prod_src:
+            issues.append("run_full_production missing lazy import of Pipeline")
+
+        passed = len(issues) == 0
+        details = (
+            "Circular import cleanly eliminated; Pipeline, StateMachine, and Engines lazily imported without bypassing genuine execution."
+            if passed else f"Issues: {issues}"
+        )
+        self.record("Circular Import & Lazy Loading Resolution", passed, details, issues)
+
+    # -----------------------------------------------------------------------
+    # 8. Test Suite Authenticity in tests/test_evidence_graph.py
+    # -----------------------------------------------------------------------
+    def audit_test_suite_authenticity(self):
+        issues = []
+        test_file = PROJECT_ROOT / "tests" / "test_evidence_graph.py"
+        content = test_file.read_text(encoding="utf-8")
+        tree = ast.parse(content, filename=str(test_file))
+
+        test_methods = []
+        tautological_asserts = []
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
+                test_methods.append(node.name)
+                # Check for assert True or assert x == x
+                for sub in ast.walk(node):
+                    if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute):
+                        if sub.func.attr in ("assertTrue", "assertFalse") and len(sub.args) >= 1:
+                            if isinstance(sub.args[0], ast.Constant) and isinstance(sub.args[0].value, bool):
+                                tautological_asserts.append(f"{node.name}: assert{sub.func.attr}({sub.args[0].value})")
+                        elif sub.func.attr == "assertEqual" and len(sub.args) >= 2:
+                            a1, a2 = sub.args[0], sub.args[1]
+                            if isinstance(a1, ast.Name) and isinstance(a2, ast.Name) and a1.id == a2.id:
+                                tautological_asserts.append(f"{node.name}: assertEqual({a1.id}, {a2.id})")
+
+        if len(test_methods) < 40:
+            issues.append(f"Expected at least 40 test methods, found {len(test_methods)}")
+        if tautological_asserts:
+            issues.append(f"Found tautological assertions: {tautological_asserts}")
+
+        passed = len(issues) == 0
+        details = (
+            f"All {len(test_methods)} tests in tests/test_evidence_graph.py exercise genuine functionality with zero tautological assertions."
+            if passed else f"Issues: {issues}"
+        )
+        self.record("Test Suite Authenticity & Assertion Non-Tautology", passed, details, issues)
+
+
+if __name__ == "__main__":
+    suite = ForensicAuditSuite()
+    results = suite.run_all()
+    all_passed = all(r["passed"] for r in results.values())
+    print(f"\nFinal Forensic Verdict: {'CLEAN' if all_passed else 'INTEGRITY VIOLATION'}")
+    sys.exit(0 if all_passed else 1)

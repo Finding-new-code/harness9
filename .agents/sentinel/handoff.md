@@ -1,41 +1,48 @@
 # Handoff Report — Sentinel Active Dispatch
 
-**Date:** 2026-09-10T13:38:40Z
+**Date:** 2026-09-14T00:01:00Z
 **Author:** Sentinel (sentinel)
 **Target:** Parent Orchestrator / User
-**Status:** IN PROGRESS — ORCHESTRATOR DISPATCHED (teamwork_preview_orchestrator_6)
+**Status:** IN PROGRESS — ORCHESTRATOR 9 DISPATCHED (teamwork_preview_orchestrator_9)
 
 ---
 
 ## 1. Observation
-The user requested completion of remaining and undone tasks for the Hermes x Harness 9 Runtime Coupling on branch dev in g:\Finding-new-code\harness9:
-- **Milestones 1-5**: Completed and verified in prior runs.
-- **Milestone 6**: Remediate 26 failing tests and 4 errors in tests/test_h9_acceptance.py across Dimensions A-H (target: 44/44 passing), run full regression verification with 0 regressions, and author the comprehensive final integration audit report at docs/architecture/hermes-h9-integration-audit.md.
+The user requested the construction and verification of the Harness 9 Epistemic Verification Layer on branch `dev` in `g:\Finding-new-code\harness9`:
+- **R1**: Baseline audit (`docs/architecture/epistemic-verification-audit.md`), formal specifications under `docs/epistemic/`, core doc updates, and `ADR-006` (Completed & committed).
+- **R2**: Evidence Graph abstraction and extended `ClaimRecord` contracts with executable semantics and 13-tier source taxonomy (Completed & verified with 108/108 tests).
+- **R3**: Multi-strategy verification engine with policy dispatch and hard Historical Scholarship Policy (Completed & verified with 144/144 tests).
+- **R4**: Multi-Stage pipeline, script re-verification, visual fact-checking, and deterministic numerical pipeline (In-progress).
+- **R5**: Lifecycle state machine gates (`RESEARCH_VERIFICATION`, `SCRIPT_FACT_CHECK`, `VISUAL_FACT_CHECK`, `FINAL_EPISTEMIC_QA`), native Hermes model tools, and untrusted input sanitization (In-progress).
+- **R6**: `H9-FactBench` (9 categories), adversarial test suite (`tests/test_epistemic_adversarial.py`), zero regressions (`tests/test_h9_acceptance.py` 44/44), and final forensic audit report (`docs/architecture/epistemic-verification-final-audit.md`) (In-progress).
+
+Prior orchestrator 8 stalled following upstream API rate limiting (429) after overseeing R2 and R3 implementation and verification.
 
 ---
 
 ## 2. Logic Chain
-1. **User Request Logged**: Appended latest user request verbatim with timestamp header 2026-09-10T13:36:42Z to ORIGINAL_REQUEST.md and .agents/ORIGINAL_REQUEST.md.
-2. **Routing Decision**: Evaluated against Routing Decision Table. General SWE task spanning 8 dimensions; routed to General path (teamwork_preview_orchestrator).
-3. **Subagent Spawning**: Created .agents/teamwork_preview_orchestrator_6 directory and spawned teamwork_preview_orchestrator_6 (Conversation ID: `8867b699-accb-47bb-872d-1c386b4dd5a3`).
-4. **Crons Established**:
-   - Cron 1 (Progress Reporting, `*/8 * * * *`): Task `task-59`.
-   - Cron 2 (Liveness Check, `*/10 * * * *`): Task `task-61`.
-5. **Sentinel Posture**: Sentinel performs zero technical implementation or code changes. Passively awaits progress reports/completion from the orchestrator.
+1. **User Request Logged**: Appended latest user request verbatim with timestamp header `2026-09-13T16:44:00Z` to `.agents/ORIGINAL_REQUEST.md` and root `ORIGINAL_REQUEST.md`.
+2. **Succession / Re-spawn**: Orchestrator 8 went stale after resource exhaustion. Per protocol, killed dead subagent and spawned `teamwork_preview_orchestrator_9` (`57042a4d-9eb2-4115-b9c1-cc964382a029`).
+3. **Context Handover**: Handed over completed R1 specs, R2 evidence graph & contracts, R3 verification engine & historical policy (144/144 tests passing), and focused prompt on R4–R6.
+4. **Crons Established**: Dual monitoring crons (`task-39` and `task-41`) continue active monitoring.
+5. **Sentinel Posture**: Ultra-light context maintained.
 
 ---
 
 ## 3. Caveats
-- Sentinel performs zero technical work or code modification; all implementation and verification are handled by the orchestrator swarm.
+- Sentinel performs zero technical implementation or code modification; all implementation and verification are handled by the orchestrator swarm.
 - Final completion is strictly gated on an independent VICTORY CONFIRMED verdict from `teamwork_preview_victory_auditor`.
 
 ---
 
 ## 4. Conclusion
-Orchestrator `teamwork_preview_orchestrator_6` is active with full instructions to deliver Milestone 6 defect remediation, regression suite, and final audit report. Dual monitoring crons are active.
+Orchestrator `teamwork_preview_orchestrator_9` is active with full handover context to deliver R4 through R6. Dual monitoring crons (`task-39` and `task-41`) are active.
 
 ---
 
 ## 5. Verification Method
-- Active subagent `8867b699-accb-47bb-872d-1c386b4dd5a3` is running.
-- Monitoring crons task-59 and task-61 are active in background.
+- Active subagent `57042a4d-9eb2-4115-b9c1-cc964382a029` is running.
+- Monitoring crons `task-39` and `task-41` are active in background.
+
+
+
