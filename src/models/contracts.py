@@ -765,7 +765,7 @@ class RenderArtifact(H9BaseModel):
     rendered_at: str = Field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
-    validation_status: str = "VERIFIED"
+    validation_status: str = "UNVERIFIED"  # only a measured gate (src.evaluation.media_gate) may set VERIFIED
 
 
 class PublishPackage(H9BaseModel):

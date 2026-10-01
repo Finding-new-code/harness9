@@ -57,6 +57,7 @@ from tools.registry import (
     registry,
     set_h9_available,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 
 
 class TestH9ToolRegistrationAndSchemas(unittest.TestCase):

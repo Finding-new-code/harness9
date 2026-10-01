@@ -13,6 +13,7 @@ import unittest
 from pathlib import Path
 
 from verify_pipeline import run_pipeline_flow, PipelineVerifier
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 
 
 class TestTier3PairwiseCombinations(unittest.TestCase):

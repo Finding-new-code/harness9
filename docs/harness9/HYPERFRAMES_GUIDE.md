@@ -88,12 +88,16 @@ The rendering pipeline converts web compositions to broadcast `.mp4` video:
   • Captures raw frame buffer (PNG/JPEG) for frame t = 0 .. N
               │
               ▼
-[FFmpeg Pipe (H.264 / AAC Muxer)]
-  • Ingests raw video frame stream via stdin
+[FFmpeg encode (H.264 / AAC Muxer)]
+  • Reads the captured frame sequence from a temp directory (piping via stdin is on the roadmap)
   • Ingests synchronized `narration.wav` audio track
   • Applies high-compatibility encoding flags:
     `-c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k`
               │
               ▼
-[renders/final.mp4]
+[Media gate: decodes the file; flat/black/frozen picture, edge detail, motion,
+ audio level, A/V sync, duration, resolution, fps]
+              │ pass                      │ fail
+              ▼                           ▼
+[renders/final.mp4 + final.gate.json]   [renders/final.rejected.mp4 + final.gate.json; run FAILED]
 ```

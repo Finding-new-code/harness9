@@ -18,7 +18,10 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from src.assets.pipeline import AssetPipeline
 from src.hyperframes.generator import HyperFramesGenerator
+from src.evaluation.media_gate import MediaGateError
+from src.hyperframes.browser_capture import BrowserCaptureError, RenderUnavailableError
 from src.hyperframes.renderer import HyperFramesRenderer
+from src.utils.ffmpeg import FFmpegError
 from src.models.dossier import ResearchDossier
 from src.models.ledger import AssetProvenanceLedger
 from src.models.summary import PipelineSummary, StageResult
@@ -50,6 +53,7 @@ class Pipeline:
         self.duration = max(1, int(duration))
         self.voice = voice or "default"
         self.quality = quality or "standard"
+        self.render_backend: Optional[str] = kwargs.get("render_backend")
         self.extra_kwargs = kwargs
 
     def run(self) -> bool:
@@ -203,32 +207,63 @@ class Pipeline:
                 brand=script_res.brand,
             )
 
-            hf_renderer = HyperFramesRenderer(fps=30, quality=self.quality)
+            hf_renderer = HyperFramesRenderer(fps=30, quality=self.quality, backend=self.render_backend)
             render_res = hf_renderer.render(
                 project_dir=self.output_dir,
                 output_mp4=self.output_dir / "renders" / "final.mp4",
                 duration=float(self.duration),
             )
             t_dur = time.time() - t0
+            gate = (render_res.gate or {}).get("metrics", {})
+            rel_video = Path(render_res.output_path).resolve().relative_to(self.output_dir).as_posix()
+            artifacts = ["index.html", "styles.css", "main.js", rel_video]
+            if render_res.gate is not None:
+                artifacts.append("renders/final.gate.json")
             stage_results.append(StageResult(
                 stage_name="hyperframes_render",
                 success=True,
                 execution_time_seconds=t_dur,
-                artifacts=[
-                    "index.html",
-                    "styles.css",
-                    "main.js",
-                    "renders/final.mp4",
-                ],
+                artifacts=artifacts,
                 metrics={
                     "video_duration": render_res.duration_seconds,
                     "video_size_bytes": render_res.file_size_bytes,
                     "width": render_res.width,
                     "height": render_res.height,
                     "fps": render_res.fps,
+                    "backend": render_res.backend,
+                    "validation_status": render_res.validation_status,
+                    "frames_captured": render_res.frames_captured,
+                    "gate_passed": None if render_res.gate is None else bool(render_res.gate.get("passed")),
+                    "measured": {k: gate[k] for k in (
+                        "flat_frame_ratio", "edge_density", "motion_ratio", "frozen_ratio", "black_ratio",
+                        "mean_volume_db", "integrated_lufs", "silence_ratio",
+                    ) if k in gate},
+                    "warnings": list(render_res.warnings),
                 },
             ))
-            logger.info(f"Stage 4 (HyperFrames Render) completed in {t_dur:.2f}s: {render_res.output_path}")
+            logger.info(f"Stage 4 (HyperFrames Render) completed in {t_dur:.2f}s [{render_res.backend}/"
+                        f"{render_res.validation_status}]: {render_res.output_path}")
+            for warning in render_res.warnings:
+                logger.warning(f"Stage 4 warning: {warning}")
+            final_rel_video = rel_video
+            run_status = "SUCCESS" if render_res.validation_status == "VERIFIED" else "PARTIAL"
+        except (RenderUnavailableError, BrowserCaptureError, FFmpegError, MediaGateError) as e:
+            # Expected, actionable failures: report them as they are. No placeholder video is produced.
+            t_dur = time.time() - t0
+            logger.error(f"Stage 4 (HyperFrames Render) failed: {e}")
+            failed_artifacts: List[str] = []
+            if isinstance(e, MediaGateError):
+                failed_artifacts = ["renders/final.rejected.mp4", "renders/final.gate.json"]
+            stage_results.append(StageResult(
+                stage_name="hyperframes_render",
+                success=False,
+                execution_time_seconds=t_dur,
+                artifacts=failed_artifacts,
+                error=f"{type(e).__name__}: {e}",
+                metrics={"failure_kind": type(e).__name__},
+            ))
+            self._write_summary(run_id, start_ts, start_time, "FAILED", stage_results)
+            return False
         except Exception as e:
             t_dur = time.time() - t0
             logger.error(f"Stage 4 (HyperFrames Render) failed: {e}")
@@ -248,11 +283,15 @@ class Pipeline:
             run_id=run_id,
             start_ts=start_ts,
             start_time=start_time,
-            status="SUCCESS",
+            status=run_status,
             stage_results=stage_results,
-            final_video_path="renders/final.mp4",
+            final_video_path=final_rel_video,
         )
-        logger.info(f"Harness 9 Pipeline Run [{run_id}] completed successfully!")
+        if run_status == "SUCCESS":
+            logger.info(f"Harness 9 Pipeline Run [{run_id}] completed successfully!")
+        else:
+            logger.warning(f"Harness 9 Pipeline Run [{run_id}] finished as {run_status}: "
+                           "the video is a STUB dry run, not a real render.")
         return True
 
     def _write_summary(
@@ -284,6 +323,7 @@ class Pipeline:
                 "target_duration_seconds": self.duration,
                 "offline_mode": self.offline,
                 "voice": self.voice,
+                "render_backend": self.render_backend or "default",
             },
         )
         summary.save(self.output_dir, base_name="pipeline_summary")

@@ -7,7 +7,7 @@ Harness 9 runs natively on Windows, macOS, and Linux with Python 3.10+ and Node.
 ### Dependencies
 - **Python**: `httpx`, `pydantic`, `pyyaml`, `pytest`
 - **System**: `ffmpeg` (for video/audio encoding)
-- **Node.js**: Chromium / Puppeteer for headless browser frame extraction (optional; automated pure-canvas/snapshot fallbacks included).
+- **Node.js (>= 18) + Chrome/Chromium/Edge**: required for real rendering (headless frame capture via puppeteer-core; installed once into `~/.harness9/render-toolchain`). There are **no automatic fallbacks**: if the renderer is unavailable the run fails with instructions. Use `--render-backend stub` (or `HARNESS9_RENDER_BACKEND=stub`) for an explicit, labelled dry run. Tests that only exercise pipeline stages select the stub backend via `tests/h9_render_env.py`; real-render tests skip when the toolchain is absent. See `RENDERING.md`.
 
 ---
 

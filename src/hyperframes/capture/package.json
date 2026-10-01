@@ -1,0 +1,12 @@
+{
+  "name": "harness9-render-toolchain",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned Node dependencies for Harness 9 deterministic HyperFrames frame capture.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "gsap": "3.12.5",
+    "puppeteer-core": "24.43.1"
+  }
+}

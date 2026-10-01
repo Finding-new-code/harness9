@@ -16,6 +16,7 @@ from adapters.hermes.tools import (
     TOOL_INSPECT_STATE,
     TOOL_EVALUATE_QUALITY,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 
 
 class TestHermesAdapter(unittest.TestCase):
@@ -133,9 +134,14 @@ class TestHermesAdapter(unittest.TestCase):
         self.assertGreaterEqual(inspection["render_count"], 1)
 
         # Verify evaluation
+        # The module runs the explicit dry-run (stub) render backend, which writes flat placeholder frames.
+        # The evaluator MEASURES the file, so it must refuse to pass it and must not invent scores.
         evaluation = bridge.evaluate_session("bridge_session_01")
-        self.assertTrue(evaluation["passed"])
-        self.assertGreater(evaluation["composite_score"], 0.8)
+        self.assertFalse(evaluation["passed"])
+        self.assertTrue(any(f.startswith("FAIL not_flat") for f in evaluation["feedback"]), evaluation["feedback"])
+        for invented in ("factual_grounding", "audio_speech_alignment", "scene_pacing"):
+            self.assertNotIn(invented, evaluation["scores"])
+        self.assertTrue(any("NOT MEASURED" in f for f in evaluation["feedback"]))
 
     def test_06_handle_tool_call_dispatcher(self):
         """Verify handle_tool_call routes tool calls and returns structured responses."""
@@ -172,7 +178,7 @@ class TestHermesAdapter(unittest.TestCase):
             session_id="dispatcher_session_01",
             bridge=bridge,
         )
-        self.assertTrue(res_eval["passed"])
+        self.assertFalse(res_eval["passed"])  # stub placeholder video: measured, and rejected
 
         # 4. Unknown tool call handling
         res_unknown = handle_tool_call(

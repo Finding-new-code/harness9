@@ -12,7 +12,7 @@ from enum import Enum
 import hashlib
 from pathlib import Path
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, model_validator
 
 from src.h9_runtime.types import ProductionIR
@@ -24,7 +24,8 @@ from src.models.contracts import (
     ScriptBeat,
     ScriptScene,
 )
-from adapters.hyperframes.adapter import HyperFramesAdapter, HyperFramesProject
+if TYPE_CHECKING:  # annotations only: the models layer must not import the adapters layer at runtime
+    from adapters.hyperframes.adapter import HyperFramesAdapter, HyperFramesProject
 
 
 # ===========================================================================
@@ -733,7 +734,11 @@ class HyperFramesCompiler:
     """Consumes a validated ProductionIRDocument AST to compile an executable HyperFrames project."""
 
     def __init__(self, adapter: Optional[HyperFramesAdapter] = None) -> None:
-        self.adapter = adapter or HyperFramesAdapter()
+        if adapter is None:
+            from adapters.hyperframes.adapter import HyperFramesAdapter  # lazy: avoids a models<->adapters import cycle
+
+            adapter = HyperFramesAdapter()
+        self.adapter = adapter
 
     def compile(
         self,

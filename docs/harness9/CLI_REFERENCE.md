@@ -27,6 +27,8 @@ python run_harness9.py [OPTIONS]
 | `--offline` | `flag` | `False` | Force offline mode using built-in curated presets, procedural SVGs, and local TTS. |
 | `--voice` | `str` | `"default"` | Voice profile identifier (`"default"`, `"elevenlabs"`, `"sapi"`, `"synthetic"`). |
 | `--fps` | `int` | `30` | Render frame rate for the final MP4 video. |
+| `--render-backend` | `str` | `chrome` | `chrome` = real headless-Chromium render + measured media gate (also `$HARNESS9_RENDER_BACKEND`). `stub` = explicit dry run with placeholder frames; status `STUB`, run status `PARTIAL`, never `VERIFIED`. |
+| `--check-render` | `flag` | `False` | Report whether the real renderer can run here (Node, Chrome, FFmpeg, toolchain) and exit (0 = ready). See `RENDERING.md`. |
 | `--verbose` | `flag` | `False` | Enable detailed debug logging to stdout. |
 
 ### Examples

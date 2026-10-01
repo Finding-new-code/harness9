@@ -78,6 +78,7 @@ from src.security.guard import (
     get_security_guard,
     reset_security_guard,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 from tools.h9_content_tools import (
     H9_PUBLISH_SCHEMA,
     handle_h9_publish,
@@ -211,7 +212,8 @@ class TestR51ExecutionSandboxing(unittest.TestCase):
             )
 
             self.assertIsInstance(res, RenderResult)
-            self.assertIn(res.validation_status, ("VERIFIED", "WARNINGS"))
+            # Routing test on the explicit dry-run backend: honest status, never VERIFIED.
+            self.assertEqual(res.validation_status, "STUB")
             # Verify that mock_execution was passed to render_video_with_ffmpeg
             mock_ffmpeg_render.assert_called_once()
             _, kwargs = mock_ffmpeg_render.call_args

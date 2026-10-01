@@ -94,6 +94,7 @@ from src.models.contracts import (
     ScriptScene,
     SourceRecord,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 from src.models.ir import (
     AudioNarration,
     HyperFramesCompiler,
@@ -1081,7 +1082,9 @@ class TestAcceptanceDimensionGSandboxCoupling(unittest.TestCase):
         )
         mock_exec.validate_path.side_effect = lambda p: Path(p).resolve()
 
-        renderer = HyperFramesRenderer(execution_runtime=mock_exec)
+        # This test is about sandbox ROUTING, not pixels: it uses the explicit dry-run backend, whose
+        # status is "STUB" (never "VERIFIED"). Real-render behaviour lives in tests/test_render_backend.py.
+        renderer = HyperFramesRenderer(execution_runtime=mock_exec, backend="stub")
 
         with patch("src.hyperframes.renderer.is_ffmpeg_available", return_value=True), \
              patch("src.hyperframes.renderer.probe_media_file", return_value={
@@ -1091,7 +1094,9 @@ class TestAcceptanceDimensionGSandboxCoupling(unittest.TestCase):
 
             res = renderer.render(project_dir=proj_dir)
             self.assertIsInstance(res, RenderResult)
-            self.assertEqual(res.validation_status, "VERIFIED")
+            self.assertEqual(res.validation_status, "STUB")
+            self.assertEqual(res.backend, "stub")
+            self.assertEqual(mock_ffmpeg.call_args.kwargs.get("execution_runtime"), mock_exec)
 
     def test_g07_sandboxed_media_streaming_and_byte_capping(self):
         """Verify download_stream_sandboxed restricts byte size and confines destination to jail."""

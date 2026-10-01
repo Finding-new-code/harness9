@@ -20,6 +20,7 @@ from src.utils.ffmpeg import (
     probe_media_file,
     render_video_with_ffmpeg,
     create_fallback_mp4,
+    FFmpegError,
 )
 
 __all__ = [
@@ -40,4 +41,5 @@ __all__ = [
     "probe_media_file",
     "render_video_with_ffmpeg",
     "create_fallback_mp4",
+    "FFmpegError",
 ]

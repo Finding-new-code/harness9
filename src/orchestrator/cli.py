@@ -84,6 +84,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "--render-backend",
+        choices=["chrome", "stub"],
+        default=None,
+        help="chrome = real headless-Chromium render + measured media gate (default, or $HARNESS9_RENDER_BACKEND); "
+             "stub = labelled dry run with placeholder frames (never marked VERIFIED)",
+    )
+
+    parser.add_argument(
+        "--check-render",
+        action="store_true",
+        default=False,
+        help="Report whether the real renderer can run on this machine (Node, Chrome, FFmpeg, toolchain) and exit",
+    )
+
+    parser.add_argument(
         "--json",
         action="store_true",
         default=False,
@@ -117,6 +132,13 @@ def main(args: Optional[List[str]] = None) -> int:
     parser = build_parser()
     parsed_args = parser.parse_args(args)
 
+    if parsed_args.check_render:
+        from src.hyperframes.browser_capture import availability
+
+        report = availability()
+        print(json.dumps(report, indent=2))
+        return 0 if not report["problems"] else 1
+
     topic = parsed_args.topic.strip()
     if not topic:
         print("Error: --topic must not be empty.", file=sys.stderr)
@@ -147,6 +169,7 @@ def main(args: Optional[List[str]] = None) -> int:
             duration=duration,
             voice=parsed_args.voice,
             quality=parsed_args.quality,
+            render_backend=parsed_args.render_backend,
         )
         success = pipeline.run()
 
@@ -158,12 +181,33 @@ def main(args: Optional[List[str]] = None) -> int:
                 print(json.dumps({"success": success, "output_directory": str(out_dir)}))
 
         if success:
-            print(f"\n[SUCCESS] Video generation pipeline completed successfully!")
+            status, video = "SUCCESS", out_dir / "renders" / "final.mp4"
+            summary_file = out_dir / "pipeline_summary.json"
+            if summary_file.exists():
+                try:
+                    data = json.loads(summary_file.read_text(encoding="utf-8"))
+                    status = data.get("status", status)
+                    video = out_dir / (data.get("final_video_path") or "renders/final.mp4")
+                except (OSError, ValueError):
+                    pass
+            if status == "SUCCESS":
+                print(f"\n[SUCCESS] Video generated and verified by the media gate.")
+            else:
+                print(f"\n[DRY RUN] Stub render only: placeholder frames, NOT a real video (status {status}).")
             print(f"Artifacts and summary written to: {out_dir}")
-            print(f"Rendered video: {out_dir / 'renders' / 'final.mp4'}")
+            print(f"Rendered video: {video}")
             return 0
         else:
             print(f"\n[FAILED] Pipeline execution failed. See logs for details.", file=sys.stderr)
+            summary_file = out_dir / "pipeline_summary.json"
+            if summary_file.exists():
+                try:
+                    data = json.loads(summary_file.read_text(encoding="utf-8"))
+                    for stage in data.get("stages", []):
+                        if not stage.get("success") and stage.get("error"):
+                            print(f"  {stage['stage_name']}: {stage['error']}", file=sys.stderr)
+                except (OSError, ValueError):
+                    pass
             return 1
     except Exception as e:
         logger.exception(f"Unhandled pipeline exception: {e}")

@@ -8,12 +8,15 @@ Production IR compilation, and broadcast MP4 rendering.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 import logging
 from pathlib import Path
 import shutil
 import time
 from typing import Any, Dict, List, Optional, Protocol, Tuple, Union, runtime_checkable
 
+from src.evaluation.media_gate import ExpectedMedia, MediaGate
+from src.evaluation.render_evaluation import evaluate_render
 from src.h9_runtime.types import (
     ExecutionResult,
     ProductionIR,
@@ -35,6 +38,19 @@ from src.models.contracts import (
     ScriptBeat,
 )
 logger = logging.getLogger(__name__)
+
+
+def _render_stage_metrics(workspace: Path) -> Dict[str, Any]:
+    """Metrics of the pipeline's render stage (backend, validation_status, gate result), or {}."""
+    summary_file = Path(workspace) / "pipeline_summary.json"
+    try:
+        data = json.loads(summary_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    for stage in data.get("stages", []):
+        if stage.get("stage_name") == "hyperframes_render":
+            return dict(stage.get("metrics", {}))
+    return {}
 
 
 @runtime_checkable
@@ -368,6 +384,23 @@ class DefaultContentRuntime:
                     elapsed_seconds=round(time.time() - start_time, 2),
                 )
 
+            # A pipeline that claims success but left no video at the canonical path has failed.
+            source_video = ws / "renders" / "final.mp4"
+            if not source_video.exists():
+                sm.transition_to(
+                    ProductionState.FAILED,
+                    payload={"error": "Pipeline reported success but renders/final.mp4 does not exist"},
+                )
+                return ProductionResult(
+                    success=False,
+                    project_id=brief.project_id,
+                    session_id=session_id,
+                    error_message="Pipeline reported success but produced no video (renders/final.mp4 is missing)",
+                    state_history=sm.get_audit_log(),
+                    elapsed_seconds=round(time.time() - start_time, 2),
+                )
+            render_stage = _render_stage_metrics(ws)
+
             # Advance state machine through canonical lifecycle milestones
             sm.transition_to(ProductionState.RESEARCH_COMPLETED)
             sm.transition_to(ProductionState.EDITORIAL_ANALYSIS)
@@ -385,18 +418,34 @@ class DefaultContentRuntime:
             sm.transition_to(ProductionState.COMPLETED)
 
             # Copy rendered MP4 to session renders directory
-            source_video = ws / "renders" / "final.mp4"
             target_video = renders_dir / "final.mp4"
-            if source_video.exists():
-                shutil.copy2(source_video, target_video)
+            shutil.copy2(source_video, target_video)
 
-            # Build RenderArtifact
+            # Measure the delivered file; nothing below is assumed from the brief.
+            width = 1920 if brief.aspect_ratio == "16:9" else 1080
+            height = 1080 if brief.aspect_ratio == "16:9" else 1920
+            evaluation_report = evaluate_render(
+                target_video,
+                run_id=f"eval_{session_id}_{int(time.time())}",
+                expected=ExpectedMedia(
+                    duration=float(brief.target_duration_seconds), width=width, height=height, fps=30,
+                    require_audio=True,
+                ),
+                notes=(
+                    ["Render backend was 'stub': placeholder frames, NOT a real video."]
+                    if render_stage.get("validation_status") == "STUB" else None
+                ),
+            )
+            measured = MediaGate().probe_summary(target_video)
+
             render_artifact = RenderArtifact(
-                video_path=str(target_video.resolve()) if target_video.exists() else str(source_video.resolve()),
-                duration_seconds=float(brief.target_duration_seconds),
-                file_size_bytes=target_video.stat().st_size if target_video.exists() else 0,
-                width=1920 if brief.aspect_ratio == "16:9" else 1080,
-                height=1080 if brief.aspect_ratio == "16:9" else 1920,
+                video_path=str(target_video.resolve()),
+                duration_seconds=float(measured.get("duration") or 0.0),
+                file_size_bytes=target_video.stat().st_size,
+                width=int(measured.get("width") or width),
+                height=int(measured.get("height") or height),
+                fps=int(round(measured.get("fps") or 30)),
+                validation_status=str(render_stage.get("validation_status") or "UNVERIFIED"),
             )
 
             # Build PublishPackage
@@ -407,20 +456,6 @@ class DefaultContentRuntime:
                 tags=[brief.topic, "Harness9", "HermesAgent"],
                 video_path=render_artifact.video_path,
                 total_cost_usd=0.0,
-            )
-
-            evaluation_report = EvaluationReport(
-                run_id=f"eval_{session_id}_{int(time.time())}",
-                layer=EvaluationLayer.VIDEO,
-                scores={
-                    "video_integrity": 1.0,
-                    "audio_speech_alignment": 0.95,
-                    "scene_pacing": 0.92,
-                    "factual_grounding": 0.96,
-                },
-                composite_score=0.96,
-                passed=True,
-                feedback=["All scenes render successfully."],
             )
 
             elapsed = round(time.time() - start_time, 2)
