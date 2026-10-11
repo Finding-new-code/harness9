@@ -52,6 +52,7 @@ class Claim:
     corroborating_sources: List[Source] = field(default_factory=list)
     visual_cue_suggestion: str = ""
     verification_notes: str = ""
+    verification_status: str = "UNVERIFIED"
 
     def to_dict(self) -> Dict[str, Any]:
         data: Dict[str, Any] = {
@@ -59,6 +60,7 @@ class Claim:
             "claim_text": self.claim_text,
             "category": self.category,
             "confidence_score": float(self.confidence_score),
+            "verification_status": self.verification_status,
             "primary_source": self.primary_source.to_dict(),
             "visual_cue_suggestion": self.visual_cue_suggestion,
         }
@@ -84,6 +86,7 @@ class Claim:
             corroborating_sources=corroborating,
             visual_cue_suggestion=str(data.get("visual_cue_suggestion", "")),
             verification_notes=str(data.get("verification_notes", "")),
+            verification_status=str(data.get("verification_status", "UNVERIFIED")),
         )
 
 
@@ -95,6 +98,8 @@ class TalkingPoint:
     narrative_hook: str
     supported_claim_ids: List[str] = field(default_factory=list)
     estimated_duration_sec: float = 0.0
+    narration_text: str = ""
+    narration_short: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -103,6 +108,8 @@ class TalkingPoint:
             "narrative_hook": self.narrative_hook,
             "supported_claim_ids": list(self.supported_claim_ids),
             "estimated_duration_sec": float(self.estimated_duration_sec),
+            "narration_text": self.narration_text,
+            "narration_short": self.narration_short,
         }
 
     @classmethod
@@ -113,6 +120,8 @@ class TalkingPoint:
             narrative_hook=str(data.get("narrative_hook", "")),
             supported_claim_ids=[str(cid) for cid in data.get("supported_claim_ids", [])],
             estimated_duration_sec=float(data.get("estimated_duration_sec", 0.0)),
+            narration_text=str(data.get("narration_text", "")),
+            narration_short=str(data.get("narration_short", "")),
         )
 
 

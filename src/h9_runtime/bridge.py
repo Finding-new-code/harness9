@@ -1072,7 +1072,7 @@ class HermesCapabilityBridge:
                         attribution_required=False,
                         commercial_use_allowed=True,
                     ),
-                    verification_status="VERIFIED",
+                    verification_status="FALLBACK_GENERATED",
                     scene_target=scene_target,
                     claim_id_refs=[req_dict.get("associated_claim_id", f"claim_{idx+1:02d}")],
                 )
@@ -1130,7 +1130,7 @@ class HermesCapabilityBridge:
                         attribution_required=False,
                         commercial_use_allowed=True,
                     ),
-                    verification_status="VERIFIED",
+                    verification_status="FALLBACK_GENERATED",
                     scene_target=scene_id,
                 )
                 records.append(rec.to_dict())

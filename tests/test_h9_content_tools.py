@@ -262,7 +262,8 @@ class TestH9ResearchTool(unittest.TestCase):
 
         res2 = registry.dispatch("h9_research", {"topic": "Microprocessors"})
         data2 = json.loads(res2)
-        self.assertNotIn("error", data2)
+        self.assertIn("error", data2)
+        self.assertIn("Use online research", data2["error"])
         self.assertEqual(data2["topic"], "Microprocessors")
 
 
@@ -304,7 +305,7 @@ class TestH9DiscoverAssetsTool(unittest.TestCase):
             self.assertIn("local_path", asset)
             self.assertIn("file_sha256", asset)
             self.assertIn("dimensions", asset)
-            self.assertEqual(asset["verification_status"], "VERIFIED")
+            self.assertEqual(asset["verification_status"], "FALLBACK_GENERATED")
             self.assertEqual(asset["dimensions"]["aspect_ratio"], "16:9")
 
             # Check that physical asset was written to disk

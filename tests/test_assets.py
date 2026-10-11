@@ -263,6 +263,8 @@ class TestAssetFreezerAndHashing(unittest.TestCase):
         """Verify binary signature sniffing for JPEG, PNG, WebP, SVG, MP4, WAV, and MP3."""
         self.assertEqual(sniff_magic_bytes(b"\xff\xd8\xff\xe0\x00\x10JFIF"), "image/jpeg")
         self.assertEqual(sniff_magic_bytes(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"), "image/png")
+        self.assertEqual(sniff_magic_bytes(b"GIF87a\x01\x00\x01\x00"), "image/gif")
+        self.assertEqual(sniff_magic_bytes(b"GIF89a\x01\x00\x01\x00"), "image/gif")
         self.assertEqual(sniff_magic_bytes(b"RIFF\x24\x00\x00\x00WEBPVP8 "), "image/webp")
         self.assertEqual(sniff_magic_bytes(b"<svg xmlns='http://www.w3.org/2000/svg'>"), "image/svg+xml")
         self.assertEqual(sniff_magic_bytes(b"<?xml version='1.0'?><svg>"), "image/svg+xml")
@@ -277,6 +279,7 @@ class TestAssetFreezerAndHashing(unittest.TestCase):
         """Test MIME type mapping to file extensions."""
         self.assertEqual(mime_to_extension("image/jpeg"), "jpg")
         self.assertEqual(mime_to_extension("image/png"), "png")
+        self.assertEqual(mime_to_extension("image/gif"), "gif")
         self.assertEqual(mime_to_extension("image/webp"), "webp")
         self.assertEqual(mime_to_extension("image/svg+xml"), "svg")
         self.assertEqual(mime_to_extension("video/mp4"), "mp4")
@@ -662,6 +665,34 @@ class TestAssetPipelineIntegration(unittest.TestCase):
         self.assertEqual(loaded_json["total_assets"], 3)
         loaded_yaml = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
         self.assertEqual(loaded_yaml["total_assets"], 3)
+
+    def test_asset_claim_links_follow_scene_talking_points(self):
+        """Each scene asset must link to that scene's supported claim IDs."""
+        dossier = {
+            "topic": "Apollo Guidance Computer",
+            "claims": [{"claim_id": f"claim_{index:02d}"} for index in range(1, 5)],
+            "talking_points": [
+                {"beat_index": 1, "supported_claim_ids": ["claim_01"]},
+                {"beat_index": 2, "supported_claim_ids": ["claim_02", "claim_03"]},
+                {"beat_index": 3, "supported_claim_ids": ["claim_04"]},
+            ],
+            "suggested_visual_queries": ["AGC hardware", "AGC block diagram", "AGC DSKY"],
+        }
+        pipeline = AssetPipeline(output_dir=self.out_path)
+        ledger = pipeline.discover_and_freeze_assets(
+            dossier,
+            output_dir=self.out_path,
+            offline=True,
+        )
+
+        self.assertEqual(
+            [(asset.scene_target, asset.claim_id_refs) for asset in ledger.assets],
+            [
+                ("scene_1", ["claim_01"]),
+                ("scene_2", ["claim_02", "claim_03"]),
+                ("scene_3", ["claim_04"]),
+            ],
+        )
 
 
 class TestAssetBoundaryAndEdgeCases(unittest.TestCase):

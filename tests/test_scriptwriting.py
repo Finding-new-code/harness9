@@ -8,7 +8,9 @@ Covers:
 
 import json
 import os
+import shutil
 import struct
+import subprocess
 import tempfile
 import unittest
 import wave
@@ -316,15 +318,31 @@ class TestScriptwritingCoverage(unittest.TestCase):
             self.assertIsInstance(provider.is_available(), bool)
 
     def test_08_elevenlabs_tts_provider(self):
-        """F7: Test ElevenLabs provider handling and mock execution."""
+        """Convert and measure valid MP3 bytes; this does not claim to test ElevenLabs speech quality."""
         provider = ElevenLabsTTSProvider(api_key="mock_invalid_key")
         self.assertTrue(provider.is_available())
 
-        # Test request failure handling
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            self.skipTest("FFmpeg is required to verify MP3-to-WAV conversion.")
+
+        mp3_fixture = self.out_path / "fixture.mp3"
+        subprocess.run(
+            [
+                ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+                "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=44100",
+                "-t", "1.0", "-codec:a", "libmp3lame", "-b:a", "64k",
+                str(mp3_fixture),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        mp3_bytes = mp3_fixture.read_bytes()
+
         wav_path = self.out_path / "test_elevenlabs.wav"
         with patch("urllib.request.urlopen") as mock_urlopen:
             mock_resp = MagicMock()
-            mock_resp.read.return_value = b"RIFF" + b"\x00" * 200
+            mock_resp.read.return_value = mp3_bytes
             mock_resp.__enter__.return_value = mock_resp
             mock_urlopen.return_value = mock_resp
 
@@ -335,6 +353,11 @@ class TestScriptwritingCoverage(unittest.TestCase):
             )
             self.assertTrue(wav_path.exists())
             self.assertEqual(meta.provider_used, "elevenlabs")
+            self.assertGreater(meta.duration_seconds, 0.9)
+            self.assertLess(meta.duration_seconds, 1.2)
+            with wave.open(str(wav_path), "rb") as wav_file:
+                self.assertEqual(wav_file.getnchannels(), 1)
+                self.assertEqual(wav_file.getsampwidth(), 2)
 
     def test_09_tts_engine_provider_selection_and_fallback(self):
         """F7: Test TTSEngine fallback chain (ElevenLabs -> Windows SAPI -> Harmonic Synthesizer)."""
@@ -535,8 +558,8 @@ class TestScriptwritingBoundaries(unittest.TestCase):
             if i > 0:
                 self.assertGreaterEqual(g.start, res.groups[i-1].start)
 
-    def test_19_missing_dossier_talking_points_fallback(self):
-        """Edge Case: Dossier without talking points falls back to clean default scene synthesis."""
+    def test_19_missing_dossier_talking_points_fails_closed(self):
+        """Do not invent narrated facts when the dossier has no talking points."""
         dossier_no_tp = ResearchDossier(
             topic="Minimal Topic",
             metadata=DossierMetadata(run_id="run_min"),
@@ -545,9 +568,8 @@ class TestScriptwritingBoundaries(unittest.TestCase):
             talking_points=[],
         )
         generator = ScriptGenerator()
-        scenes = generator.synthesize_scenes_from_dossier(dossier_no_tp, target_duration=18.0)
-        self.assertEqual(len(scenes), 3)
-        self.assertAlmostEqual(sum(s.duration for s in scenes), 18.0, places=1)
+        with self.assertRaisesRegex(ValueError, "no talking points"):
+            generator.synthesize_scenes_from_dossier(dossier_no_tp, target_duration=18.0)
 
     def test_20_pipeline_custom_voice_and_aspect_ratio(self):
         """Edge Case: Pipeline execution with 9:16 portrait aspect ratio and custom voice."""

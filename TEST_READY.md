@@ -1,16 +1,18 @@
-# TEST READY: Harness 9 Decoupled Content Production OS
+# TEST READY: Harness 9 Test Evidence
 
-**Status**: ALL TESTS PASSING (100% OK)  
-**Date**: 2026-08-31  
-**Integrity Mode**: Production / Broadcast Certified  
-**Test Runner**: `python -m unittest tests/test_e2e_comprehensive.py -v`  
-**Test Suite Coverage**: Systematic 4-Tier Opaque-Box Acceptance Suite (76 test methods, 282+ assertions)
+- **Current pilot disposition**: LIMITED PRIVATE BETA for curated topics on the tested Windows host; see [BETA_READINESS.md](docs/harness9/BETA_READINESS.md)
+- **Fresh focused tests**: 98 passed on 2026-10-11 across assets, adversarial assets, scriptwriting, research integrity, and CLI
+- **Historical suite report date**: 2026-08-31
+- **Historical test runner**: `python -m unittest tests/test_e2e_comprehensive.py -v`
+- **Historical suite coverage**: 76 test methods, 282+ assertions
+
+> The matrix below records the project's earlier hermetic test-suite report. It is not evidence of a live provider, search, speech, asset, or renderer pass. The Windows production-path findings are recorded in [BETA_READINESS.md](docs/harness9/BETA_READINESS.md). The prior “Production / Broadcast Certified” wording is withdrawn pending those live gates.
 
 ---
 
-## 1. 4-Tier Test Suite Summary
+## 1. Historical 4-Tier Test Suite Summary
 
-The comprehensive end-to-end testing track (`tests/test_e2e_comprehensive.py`) is complete, hermetic, and passing with zero flakiness in 100% offline environments.
+The historical report described `tests/test_e2e_comprehensive.py` as a hermetic suite run in an offline environment. That report was not rerun for the current beta assessment.
 
 | Testing Tier | Scope / Objective | Features Exercised | Target Threshold | Actual Tests | Actual Assertions | Status |
 |---|---|:---:|:---:|:---:|:---:|:---:|

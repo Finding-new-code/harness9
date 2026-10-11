@@ -184,6 +184,12 @@ class HyperFramesRenderer:
 
         runtime = execution_runtime or self.execution_runtime
 
+        if self.backend == "chrome" and runtime is None and not is_ffmpeg_available():
+            raise RenderUnavailableError(
+                "FFmpeg is required to encode and measure the real video, but it is not available on PATH. "
+                "Install FFmpeg, refresh the process PATH, and retry."
+            )
+
         # A video left over from an earlier run must never be mistaken for this run's output.
         for stale in (target_mp4, self._rejected_path(target_mp4), self._gate_path(target_mp4)):
             try:

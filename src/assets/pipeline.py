@@ -72,6 +72,10 @@ class AssetPipeline:
         claims = dossier_data.get("claims", [])
         talking_points = dossier_data.get("talking_points", [])
         visual_queries = dossier_data.get("suggested_visual_queries", [])
+        known_claim_ids = {
+            str(claim.get("claim_id") if isinstance(claim, dict) else getattr(claim, "claim_id", ""))
+            for claim in claims
+        }
 
         # Fallback queries if list is empty
         if not visual_queries:
@@ -90,14 +94,31 @@ class AssetPipeline:
         for idx, query in enumerate(visual_queries):
             scene_target = f"scene_{idx + 1}"
             linked_claim_ids = []
-            
-            # Map claim IDs
-            if idx < len(claims):
-                c_item = claims[idx]
-                cid = c_item.get("claim_id") if isinstance(c_item, dict) else getattr(c_item, "claim_id", f"claim_{idx+1:02d}")
-                linked_claim_ids.append(cid)
-            else:
-                linked_claim_ids.append(f"claim_{idx+1:02d}")
+
+            # Assets belong to the scene's talking point, which may support
+            # several claims. Positional claim mapping mislinked later scenes
+            # whenever there were more claims than visuals.
+            if idx < len(talking_points):
+                point = talking_points[idx]
+                supported_ids = (
+                    point.get("supported_claim_ids", [])
+                    if isinstance(point, dict)
+                    else getattr(point, "supported_claim_ids", [])
+                )
+                linked_claim_ids = [
+                    str(claim_id)
+                    for claim_id in supported_ids
+                    if str(claim_id) in known_claim_ids
+                ]
+
+            # Preserve the existing fallback for incomplete dossiers while
+            # keeping all real references constrained to known claims.
+            if not linked_claim_ids:
+                if idx < len(claims):
+                    c_item = claims[idx]
+                    cid = c_item.get("claim_id") if isinstance(c_item, dict) else getattr(c_item, "claim_id", f"claim_{idx+1:02d}")
+                    if str(cid) in known_claim_ids:
+                        linked_claim_ids.append(str(cid))
 
             slug = f"asset_{idx + 1:02d}_{sanitize_filename(query.lower())[:24]}"
             asset_id = f"asset_{idx + 1:02d}"
@@ -148,7 +169,7 @@ class AssetPipeline:
                     ),
                     scene_target=scene_target,
                     claim_id_refs=linked_claim_ids,
-                    verification_status="FALLBACK_GENERATED" if is_offline else "VERIFIED",
+                    verification_status="FALLBACK_GENERATED",
                 )
             else:
                 # Online candidate found -> attempt download and freeze

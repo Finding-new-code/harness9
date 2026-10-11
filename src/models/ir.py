@@ -55,7 +55,7 @@ class IRAssetReference(BaseModel):
     height: int = Field(default=1080, gt=0, description="Pixel height")
     aspect_ratio: str = Field(default="16:9", description="Standard aspect ratio")
     license_type: str = Field(default="Public Domain", description="License provenance type")
-    verified: bool = Field(default=True, description="Integrity verification status")
+    verified: bool = Field(default=False, description="Integrity verification status")
 
 
 # ===========================================================================
@@ -513,7 +513,10 @@ def compile_script_to_ir(
             height=h,
             aspect_ratio=ar,
             license_type=l_type,
-            verified=a_dict.get("verification_status") == "VERIFIED" or a_dict.get("verified", True),
+            verified=(
+                a_dict.get("verification_status") == "VERIFIED"
+                or a_dict.get("verified") is True
+            ),
         )
 
     # 3. Process Scenes & Enforce Contiguity
@@ -591,7 +594,7 @@ def compile_script_to_ir(
                     file_path=str(vpath),
                     file_sha256=hashlib.sha256(str(vpath).encode("utf-8")).hexdigest(),
                     media_type="image/svg+xml",
-                    verified=True,
+                    verified=False,
                 )
             bindings["hero_image"] = matched_aid
 

@@ -720,7 +720,7 @@ class AssetRecord(H9BaseModel):
     page_url: Optional[str] = None
     creator_name: Optional[str] = "Harness 9 Procedural Generator"
     license: LicenseInfo = Field(default_factory=LicenseInfo)
-    verification_status: str = "VERIFIED"
+    verification_status: str = "UNVERIFIED"
     scene_target: str = "scene_1"
     claim_id_refs: List[str] = Field(default_factory=list)
 

@@ -20,6 +20,43 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 logger = logging.getLogger("harness9.utils.ffmpeg")
 
 
+def _refresh_windows_user_path() -> None:
+    """Merge registered user PATH entries into a long-lived Windows process."""
+    if os.name != "nt":
+        return
+    try:
+        import winreg
+
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+            user_path, _ = winreg.QueryValueEx(key, "Path")
+        user_path = winreg.ExpandEnvironmentStrings(str(user_path))
+    except (ImportError, OSError, ValueError):
+        return
+
+    current_path = os.environ.get("PATH", "")
+    known = {
+        os.path.normcase(os.path.normpath(entry.strip().strip('"')))
+        for entry in current_path.split(os.pathsep)
+        if entry.strip()
+    }
+    missing = []
+    for entry in user_path.split(os.pathsep):
+        candidate = os.path.expanduser(entry.strip().strip('"'))
+        if not candidate or not Path(candidate).is_dir():
+            continue
+        normalized = os.path.normcase(os.path.normpath(candidate))
+        if normalized not in known:
+            known.add(normalized)
+            missing.append(candidate)
+
+    if missing:
+        os.environ["PATH"] = os.pathsep.join(filter(None, [current_path, *missing]))
+        logger.debug("Added %d registered Windows user PATH entries to this process", len(missing))
+
+
+_refresh_windows_user_path()
+
+
 class FFmpegError(RuntimeError):
     """Raised by strict encodes when ffmpeg is missing, fails, or times out (no silent fallback video)."""
 

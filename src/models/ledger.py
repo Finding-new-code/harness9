@@ -104,7 +104,7 @@ class MediaAsset:
     page_url: Optional[str] = None
     creator: Optional[CreatorInfo] = None
     license: Optional[LicenseInfo] = None
-    verification_status: str = "VERIFIED"
+    verification_status: str = "UNVERIFIED"
     downloaded_at: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -160,7 +160,7 @@ class MediaAsset:
             page_url=data.get("page_url"),
             creator=creator,
             license=license_info,
-            verification_status=str(data.get("verification_status", "VERIFIED")),
+            verification_status=str(data.get("verification_status", "UNVERIFIED")),
             downloaded_at=data.get("downloaded_at"),
         )
 

@@ -361,27 +361,14 @@ class ScriptGenerator:
         claims = dossier.claims or []
         assets = ledger.assets if ledger else []
 
-        # If no talking points, synthesize default beats
+        # A missing outline is a research/content failure. Never invent a generic
+        # narration to make a video appear complete.
         if not talking_points:
-            num_scenes = max(3, len(assets)) if assets else 3
-            dur_per_scene = target_duration / float(num_scenes)
-            scenes = []
-            for i in range(num_scenes):
-                asset_path = assets[i].local_path if (assets and i < len(assets)) else f"assets/images/asset_{i+1:02d}.svg"
-                scenes.append(Scene(
-                    scene_id=f"scene_{i+1}",
-                    title=f"Breakthrough Chapter {i+1}",
-                    start_time=round(i * dur_per_scene, 2),
-                    duration=round(dur_per_scene, 2),
-                    narration_text=f"Exploring key discovery {i+1} regarding {dossier.topic}, detailing solid-state physics and exponential technology growth.",
-                    visual_asset_path=asset_path,
-                    hero_frame_description=f"High-impact graphic demonstrating {dossier.topic} fundamentals.",
-                    entrance_animation=f"gsap.from('.scene_{i+1} .scene-content', {{ opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' }})",
-                    transition_out="Seamless push-slide transition to next scene",
-                ))
-            return scenes
+            raise ValueError("Research dossier has no talking points; refusing to invent narration.")
 
-        num_scenes = max(len(talking_points), len(assets)) if assets else len(talking_points)
+        # Visual assets may outnumber story beats. They enrich existing scenes;
+        # they must not create unsourced narration or stretch the script.
+        num_scenes = len(talking_points)
         dur_per_scene = target_duration / float(num_scenes)
 
         scenes = []
@@ -392,17 +379,25 @@ class ScriptGenerator:
 
             if i < len(talking_points):
                 tp = talking_points[i]
-                # Map matching claim texts or narrative hook
+                # Use the curated spoken copy when available. The longer form is
+                # authored for a standard 30-second video; short-form copy avoids
+                # forcing the renderer to cut speech off at the target boundary.
                 supported_claims = [c for c in claims if c.claim_id in tp.supported_claim_ids]
-                claim_text = supported_claims[0].claim_text if supported_claims else tp.narrative_hook
                 title = tp.title
-                narration = f"{tp.title}. {tp.narrative_hook} {claim_text}" if tp.narrative_hook != claim_text else f"{tp.title}. {tp.narrative_hook}"
+                if target_duration <= 20 and tp.narration_short:
+                    narration = tp.narration_short.strip()
+                elif tp.narration_text:
+                    narration = tp.narration_text.strip()
+                else:
+                    # Without authored/model-generated copy, use the source claim
+                    # verbatim. A long sentence is allowed to fail the measured
+                    # audio-duration gate; silently trimming a fact is not.
+                    narration = supported_claims[0].claim_text.strip() if supported_claims else ""
+                if not narration:
+                    raise ValueError(f"Talking point {tp.beat_index} has no source-backed narration text.")
                 visual_cue = supported_claims[0].visual_cue_suggestion if supported_claims and supported_claims[0].visual_cue_suggestion else f"Visual card highlighting {tp.title}"
             else:
-                extra_idx = i - len(talking_points) + 1
-                title = f"Future Horizons & Scale {extra_idx}"
-                narration = f"Looking forward, {dossier.topic} continues to accelerate innovations across modern research and engineering domains."
-                visual_cue = f"Visual roadmap and scaling analysis for {dossier.topic}"
+                raise ValueError(f"Storyboard scene {i + 1} has no corresponding dossier talking point.")
 
             # Map asset
             asset_path = ""
@@ -470,6 +465,7 @@ class ScriptGenerator:
         target_duration: float = 30.0,
         aspect_ratio: str = "16:9",
         output_dir: Optional[Union[str, Path]] = None,
+        model_assisted: bool = False,
     ) -> Dict[str, Any]:
         """
         Synthesize BRIEF.md, DESIGN.md, SCRIPT.md, STORYBOARD.md, script.json, and script.yaml.
@@ -479,6 +475,20 @@ class ScriptGenerator:
             ledger=ledger,
             target_duration=target_duration,
         )
+
+        narration_provider = "curated_or_extractively_grounded"
+        if model_assisted:
+            from src.scriptwriting.model_writer import generate_narration
+
+            narration_provider, generated = generate_narration(
+                dossier=dossier,
+                scenes=scenes,
+                target_duration=target_duration,
+            )
+            for scene in scenes:
+                scene.narration_text = generated[scene.scene_id]["narration_text"]
+                if len(scene.beats) > 1:
+                    scene.beats[1].text = scene.narration_text
 
         brief_md = generate_brief(
             topic=topic,
@@ -512,6 +522,7 @@ class ScriptGenerator:
             "storyboard_md": storyboard_md,
             "script_model": script_model,
             "scenes": scenes,
+            "narration_provider": narration_provider,
         }
 
         if output_dir:

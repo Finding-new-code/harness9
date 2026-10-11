@@ -10,107 +10,103 @@ metadata:
 summary:
   headline: "How Quantum Computers Work: Harnessing Superposition and Entanglement to Redefine Computation"
   executive_summary: >
-    Unlike classical computers that process deterministic binary bits (0 or 1), quantum computers
-    leverage quantum bits (qubits) capable of existing in superpositions of states. Through quantum
-    entanglement and destructive wave interference, quantum processors can evaluate vast exponential
-    solution spaces simultaneously, revolutionizing cryptography, materials science, and drug discovery.
+    Classical computers encode information in bits; quantum computers use qubits that can be prepared
+    in superpositions. A register can represent amplitudes over many basis states, but measurement
+    returns one outcome. Quantum algorithms use operations that shape outcome probabilities, and any
+    speedup depends on the problem and algorithm.
   key_takeaways:
-    - "Qubits harness quantum superposition to represent continuous linear combinations of 0 and 1."
-    - "Quantum entanglement links multiple qubits, creating an exponentially expanding state space ($2^N$)."
-    - "Quantum algorithms use constructive and destructive interference to amplify the correct solution."
+    - "A qubit can be prepared in a superposition of computational basis states."
+    - "An N-qubit register has amplitudes over 2^N basis states, but this is not a general-purpose parallel search."
+    - "Quantum measurement returns one outcome; speedups are problem-specific."
 
 claims:
   - claim_id: "claim_01"
-    claim_text: "Classical computers operate on discrete binary bits (0 or 1), whereas quantum computers use qubits capable of existing in coherent superposition states."
+    claim_text: "Classical bits encode 0 or 1; a qubit can be prepared in a superposition of the computational basis states 0 and 1."
     category: "technical_mechanism"
-    confidence_score: 0.99
     primary_source:
-      title: "Quantum Computation and Quantum Information (Nielsen & Chuang)"
-      url: "https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE"
-      publisher: "Cambridge University Press"
-    corroborating_sources:
-      - title: "Nature Reviews Physics - Progress in Superconducting Qubits"
-        url: "https://www.nature.com/articles/s42254-021-00357-1"
+      title: "Quantum Computing Fundamentals"
+      url: "https://quantum.cloud.ibm.com/learning/en/courses/quantum-business-foundations/quantum-computing-fundamentals"
+      publisher: "IBM Quantum Learning"
     visual_cue_suggestion: "Bloch sphere 3D geometric visualization showing a qubit state vector pointing across the continuous spherical surface"
-    verification_notes: "Foundational quantum physics and information theory."
+    verification_notes: "IBM Quantum Learning describes the bit/qubit distinction and superposition; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_02"
-    claim_text: "A system of N entangled qubits can simultaneously represent 2 to the power of N computational states, creating exponential parallelism."
+    claim_text: "An N-qubit register can represent amplitudes over 2^N basis states, but this does not mean a quantum computer can return all candidate solutions by running them in parallel."
     category: "quantitative_metric"
-    confidence_score: 0.98
     primary_source:
-      title: "MIT OpenCourseWare - Quantum Information Science"
-      url: "https://ocw.mit.edu/courses/8-370-quantum-information-science-i-fall-2017/"
-      publisher: "Massachusetts Institute of Technology"
+      title: "Quantum Computing Fundamentals"
+      url: "https://quantum.cloud.ibm.com/learning/en/courses/quantum-business-foundations/quantum-computing-fundamentals"
+      publisher: "IBM Quantum Learning"
     corroborating_sources:
-      - title: "Physical Review Letters - Multi-Qubit Entanglement"
-        url: "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.260502"
+      - title: "Examining the Challenges and Opportunities for Quantum Optimization"
+        url: "https://www.ibm.com/quantum/blog/optimization-white-paper"
     visual_cue_suggestion: "Diagram contrasting exponential state growth of 50 entangled qubits versus classical binary registers"
-    verification_notes: "Mathematical proof in Hilbert state space."
+    verification_notes: "IBM explains 2^N state amplitudes and cautions against interpreting this as evaluating all solutions in parallel; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_03"
-    claim_text: "Superconducting quantum processors operate inside cryogenic dilution refrigerators cooled to approximately 15 millikelvin, colder than deep space."
+    claim_text: "A measurement of a quantum register returns one outcome; the outcome probabilities depend on the amplitudes of its quantum state."
     category: "origin_history"
-    confidence_score: 0.96
     primary_source:
-      title: "IBM Quantum Systems Overview"
-      url: "https://www.ibm.com/quantum/systems"
+      title: "Quantum Mechanics Basics: How Measurements Work"
+      url: "https://quantum.cloud.ibm.com/learning/en/courses/use-a-qc-today/quantum-mechanics-basics"
       publisher: "IBM Quantum"
-    corroborating_sources:
-      - title: "Scientific American - Inside the Golden Quantum Chandelier"
-        url: "https://www.scientificamerican.com/article/how-quantum-computers-work/"
     visual_cue_suggestion: "Gleaming gold-plated dilution refrigerator chandelier with spiral coaxial cables inside a cryogenic chamber"
-    verification_notes: "Industry standard for transmon superconducting qubit platforms."
+    verification_notes: "IBM Quantum Learning explains measurement outcomes and their state-dependent probabilities; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_04"
-    claim_text: "Quantum algorithms like Shor's and Grover's use quantum interference to cancel incorrect paths and amplify the probability of correct answers."
+    claim_text: "Quantum algorithms can use interference to shape outcome probabilities, but quantum speedups are specific to particular problems and algorithms."
     category: "modern_impact"
-    confidence_score: 0.97
     primary_source:
-      title: "SIAM Journal on Computing - Polynomial-Time Algorithms for Prime Factorization"
-      url: "https://epubs.siam.org/doi/10.1137/S0097539795293172"
-      publisher: "Society for Industrial and Applied Mathematics"
-    corroborating_sources:
-      - title: "NIST Post-Quantum Cryptography Standardization"
-        url: "https://csrc.nist.gov/projects/post-quantum-cryptography"
+      title: "Examining the Challenges and Opportunities for Quantum Optimization"
+      url: "https://www.ibm.com/quantum/blog/optimization-white-paper"
+      publisher: "IBM Quantum"
     visual_cue_suggestion: "Wave interference pattern where destructive peaks cancel error paths and constructive waves amplify the correct answer"
-    verification_notes: "Mathematically proven algorithm complexity results."
+    verification_notes: "IBM Quantum notes that speedups are problem-specific and quantum computers do not generally search all solutions in parallel; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
 talking_points:
   - beat_index: 1
     title: "Beyond the Binary Code"
-    narrative_hook: "For eighty years, every computer on Earth spoke in binary — just zeros and ones. Quantum computing rewrites those rules entirely."
+    narrative_hook: "Classical bits encode zero or one; qubits can be prepared in superpositions of those basis states."
     supported_claim_ids: ["claim_01"]
     estimated_duration_sec: 8.0
+    narration_short: "Qubits can be superpositions of zero and one."
+    narration_text: "Classical bits encode zero or one; qubits can be prepared in superpositions of those basis states."
 
   - beat_index: 2
-    title: "The Magic of Superposition"
-    narrative_hook: "Inside a golden chandelier cooled near absolute zero, qubits hold both possibilities at once, unlocking exponential calculations."
+    title: "What Measurement Reveals"
+    narrative_hook: "An N-qubit register has amplitudes over 2^N basis states, while measurement returns one outcome."
     supported_claim_ids: ["claim_02", "claim_03"]
     estimated_duration_sec: 11.0
+    narration_short: "N qubits represent amplitudes over basis states."
+    narration_text: "An N-qubit register has amplitudes over 2^N basis states, but measurement returns one outcome."
 
   - beat_index: 3
     title: "A New Frontier in Science"
-    narrative_hook: "By using quantum interference to find answers in seconds that would take supercomputers millennia, quantum computing is charting the future."
+    narrative_hook: "Quantum operations shape measurement probabilities. Any speedup depends on the problem and the algorithm."
     supported_claim_ids: ["claim_04"]
     estimated_duration_sec: 11.0
+    narration_short: "One measurement gives one result; speedups depend on problems."
+    narration_text: "Quantum algorithms use interference to shape outcomes, but speedups depend on the problem and algorithm."
 
 statistics:
-  - metric: "Operating Temperature"
-    value: "15 Millikelvin (-273.135 °C)"
-    context: "Dilution refrigerator base temperature for superconducting qubits"
-    source_claim_id: "claim_03"
+  - metric: "Basis State Amplitudes"
+    value: "2^N"
+    context: "An N-qubit register represents amplitudes over 2^N basis states"
+    source_claim_id: "claim_02"
   - metric: "State Space Scaling"
     value: "2^N States"
-    context: "Exponential capacity of N entangled qubits"
+    context: "Number of basis-state amplitudes represented by an N-qubit register"
     source_claim_id: "claim_02"
-  - metric: "Theoretical Speedup"
-    value: "Exponential Speedup"
-    context: "For prime factorization and quantum chemical simulation"
-    source_claim_id: "claim_04"
+  - metric: "Measurement Result"
+    value: "One outcome per measurement"
+    context: "Outcome probabilities depend on the quantum state"
+    source_claim_id: "claim_03"
 
 suggested_visual_queries:
-  - "Bloch sphere 3D quantum bit state visualization"
-  - "Golden cryogenic dilution refrigerator chandelier quantum computer"
-  - "Quantum wave interference destructive constructive pattern"
-  - "Silicon superconducting qubit processor die"
+  - "quantum computer"
+  - "quantum processor"
+  - "quantum interference"

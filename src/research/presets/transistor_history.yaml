@@ -10,35 +10,34 @@ metadata:
 summary:
   headline: "The History of the Transistor: How Three Bell Labs Physicists Ignited the Digital Age in 1947"
   executive_summary: >
-    In December 1947, John Bardeen, Walter Brattain, and William Shockley created the first
-    working point-contact transistor at Bell Labs. Replacing fragile, power-hungry vacuum tubes,
-    the transistor enabled solid-state electronics, microchips, and the modern computing era.
+    Bell Labs demonstrated a point-contact transistor in December 1947 and announced the invention
+    in June 1948. Bardeen, Brattain, and Shockley shared the 1956 Nobel Prize in Physics. Transistors
+    offered a smaller, lower-power alternative to vacuum tubes in electronic devices.
   key_takeaways:
-    - "Invented in December 1947 at Bell Labs using germanium crystal and gold foil."
-    - "Bardeen, Brattain, and Shockley were awarded the 1956 Nobel Prize in Physics."
-    - "Modern microprocessors contain over 100 billion transistors on a single chip."
+    - "The first laboratory demonstration took place on December 23, 1947."
+    - "Bell Labs publicly announced the transistor on June 30, 1948."
+    - "The Nobel Prize recognized Bardeen, Brattain, and Shockley's semiconductor research and discovery of the transistor effect."
 
 claims:
   - claim_id: "claim_01"
     claim_text: "The first working point-contact transistor was successfully demonstrated on December 23, 1947, by John Bardeen and Walter Brattain at Bell Laboratories."
     category: "origin_history"
-    confidence_score: 0.98
     primary_source:
-      title: "The Invention of the Transistor - Bell Labs Archive"
-      url: "https://www.bell-labs.com/about/history/transistor/"
-      publisher: "Nokia Bell Labs"
+      title: "Regency Model TR-1 Transistor Radio: Object Description"
+      url: "https://www.si.edu/object/regency-model-tr-1-transistor-radio%3Anmah_713528"
+      publisher: "Smithsonian National Museum of American History"
     corroborating_sources:
       - title: "December 23, 1947: Transistor Invented - APS Physics"
         url: "https://www.aps.org/publications/apsnews/200012/history.cfm"
       - title: "Computer History Museum - The Transistor Milestone"
         url: "https://www.computerhistory.org/siliconengine/invention-of-the-point-contact-transistor/"
     visual_cue_suggestion: "Historical replica photo of the 1947 point-contact transistor with germanium crystal and plastic wedge"
-    verification_notes: "Unanimous historical consensus across Nobel, Bell Labs, and IEEE archives."
+    verification_notes: "Smithsonian object record gives the first demonstration date and Bell Labs public-announcement date; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_02"
     claim_text: "Shockley, Bardeen, and Brattain were jointly awarded the 1956 Nobel Prize in Physics for their research on semiconductors and the transistor effect."
     category: "key_figure"
-    confidence_score: 1.00
     primary_source:
       title: "The Nobel Prize in Physics 1956"
       url: "https://www.nobelprize.org/prizes/physics/1956/summary/"
@@ -47,54 +46,55 @@ claims:
       - title: "IEEE Milestone in Electrical Engineering and Computing"
         url: "https://ethw.org/Milestones:Invention_of_the_First_Transistor_at_Bell_Telephone_Laboratories,_1947"
     visual_cue_suggestion: "Photograph of John Bardeen, William Shockley, and Walter Brattain at Bell Labs laboratory workbench"
-    verification_notes: "Verified via official Nobel Prize citation."
+    verification_notes: "Confirmed by the Nobel Foundation's official 1956 prize summary; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_03"
-    claim_text: "Early vacuum tubes consumed large amounts of power and generated high heat; transistors slashed power consumption by over 99% and miniaturized circuits."
+    claim_text: "Transistors provided a more reliable, lower-power alternative to fragile vacuum tubes."
     category: "technical_mechanism"
-    confidence_score: 0.92
     primary_source:
-      title: "From Vacuum Tubes to Transistors - IEEE Spectrum"
-      url: "https://spectrum.ieee.org/from-vacuum-tubes-to-transistors"
-      publisher: "IEEE Spectrum"
-    corroborating_sources:
-      - title: "Smithsonian History of Solid State Electronics"
-        url: "https://americanhistory.si.edu/collections/search/object/nmah_738520"
+      title: "Transistor Samples: Object Description"
+      url: "https://www.si.edu/object/transistor-samples%3Anmah_1213582"
+      publisher: "Smithsonian National Museum of American History"
     visual_cue_suggestion: "Side-by-side comparison diagram of a glowing glass vacuum tube versus a tiny modern semiconductor chip"
-    verification_notes: "Consistent with standard solid-state electronics engineering benchmarks."
+    verification_notes: "Smithsonian collection record describes transistors as more reliable and using far less power than vacuum tubes; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_04"
-    claim_text: "By 2026, leading-edge semiconductor chips pack over 100 billion transistors onto a silicon die smaller than a postage stamp."
-    category: "quantitative_metric"
-    confidence_score: 0.95
+    claim_text: "Bell Labs publicly announced the transistor invention on June 30, 1948."
+    category: "origin_history"
     primary_source:
-      title: "Semiconductor Industry Roadmap & Transistor Scaling"
-      url: "https://www.semiconductors.org/technology-and-innovation/"
-      publisher: "Semiconductor Industry Association"
-    corroborating_sources:
-      - title: "Nature Nanotechnology - Transistor scaling frontiers"
-        url: "https://www.nature.com/articles/nnano.2023.120"
-    visual_cue_suggestion: "Macro photograph of modern silicon wafer microchip die with iridescent microscopic circuitry"
-    verification_notes: "Matches TSMC, Apple M-series, and Nvidia GPU transistor density disclosures."
+      title: "Regency Model TR-1 Transistor Radio: Object Description"
+      url: "https://www.si.edu/object/regency-model-tr-1-transistor-radio%3Anmah_713528"
+      publisher: "Smithsonian National Museum of American History"
+    visual_cue_suggestion: "1948 public announcement of the transistor"
+    verification_notes: "The Smithsonian object record states the public announcement date; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
 talking_points:
   - beat_index: 1
     title: "The Vacuum Tube Bottleneck"
-    narrative_hook: "Before the computer in your pocket, early computers filled entire rooms with burning hot, glass vacuum tubes."
+    narrative_hook: "Transistors offered a smaller, lower-power alternative to fragile vacuum tubes."
     supported_claim_ids: ["claim_03"]
     estimated_duration_sec: 7.0
+    narration_short: "Transistors used less power than vacuum tubes."
+    narration_text: "Transistors used less power and were more reliable than fragile vacuum tubes."
 
   - beat_index: 2
     title: "The Miracle at Bell Labs"
-    narrative_hook: "On two cold days in December 1947, three physicists made history with a sliver of germanium, gold foil, and a paper clip."
-    supported_claim_ids: ["claim_01", "claim_02"]
+    narrative_hook: "Bell Labs demonstrated a point-contact transistor in December 1947."
+    supported_claim_ids: ["claim_01", "claim_02", "claim_04"]
     estimated_duration_sec: 13.0
+    narration_short: "Bardeen and Brattain demonstrated a transistor in 1947."
+    narration_text: "Bardeen and Brattain demonstrated a point-contact transistor at Bell Labs on December 23, 1947; it was announced publicly in June 1948."
 
   - beat_index: 3
-    title: "100 Billion Strong"
-    narrative_hook: "Today, that single rough prototype has scaled to over 100 billion microscopic switches powering every AI and phone on Earth."
-    supported_claim_ids: ["claim_04"]
+    title: "A Shared Nobel Prize"
+    narrative_hook: "Bardeen, Brattain, and Shockley shared the 1956 Nobel Prize in Physics for semiconductor research."
+    supported_claim_ids: ["claim_02"]
     estimated_duration_sec: 10.0
+    narration_short: "Three physicists shared the 1956 Nobel Prize."
+    narration_text: "Bardeen, Brattain, and Shockley shared the 1956 Nobel Prize in Physics for semiconductor and transistor-effect research."
 
 statistics:
   - metric: "Date of First Working Demonstration"
@@ -105,13 +105,7 @@ statistics:
     value: "1956"
     context: "Awarded jointly to Bardeen, Brattain, and Shockley"
     source_claim_id: "claim_02"
-  - metric: "Modern Transistor Count"
-    value: "100,000,000,000+"
-    context: "Transistors packed per state-of-the-art silicon die"
-    source_claim_id: "claim_04"
-
 suggested_visual_queries:
-  - "Point contact transistor 1947 Bell Labs replica"
-  - "Bardeen Brattain Shockley Bell Labs laboratory"
-  - "Vacuum tube vs transistor comparison"
-  - "Modern silicon wafer semiconductor microchip"
+  - "Transistor"
+  - "Bell Labs transistor"
+  - "Vacuum tube"

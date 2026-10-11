@@ -19,6 +19,42 @@ from src.config import (
 
 logger = logging.getLogger(__name__)
 
+_QUERY_DIRECTIVE_WORDS = {
+    "a", "an", "and", "application", "applications", "architecture", "background",
+    "components", "diagrams", "facts", "for", "from", "global", "history", "how",
+    "impact", "key", "mechanism", "mechanisms", "milestones", "modern", "numbers",
+    "of", "on", "origin", "origins", "photographs", "principles", "quantitative",
+    "schematics", "significance", "specification", "specifications", "statistics",
+    "technical", "the", "to", "work", "works", "future", "historical",
+}
+
+
+def _relevance_terms(text: str) -> List[str]:
+    """Return topic terms, omitting intent words added by research query expansion."""
+    terms = []
+    for token in re.findall(r"[a-z0-9]+", text.lower()):
+        if token in _QUERY_DIRECTIVE_WORDS:
+            continue
+        if token.endswith("ing") and len(token) > 5:
+            token = token[:-3]
+        elif token.endswith("er") and len(token) > 5:
+            token = token[:-2]
+        elif token.endswith("s") and len(token) > 4:
+            token = token[:-1]
+        if token and token not in terms:
+            terms.append(token)
+    return terms
+
+
+def _title_relevance(query: str, title: str) -> int:
+    """Count topic terms in a title using simple singular/gerund normalization."""
+    query_terms = _relevance_terms(query)
+    title_terms = _relevance_terms(title)
+    return sum(
+        1 for term in query_terms
+        if any(term == title_term or term.startswith(title_term) or title_term.startswith(term) for title_term in title_terms)
+    )
+
 
 @dataclass
 class SearchResult:
@@ -91,80 +127,78 @@ class BaseSearchProvider(ABC):
 
 
 class WikipediaProvider(BaseSearchProvider):
-    """Live search adapter querying Wikipedia REST and Action APIs via urllib."""
+    """Live search adapter querying the MediaWiki Action API with page extracts."""
+
+    USER_AGENT = "Harness9/0.2 (https://github.com/nousresearch/hermes-agent)"
 
     def __init__(self, timeout: int = DEFAULT_SEARCH_TIMEOUT_SEC):
         super().__init__(name="wikipedia", timeout=timeout)
         self.opensearch_url = "https://en.wikipedia.org/w/api.php"
-        self.summary_api_url = "https://en.wikipedia.org/api/rest_v1/page/summary/"
 
     def search(self, query: str, max_results: int = DEFAULT_MAX_SEARCH_RESULTS) -> List[SearchResult]:
         results: List[SearchResult] = []
         try:
-            # 1. Opensearch for candidate page titles
+            # Fetch result titles and introductory extracts in a single request.
+            # The previous OpenSearch-plus-summary loop could make dozens of
+            # requests per topic and used a placeholder contact address in its
+            # User-Agent, making throttling more likely.
             params = {
-                "action": "opensearch",
-                "search": query,
-                "limit": str(max_results),
-                "namespace": "0",
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": query,
+                "gsrnamespace": "0",
+                "gsrlimit": str(min(max(1, max_results), 5)),
+                "prop": "extracts|info",
+                "exintro": "1",
+                "explaintext": "1",
+                "inprop": "url",
                 "format": "json",
+                "formatversion": "2",
             }
             req_url = f"{self.opensearch_url}?{urllib.parse.urlencode(params)}"
             req = urllib.request.Request(
                 req_url,
-                headers={"User-Agent": "Harness9VideoPipeline/1.0 (Educational research; contact@example.com)"},
+                headers={"User-Agent": self.USER_AGENT, "Accept": "application/json"},
             )
 
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
 
-            if not isinstance(data, list) or len(data) < 4:
+            pages = (data.get("query") or {}).get("pages", []) if isinstance(data, dict) else []
+            if not isinstance(pages, list):
                 return results
 
-            titles = data[1]
-            snippets = data[2]
-            urls = data[3]
+            ranked_pages = []
+            core_terms = _relevance_terms(query)
+            minimum_overlap = min(3, len(core_terms)) if core_terms else 1
+            for page in pages:
+                if not isinstance(page, dict):
+                    continue
+                title = str(page.get("title") or "").strip()
+                relevance = _title_relevance(query, title)
+                if not title or relevance < minimum_overlap:
+                    continue
+                ranked_pages.append((relevance, page))
 
-            for i in range(min(len(titles), max_results)):
-                title = titles[i]
-                snippet = clean_snippet(snippets[i] if i < len(snippets) else "")
-                url = urls[i] if i < len(urls) else f"https://en.wikipedia.org/wiki/{urllib.parse.quote(title)}"
-
-                # If snippet is short or sparse, fetch rich page summary
-                if len(snippet) < 150:
-                    detailed_summary = self._fetch_page_summary(title)
-                    if detailed_summary:
-                        snippet = detailed_summary
-
+            ranked_pages.sort(key=lambda item: item[0], reverse=True)
+            for _, page in ranked_pages[:max_results]:
+                title = str(page.get("title") or "").strip()
+                snippet = clean_snippet(str(page.get("extract") or ""))
+                url = str(page.get("fullurl") or "").strip()
                 if title and url:
                     results.append(
                         SearchResult(
                             title=f"{title} - Wikipedia",
                             url=url,
-                            snippet=snippet or f"Overview of {title} from Wikipedia encyclopedia.",
+                            snippet=snippet,
                             source_domain="wikipedia.org",
-                            authority_score=0.88,
+                            authority_score=0.75,
                         )
                     )
         except Exception as e:
             logger.warning(f"WikipediaProvider search failed for query '{query}': {e}")
 
         return results
-
-    def _fetch_page_summary(self, page_title: str) -> Optional[str]:
-        """Fetch lead extract for a specific Wikipedia title."""
-        try:
-            title_encoded = urllib.parse.quote(page_title.replace(" ", "_"))
-            summary_url = f"{self.summary_api_url}{title_encoded}"
-            req = urllib.request.Request(
-                summary_url,
-                headers={"User-Agent": "Harness9VideoPipeline/1.0 (Educational research; contact@example.com)"},
-            )
-            with urllib.request.urlopen(req, timeout=min(5, self.timeout)) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return clean_snippet(data.get("extract", ""))
-        except Exception:
-            return None
 
 
 class DuckDuckGoProvider(BaseSearchProvider):
@@ -372,13 +406,18 @@ class MultiProviderDispatcher:
         """Dispatch query to providers in priority order, merging and deduplicating results."""
         all_results: List[SearchResult] = []
         seen_urls = set()
+        query_terms = _relevance_terms(query)
+        minimum_overlap = min(3, len(query_terms)) if query_terms else 1
 
         for provider in self.providers:
             try:
                 res = provider.search(query, max_results=max_results)
                 for item in res:
                     normalized_url = item.url.lower().rstrip("/")
-                    if normalized_url not in seen_urls:
+                    if (
+                        normalized_url not in seen_urls
+                        and _title_relevance(query, item.title) >= minimum_overlap
+                    ):
                         seen_urls.add(normalized_url)
                         all_results.append(item)
                 if len(all_results) >= max_results:

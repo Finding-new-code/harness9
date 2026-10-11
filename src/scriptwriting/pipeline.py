@@ -42,6 +42,7 @@ class ScriptwritingResult:
     script_model: Script
     status: str = "success"
     brand_guidelines: Optional[BrandGuidelines] = None
+    narration_provider: str = "curated_or_extractively_grounded"
 
     @property
     def audio(self) -> AudioMetadata:
@@ -78,6 +79,7 @@ class ScriptwritingResult:
             },
             "audio_metadata": self.audio_metadata.to_dict(),
             "transcript": self.transcript_result.to_dict(),
+            "narration_provider": self.narration_provider,
         }
 
 
@@ -150,6 +152,7 @@ class ScriptwritingPipeline:
         aspect_ratio: str = "16:9",
         voice: Optional[str] = None,
         format_aspect: Optional[str] = None,
+        model_assisted: bool = False,
         **kwargs: Any,
     ) -> ScriptwritingResult:
         """
@@ -174,6 +177,7 @@ class ScriptwritingPipeline:
             target_duration=duration,
             aspect_ratio=effective_aspect,
             output_dir=out_dir_path,
+            model_assisted=model_assisted,
         )
 
         script_model: Script = gen_result["script_model"]
@@ -222,4 +226,5 @@ class ScriptwritingPipeline:
             script_model=script_model,
             status="success",
             brand_guidelines=self.brand_guidelines,
+            narration_provider=str(gen_result.get("narration_provider", "curated_or_extractively_grounded")),
         )
