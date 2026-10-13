@@ -53,6 +53,27 @@ def _render_stage_metrics(workspace: Path) -> Dict[str, Any]:
     return {}
 
 
+def _canonical_state_history(state_machine: Any) -> List[Dict[str, Any]]:
+    """Return lifecycle history with an explicit state field on every record."""
+    audit_log = state_machine.get_audit_log()
+    first_timestamp = (
+        state_machine.history[0].timestamp
+        if state_machine.history
+        else datetime.now(timezone.utc).isoformat()
+    )
+    history = [{
+        "state": "CREATED",
+        "from_state": None,
+        "to_state": "CREATED",
+        "timestamp": first_timestamp,
+    }]
+    for record in audit_log:
+        entry = dict(record)
+        entry.setdefault("state", entry.get("to_state", entry.get("from_state")))
+        history.append(entry)
+    return history
+
+
 @runtime_checkable
 class ContentRuntime(Protocol):
     """High-level content production interface connecting H9 domain logic with Hermes."""
@@ -152,19 +173,44 @@ class DefaultContentRuntime:
 
         dossier_dict = dossier_obj.to_dict() if hasattr(dossier_obj, "to_dict") else dict(dossier_obj)
         claims = dossier_dict.get("claims", [])
+        if not claims:
+            from src.research.engine import ResearchUnavailableError
+
+            raise ResearchUnavailableError(f"Research for {topic!r} returned no source-backed claims.")
+        summary = dossier_dict.get("summary") or {}
         for c in claims:
             if "claim_id" not in c and "id" in c:
                 c["claim_id"] = c["id"]
             if "confidence_score" not in c and "confidence" in c:
                 c["confidence_score"] = c["confidence"]
+            if "epistemic_status" not in c:
+                verification_status = str(c.get("verification_status") or "").upper()
+                c["epistemic_status"] = (
+                    "verified" if verification_status == "VERIFIED" else "unverifiable"
+                )
+
+        measured_scores = [float(c["confidence_score"]) for c in claims if c.get("confidence_score") is not None]
+        if len(measured_scores) != len(claims):
+            raise ValueError("Research claims must carry measured confidence scores.")
+
+        key_takeaways = (
+            dossier_dict.get("key_takeaways")
+            or summary.get("key_takeaways")
+            or [str(claim.get("claim_text") or "").strip() for claim in claims]
+        )
+        key_takeaways = [takeaway for takeaway in key_takeaways if takeaway]
+        if not key_takeaways:
+            raise ValueError("Research dossier contains no usable claim text for script generation.")
 
         return ResearchDossier(
             dossier_id=dossier_dict.get("run_id", f"dossier_{session_id}"),
             topic=topic,
-            key_takeaways=dossier_dict.get("key_takeaways", []),
+            headline=str(summary.get("headline") or ""),
+            executive_summary=str(summary.get("executive_summary") or ""),
+            key_takeaways=key_takeaways,
             claims=claims,
             search_queries=dossier_dict.get("suggested_visual_queries", []),
-            confidence_score=0.95,
+            confidence_score=sum(measured_scores) / len(measured_scores),
         )
 
     def evaluate_angles(
@@ -188,6 +234,8 @@ class DefaultContentRuntime:
         duration: float = 30.0,
     ) -> Script:
         """Generate structured script with timestamped scenes and beats."""
+        if not dossier.claims:
+            raise ValueError("Script generation requires at least one source-backed claim.")
         total_duration = max(5.0, float(duration))
         scene_count = 4
         scene_duration = total_duration / scene_count
@@ -204,13 +252,12 @@ class DefaultContentRuntime:
 
         style_name = getattr(angle, "narrative_style", getattr(angle, "title", "Editorial Perspective"))
 
+        takeaways = dossier.key_takeaways or [claim.claim_text for claim in dossier.claims]
         for i, comp in enumerate(components):
             start = i * scene_duration
             end = (i + 1) * scene_duration
             takeaway = (
-                dossier.key_takeaways[i % len(dossier.key_takeaways)]
-                if getattr(dossier, "key_takeaways", None)
-                else "Critical technological evolution."
+                takeaways[i % len(takeaways)]
             )
             narration = (
                 f"Scene {i+1}: Investigating {dossier.topic} through {style_name}. "
@@ -301,31 +348,89 @@ class DefaultContentRuntime:
         output_dir: Path,
         session_id: str,
     ) -> RenderArtifact:
-        """Render broadcast MP4 from Production IR."""
-        output_dir.mkdir(parents=True, exist_ok=True)
-        video_target = output_dir / "final.mp4"
+        """Copy and re-verify the completed render associated with this session.
 
-        # Check if source video already exists in workspace
+        Production IR alone does not contain the synthesized narration media needed
+        to render a video. Never fabricate a media container when the production
+        pipeline has not produced a real video.
+        """
         ws = self._get_session_workspace(session_id)
         candidate = ws / "renders" / "final.mp4"
-        if candidate.exists() and candidate.stat().st_size > 0:
-            if candidate.resolve() != video_target.resolve():
-                shutil.copy2(candidate, video_target)
-        else:
-            # Generate a minimal valid media container if rendering pipeline hasn't executed
-            video_target.write_bytes(b"\x00\x00\x00\x1cftypisom\x00\x00\x02\x00isomiso2mp41")
+        summary_path = ws / "pipeline_summary.json"
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise RuntimeError(
+                "No completed Harness 9 production summary exists for this session. "
+                "Production IR does not include narration audio; run the full production pipeline first."
+            ) from exc
+        if summary.get("status") != "SUCCESS":
+            raise RuntimeError(
+                f"Session production status is {summary.get('status', 'UNKNOWN')}; only SUCCESS runs can be exported."
+            )
 
-        file_size = video_target.stat().st_size if video_target.exists() else 0
+        metadata = getattr(ir, "metadata", {})
+        expected_topic = getattr(metadata, "topic", None) if not isinstance(metadata, dict) else metadata.get("topic")
+        metrics = summary.get("metrics") or {}
+        render_stages = [
+            stage for stage in summary.get("stages", [])
+            if stage.get("stage_name") == "hyperframes_render"
+        ]
+        render_metrics = render_stages[-1].get("metrics", {}) if render_stages else {}
+        if not expected_topic or str(summary.get("topic", "")).casefold() != str(expected_topic).casefold():
+            raise RuntimeError("The completed render does not match the topic in the supplied Production IR.")
+        if summary.get("final_video_path") != "renders/final.mp4":
+            raise RuntimeError("The production summary does not identify its canonical final video.")
+        if metrics.get("format") != ir.aspect_ratio:
+            raise RuntimeError("The completed render aspect ratio does not match the supplied Production IR.")
+        if abs(float(metrics.get("target_duration_seconds", 0.0)) - float(ir.duration_seconds)) > 0.01:
+            raise RuntimeError("The completed render duration does not match the supplied Production IR.")
+        if render_metrics.get("validation_status") != "VERIFIED" or render_metrics.get("gate_passed") is not True:
+            raise RuntimeError("The production summary does not contain a passing measured render gate.")
+        if not candidate.is_file() or candidate.stat().st_size == 0:
+            raise FileNotFoundError(
+                "The successful production summary points to a missing or empty final video."
+            )
+
+        if ir.aspect_ratio not in {"16:9", "9:16"}:
+            raise ValueError(f"Unsupported render aspect ratio: {ir.aspect_ratio!r}")
+        if ir.duration_seconds <= 0 or ir.fps <= 0:
+            raise ValueError("Production IR must specify a positive duration and frame rate.")
+
+        width, height = (1920, 1080) if ir.aspect_ratio == "16:9" else (1080, 1920)
+        expected = ExpectedMedia(
+            duration=float(ir.duration_seconds),
+            width=width,
+            height=height,
+            fps=float(ir.fps),
+            require_audio=True,
+        )
+        gate = MediaGate()
+        report = gate.enforce(candidate, expected=expected)
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        video_target = output_dir / "final.mp4"
+        if candidate.resolve() != video_target.resolve():
+            shutil.copy2(candidate, video_target)
+            report = gate.enforce(video_target, expected=expected)
+
+        measured = gate.probe_summary(video_target)
+        if not measured.get("has_video") or not measured.get("has_audio"):
+            raise RuntimeError("The delivered render is missing a measured video or audio stream.")
+        container = report.metrics.get("container", {})
+        video_stream = container.get("video") or {}
+        audio_stream = container.get("audio") or {}
 
         return RenderArtifact(
             video_path=str(video_target.resolve()),
-            duration_seconds=float(ir.duration_seconds),
-            file_size_bytes=file_size,
-            width=1920 if ir.aspect_ratio == "16:9" else 1080,
-            height=1080 if ir.aspect_ratio == "16:9" else 1920,
-            fps=ir.fps,
-            video_codec="h264",
-            audio_codec="aac",
+            duration_seconds=float(measured.get("duration") or 0.0),
+            file_size_bytes=video_target.stat().st_size,
+            width=int(measured.get("width") or 0),
+            height=int(measured.get("height") or 0),
+            fps=int(round(measured.get("fps") or 0)),
+            video_codec=str(video_stream.get("codec_name") or "unknown"),
+            audio_codec=str(audio_stream.get("codec_name") or "unknown"),
+            validation_status="VERIFIED",
         )
 
     def run_full_production(
@@ -380,7 +485,7 @@ class DefaultContentRuntime:
                     project_id=brief.project_id,
                     session_id=session_id,
                     error_message="Pipeline execution returned failure status",
-                    state_history=sm.get_audit_log(),
+                    state_history=_canonical_state_history(sm),
                     elapsed_seconds=round(time.time() - start_time, 2),
                 )
 
@@ -396,7 +501,7 @@ class DefaultContentRuntime:
                     project_id=brief.project_id,
                     session_id=session_id,
                     error_message="Pipeline reported success but produced no video (renders/final.mp4 is missing)",
-                    state_history=sm.get_audit_log(),
+                    state_history=_canonical_state_history(sm),
                     elapsed_seconds=round(time.time() - start_time, 2),
                 )
             render_stage = _render_stage_metrics(ws)
@@ -460,18 +565,7 @@ class DefaultContentRuntime:
 
             elapsed = round(time.time() - start_time, 2)
 
-            initial_record = {
-                "state": "CREATED",
-                "from_state": None,
-                "to_state": "CREATED",
-                "timestamp": sm.history[0].timestamp if sm.history else datetime.now(timezone.utc).isoformat(),
-            }
-            canonical_history = [initial_record]
-            for r in sm.get_audit_log():
-                entry = dict(r)
-                if "state" not in entry:
-                    entry["state"] = entry.get("to_state", entry.get("from_state"))
-                canonical_history.append(entry)
+            canonical_history = _canonical_state_history(sm)
 
             return ProductionResult(
                 success=True,
@@ -492,18 +586,7 @@ class DefaultContentRuntime:
                     ProductionState.FAILED,
                     payload={"exception": str(exc)},
                 )
-            initial_record = {
-                "state": "CREATED",
-                "from_state": None,
-                "to_state": "CREATED",
-                "timestamp": sm.history[0].timestamp if sm.history else datetime.now(timezone.utc).isoformat(),
-            }
-            canonical_history = [initial_record]
-            for r in sm.get_audit_log():
-                entry = dict(r)
-                if "state" not in entry:
-                    entry["state"] = entry.get("to_state", entry.get("from_state"))
-                canonical_history.append(entry)
+            canonical_history = _canonical_state_history(sm)
             return ProductionResult(
                 success=False,
                 project_id=brief.project_id,

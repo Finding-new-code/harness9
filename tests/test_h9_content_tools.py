@@ -12,6 +12,8 @@ Tests:
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -82,6 +84,49 @@ class TestH9ToolRegistrationAndSchemas(unittest.TestCase):
                 registered_tools,
                 f"Expected tool '{tool}' to be registered under toolset 'h9_content'",
             )
+
+    def test_fresh_hermes_startup_registers_h9_tools_behind_the_service_gate(self):
+        """A clean model_tools import exposes H9 only when its toolset is enabled and available."""
+        probe = r'''
+import json
+import sys
+import model_tools
+from tools.registry import set_h9_available
+
+set_h9_available(sys.argv[1] == "enabled")
+available = model_tools.get_tool_definitions(
+    ["h9_content"], quiet_mode=True, skip_tool_search_assembly=True
+)
+disabled = model_tools.get_tool_definitions(
+    [], quiet_mode=True, skip_tool_search_assembly=True
+)
+print(json.dumps({
+    "available": [item["function"]["name"] for item in available],
+    "disabled": [item["function"]["name"] for item in disabled],
+}))
+'''
+        results = {}
+        for mode in ("enabled", "unavailable"):
+            result = subprocess.run(
+                [sys.executable, "-c", probe, mode],
+                cwd=Path.cwd(),
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=45,
+            )
+            results[mode] = json.loads(result.stdout.strip().splitlines()[-1])
+        self.assertIn("h9.research", results["enabled"]["available"])
+        self.assertIn("h9.render", results["enabled"]["available"])
+        for mode in ("unavailable", "enabled"):
+            self.assertFalse(any(
+                name.startswith("h9.") or name.startswith("h9_")
+                for name in results[mode]["disabled"]
+            ))
+        self.assertFalse(any(
+            name.startswith("h9.") or name.startswith("h9_")
+            for name in results["unavailable"]["available"]
+        ))
 
     def test_02_schema_validity(self):
         """Verify parameter schemas follow standard OpenAI function schema contracts."""
@@ -255,10 +300,10 @@ class TestH9ResearchTool(unittest.TestCase):
 
     def test_15_research_dispatch_via_registry(self):
         """Dispatch h9.research and alias h9_research through registry.dispatch."""
-        res1 = registry.dispatch("h9.research", {"topic": "Transistors"})
+        res1 = registry.dispatch("h9.research", {"topic": "The History of the Transistor"})
         data1 = json.loads(res1)
         self.assertNotIn("error", data1)
-        self.assertEqual(data1["topic"], "Transistors")
+        self.assertEqual(data1["topic"], "The History of the Transistor")
 
         res2 = registry.dispatch("h9_research", {"topic": "Microprocessors"})
         data2 = json.loads(res2)
@@ -393,6 +438,10 @@ class TestH9GenerateScriptTool(unittest.TestCase):
                     "claim_id": "c1",
                     "claim_text": "Demonstrated December 23, 1947.",
                     "confidence_score": 0.98,
+                    "primary_source": {
+                        "title": "1956 Nobel Prize in Physics: Biographical",
+                        "url": "https://www.nobelprize.org/prizes/physics/1956/bardeen/biographical/",
+                    },
                 }
             ],
         }
@@ -423,7 +472,18 @@ class TestH9GenerateScriptTool(unittest.TestCase):
         """Generate script incorporating Creator DNA rules and tone."""
         dossier = {
             "topic": "Artificial Intelligence",
-            "key_takeaways": ["Neural networks enable pattern recognition"],
+            "key_takeaways": ["NIST publishes a framework for managing AI system risks."],
+            "claims": [
+                {
+                    "claim_id": "ai_risk_framework",
+                    "claim_text": "NIST publishes a framework for identifying and managing risks in AI systems.",
+                    "confidence_score": 0.85,
+                    "primary_source": {
+                        "title": "NIST AI Risk Management Framework",
+                        "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+                    },
+                }
+            ],
         }
         creator = {
             "creator_id": "creator_tech_explainer",
@@ -443,9 +503,43 @@ class TestH9GenerateScriptTool(unittest.TestCase):
         self.assertIn("error", data)
         self.assertIn("dossier", data["error"].lower())
 
+    def test_generate_script_rejects_claim_without_source_instead_of_inventing_one(self):
+        result_str = handle_h9_generate_script(
+            {
+                "dossier": {
+                    "topic": "Unverified topic",
+                    "claims": [
+                        {
+                            "claim_id": "claim_1",
+                            "claim_text": "A claim without a citation.",
+                            "confidence_score": 0.9,
+                        }
+                    ],
+                }
+            },
+            session_id="test_script_missing_source",
+        )
+        data = json.loads(result_str)
+        self.assertIn("error", data)
+        self.assertIn("valid HTTPS primary_source", data["error"])
+
     def test_24_generate_script_dispatch_via_registry(self):
         """Dispatch h9.generate_script and h9_generate_script through registry."""
-        dossier = {"topic": "Semiconductors", "key_takeaways": ["Silicon is a group 14 element"]}
+        dossier = {
+            "topic": "Semiconductors",
+            "key_takeaways": ["Silicon is a group 14 element."],
+            "claims": [
+                {
+                    "claim_id": "silicon_group",
+                    "claim_text": "Silicon is a group 14 element.",
+                    "confidence_score": 0.9,
+                    "primary_source": {
+                        "title": "Royal Society of Chemistry Periodic Table: Silicon",
+                        "url": "https://www.rsc.org/periodic-table/element/14/silicon",
+                    },
+                }
+            ],
+        }
         res1 = registry.dispatch("h9.generate_script", {"dossier": dossier})
         data1 = json.loads(res1)
         self.assertNotIn("error", data1)
@@ -470,7 +564,7 @@ class TestH9RenderTool(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_25_render_happy_path(self):
-        """Render broadcast MP4 from valid Production IR AST."""
+        """Do not report a render when the session has no completed media output."""
         out_dir = self.base_dir / "renders_01"
         prod_ir = {
             "project_id": "test_render_proj",
@@ -487,17 +581,9 @@ class TestH9RenderTool(unittest.TestCase):
         args = {"production_ir": prod_ir, "output_dir": str(out_dir)}
         result_str = handle_h9_render(args, session_id="test_render_01")
         data = json.loads(result_str)
-        self.assertNotIn("error", data)
-        self.assertIn("video_path", data)
-        self.assertEqual(data["duration_seconds"], 15.0)
-        self.assertEqual(data["width"], 1920)
-        self.assertEqual(data["height"], 1080)
-        self.assertEqual(data["fps"], 30)
-
-        # Confirm physical MP4 file was rendered to disk
-        video_file = Path(data["video_path"])
-        self.assertTrue(video_file.exists(), "Rendered MP4 file must exist on disk")
-        self.assertGreater(video_file.stat().st_size, 0, "Rendered MP4 file must be non-empty")
+        self.assertFalse(data["success"])
+        self.assertIn("No completed Harness 9 production summary", data["error"])
+        self.assertFalse((out_dir / "final.mp4").exists())
 
     def test_26_render_missing_ir_error(self):
         """Render without production_ir returns error JSON."""
@@ -519,14 +605,16 @@ class TestH9RenderTool(unittest.TestCase):
         prod_ir = {"project_id": "p1", "duration_seconds": 10.0}
         res1 = registry.dispatch("h9.render", {"production_ir": prod_ir, "output_dir": str(out_dir)})
         data1 = json.loads(res1)
-        self.assertNotIn("error", data1)
-        self.assertTrue(Path(data1["video_path"]).exists())
+        self.assertFalse(data1["success"])
+        self.assertIn("No completed Harness 9 production summary", data1["error"])
+        self.assertFalse((out_dir / "final.mp4").exists())
 
         out_dir2 = self.base_dir / "renders_03"
         res2 = registry.dispatch("h9_render", {"production_ir": prod_ir, "output_dir": str(out_dir2)})
         data2 = json.loads(res2)
-        self.assertNotIn("error", data2)
-        self.assertTrue(Path(data2["video_path"]).exists())
+        self.assertFalse(data2["success"])
+        self.assertIn("No completed Harness 9 production summary", data2["error"])
+        self.assertFalse((out_dir2 / "final.mp4").exists())
 
 
 class TestHermesCapabilityBridge(unittest.TestCase):
@@ -597,11 +685,12 @@ class TestHermesCapabilityBridge(unittest.TestCase):
         sub_res = bridge.delegate_subagent_task(
             goal="Research point contact transistor origins",
             role="researcher",
-            context={"topic": "Transistors"},
+            context={"topic": "The History of the Transistor"},
         )
-        self.assertEqual(sub_res["status"], "COMPLETED")
+        self.assertEqual(sub_res["status"], "FAILED")
+        self.assertIn("No live Hermes parent agent", sub_res["error"])
         self.assertIn("subagent_id", sub_res)
-        self.assertIn("dossier_summary", sub_res["structured_data"])
+        self.assertNotIn("dossier", sub_res["structured_data"])
 
     def test_33_bridge_sandboxed_command(self):
         """Execute sandboxed command through bridge."""

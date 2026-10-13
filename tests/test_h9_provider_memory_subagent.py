@@ -579,7 +579,8 @@ class TestH9ProviderMemorySubagent(unittest.TestCase):
             allowed_toolsets=requested_tools,
         )
 
-        self.assertEqual(result.status, SubagentStatus.COMPLETED)
+        self.assertEqual(result.status, SubagentStatus.FAILED)
+        self.assertIn("will not synthesize", result.error_message)
         allowed = result.structured_data["allowed_tools"]
         self.assertIn("web_search", allowed)
         self.assertIn("read_file", allowed)
@@ -594,20 +595,22 @@ class TestH9ProviderMemorySubagent(unittest.TestCase):
         bridge = HermesCapabilityBridge(session_id="sess_research_sub_01", workspace_root=self.workspace)
 
         dossier = bridge.plan_research(
-            topic="Solid-State Battery Breakthroughs",
+            topic="How GPUs Work",
             depth="deep",
         )
 
         self.assertIsInstance(dossier, ResearchDossier)
-        self.assertEqual(dossier.topic, "Solid-State Battery Breakthroughs")
+        self.assertEqual(dossier.topic, "How GPUs Work")
         self.assertGreaterEqual(len(dossier.claims), 2)
         self.assertGreaterEqual(len(dossier.key_takeaways), 2)
 
         # Check claim source verification
         claim1 = dossier.claims[0]
         self.assertIsInstance(claim1.primary_source, SourceRecord)
-        self.assertTrue(claim1.primary_source.url)
-        self.assertGreaterEqual(claim1.confidence_score, 0.70)
+        self.assertTrue(claim1.primary_source.url.startswith("https://"))
+        self.assertEqual(claim1.verification_status, "VERIFIED")
+        self.assertGreaterEqual(claim1.confidence_score, 0.0)
+        self.assertLessEqual(claim1.confidence_score, 1.0)
 
     def test_17_prompt_caching_isolation_no_parent_leakage(self):
         """Verify parent context is isolated and subagent intermediate turns never enter parent history."""
@@ -621,38 +624,40 @@ class TestH9ProviderMemorySubagent(unittest.TestCase):
         # Spawn subagent
         sub_res = agent_rt.delegate_subagent(
             parent_session_id="sess_parent_caching_01",
-            goal="Investigate Graphene Conductivity",
+            goal="Research how GPUs work",
             role="researcher",
-            context={"topic": "Graphene"},
+            context={"topic": "How GPUs Work"},
         )
 
         # Verify parent iteration count did not increment
         self.assertEqual(parent_state.iteration_count, 1)
         # Verify subagent ID is tracked in parent metadata
+        self.assertEqual(sub_res.status, SubagentStatus.FAILED)
         self.assertIn("child_subagents", parent_state.metadata)
         self.assertIn(sub_res.subagent_id, parent_state.metadata["child_subagents"])
 
         # Tool dispatch through handle_h9_research records only top-level result
         tool_res = handle_h9_research(
-            {"topic": "Graphene", "depth": "deep"},
+            {"topic": "How GPUs Work", "depth": "deep"},
             session_id="sess_parent_caching_01",
         )
         parsed_res = json.loads(tool_res)
         self.assertNotIn("error", parsed_res)
-        self.assertEqual(parsed_res["topic"], "Graphene")
+        self.assertEqual(parsed_res["topic"], "How GPUs Work")
+        self.assertGreater(len(parsed_res["dossier"]["claims"]), 0)
 
     def test_18_research_fallback_on_subagent_failure(self):
-        """Verify graceful fallback to content runtime / procedural research if subagent raises error."""
+        """Verify delegation failure falls back only to a curated source-backed dossier."""
         bridge = HermesCapabilityBridge(session_id="sess_fallback_01", workspace_root=self.workspace)
 
         # Mock delegate_subagent to raise exception
         with patch.object(bridge, "delegate_subagent", side_effect=RuntimeError("Subagent spawn timeout")):
             dossier = bridge.plan_research(
-                topic="CRISPR Gene Editing",
+                topic="How GPUs Work",
                 depth="deep",
             )
             self.assertIsInstance(dossier, ResearchDossier)
-            self.assertEqual(dossier.topic, "CRISPR Gene Editing")
+            self.assertEqual(dossier.topic, "How GPUs Work")
             self.assertGreaterEqual(len(dossier.claims), 1)
 
     def test_19_bridge_unified_facade_integration(self):
@@ -670,10 +675,10 @@ class TestH9ProviderMemorySubagent(unittest.TestCase):
 
         # 2. Plan deep research via subagent
         dossier = bridge.plan_research(
-            topic="Room-Temperature Photonic Chips",
+            topic="How GPUs Work",
             depth="deep",
         )
-        self.assertEqual(dossier.topic, "Room-Temperature Photonic Chips")
+        self.assertEqual(dossier.topic, "How GPUs Work")
 
         # 3. Create and persist ContentProject
         proj = ContentProject(

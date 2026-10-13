@@ -1,53 +1,32 @@
 # Harness 9 limited beta readiness: Windows
 
-**Assessment date:** 2026-10-11  
-**Disposition:** Ready for a small, supervised Windows pilot using curated research.  
-**Tested scope:** 15-second 16:9 and 9:16 videos; 30-second 16:9 video; Windows SAPI; real Chrome/FFmpeg rendering; optional configured Hermes model.
+**Assessment date:** 2026-10-12
+**Disposition:** Ready for a supervised beta with three Windows testers.
+**Scope:** 15-second model-assisted videos in landscape and portrait, curated research with live licensed assets, and one live-research source-integrity scenario.
 
-The cleanest tester path keeps the curated, source-reviewed research while discovering real images online. Add `--model-script` to exercise the configured model in the production pipeline:
+## Current production-path evidence
 
-```powershell
-.venv\Scripts\python.exe run_harness9.py `
-  --topic "How GPUs Work" `
-  --duration 15 `
-  --format 16:9 `
-  --output-dir output\beta-gpu `
-  --offline --online-assets --model-script --json
-```
-
-`--online-assets` is an explicit network opt-in. In this combination, `--offline` means curated research; the effective asset mode and model use are recorded separately in `pipeline_summary.json`. Each tester must configure their own Hermes provider credentials. The Azure credential used for these checks is kept in the local Hermes profile, outside this repository.
-
-## Real production-path evidence
+Both curated runs used the configured `azure-foundry:gpt-6-luna` model, real Windows SAPI narration, online Wikimedia asset discovery, Chrome capture, and FFmpeg. Each run returned `SUCCESS`, passed all six verifier checkpoints, and passed the media gate.
 
 | Run | Result | Measured evidence |
 |---|---|---|
-| `output/h9-beta-curated-final-20261011` — GPU, 30s, 16:9 | `SUCCESS` | 900 Chrome frames at 1920×1080/30 fps; three frozen Wikimedia assets; SAPI audio 29.58s; media gate passed. |
-| `output/h9-beta-curated-15s-final-20261011` — GPU, 15s, 16:9 | `SUCCESS` | 450 Chrome frames; three frozen Wikimedia assets; SAPI audio 14.19s; media gate passed. |
-| `output/h9-beta-quantum-15s-live-20261011` — Quantum, 15s, 16:9 | `SUCCESS` | Three frozen Wikimedia assets, including a real GIF; SAPI audio 14.94s; 450 Chrome frames; media gate passed. |
-| `output/h9-beta-curated-model-15s-20261011` — GPU, 15s, model-assisted 16:9 | `SUCCESS` | Actual `azure-foundry:gpt-6-luna` request; verified curated claims; three licensed Wikimedia assets; SAPI audio 14.52s; media gate passed. |
-| `output/h9-beta-curated-model-15s-9x16-final-20261011` — GPU, 15s, model-assisted 9:16 | `SUCCESS` | Actual Azure model request; 1080×1920/30 fps; three real assets with correct per-scene claim links; SAPI audio 14.88s; zero fallbacks; media gate passed. |
-| `output/h9-beta-model-assisted-15s-live-retry1-20261011` — Apollo, 15s, live research/model | `PARTIAL` (expected) | Azure model and render succeeded; three real Wikimedia assets; SAPI audio 14.02s; 450 frames and media gate passed. All four live claims remain `UNVERIFIED`, so the pipeline did not report `SUCCESS`. |
+| `output/h9-beta-verified-model-15s-20261012-rerun3` | `SUCCESS` | Four cited research claims; three frozen, licensed assets; SAPI audio 14.32s; 450 frames at 1920x1080/30 fps; verified H.264/AAC render. |
+| `output/h9-beta-verified-model-15s-9x16-20261012` | `SUCCESS` | Four cited claims; three frozen, licensed assets; SAPI audio 13.93s; 450 frames at 1080x1920/30 fps; verified H.264/AAC render. |
+| `output/h9-beta-live-integrity-apollo11-20261012` | `PARTIAL` (expected) | Five live claims remain unverified; three frozen, licensed assets; SAPI audio 14.12s; verified 450-frame Chrome render; no generated fallback visuals. The CLI returned 1 and correctly marked the output non-publishable. |
+| `output/h9-beta-curated-final-20261011` | `SUCCESS` (prior host run) | 30-second 16:9 render with 900 Chrome frames and SAPI audio 29.58s. |
 
-The saved Hermes model configuration was exercised through actual Responses API requests; the model-assisted production runs report `azure-foundry:gpt-6-luna`. The 15-second GPU model script uses three scenes and passed the measured audio-duration gate in both aspect ratios.
+The live Apollo 11 scenario is the third tester's source-review exercise. A separate attempt with `The Apollo Guidance Computer` found only one usable claim and stopped at research; live mode intentionally requires at least three and does not invent replacement claims.
 
-The portrait contact sheet is at `output/h9-beta-visual-review-20261011/portrait_final_contact_sheet.jpg`. It was reviewed after the final asset-query update. The SIMT scene now uses a Wikimedia microarchitecture diagram, with its creator and Apache 2.0 license recorded in the asset ledger.
+## Readiness checks
 
-## Reliability and content gates
+- `run_harness9.py --check-render` found Node, npm, Chrome, FFmpeg, and the installed render toolchain; `problems` was empty and `ready_without_install` was `true`.
+- The focused component suite passed **247 tests and 3 subtests** across acceptance, content tools, runtime, provider/subagent behavior, skills, HyperFrames, rendering, research, CLI, scriptwriting, end-to-end pipeline, and verifier suites.
+- Full repository collection was not completed: unrelated ACP tests require the optional `acp` package, which is absent in this environment. Do not treat the scoped suite as a full-repository pass.
+- The suite includes two duration-fitting regression tests. Small WAV overruns receive at most 5% pitch-preserving FFmpeg time compression and are remeasured; larger overruns remain subject to the pipeline's fail-closed duration gate.
+- Landscape and portrait contact sheets were spot-checked for visible assets, titles, and captions within the frame.
 
-- Stage 3 measures the generated WAV and refuses audio that would be clipped or leave a material silent tail.
-- A run can be `SUCCESS` only when the real render is `VERIFIED`, every research claim is verified, and no asset is a generated fallback. Live research is intentionally `PARTIAL` until its claims receive human/source review.
-- Model-written narration must use each scene's allowed claim IDs, meet per-scene and total word budgets, and fit the selected target. The writer makes at most two bounded revision calls, then fails closed.
-- Asset ledgers link each scene's visual to that scene's `supported_claim_ids`, including scenes backed by multiple claims. Unknown claims are not invented to fill gaps.
-- Live search/download failures remain visible as generated fallbacks; those outputs cannot be mistaken for a fully successful run.
-- The focused regression suite passed **98 tests** on this checkout: assets, adversarial assets, scriptwriting, research integrity, and CLI.
-- `run_harness9.py --check-render` found Node, Chrome, FFmpeg, ffprobe, and the render toolchain without a PATH override; `ready_without_install` was `true`.
+## Tester requirements and limits
 
-## Pilot limits
+Each tester needs the configured Hermes model provider plus a usable Windows SAPI voice or an ElevenLabs TTS credential. Run the SAPI check in the run sheet from the account that will run H9; model credentials alone do not supply speech synthesis. Keep outputs local during the pilot. The live scenario must stay `PARTIAL` until a person checks every claim against its linked source; fewer than three usable live claims should stop early with `FAILED`.
 
-- The full render checks cover GPU and quantum curated topics. Windows SAPI duration checks also cover the transistor and Apollo curated presets, but those two do not yet have a clean full production render recorded here.
-- The real model-assisted live Apollo run is a content-review sample, not a publishable success. Its `PARTIAL` result is correct until its four claims are checked against reliable sources.
-- The checks use one Windows host. They do not establish compatibility with other Windows versions or other operating systems.
-- 15-second rendering took about two minutes on this host. Longer jobs and other durations were not characterized.
-- `FROZEN_LOCAL` records downloaded media and rights metadata; testers should preserve the asset ledger when sharing videos that use attribution-required licenses.
-
-This is a limited pilot disposition, not a public-release or broadcast-certification claim.
+These checks use one Windows host and do not establish compatibility with other Windows releases. A 15-second render took about two minutes here. Testers should record speech intelligibility, visual defects, Windows version, elapsed time, and any source concerns. Preserve each asset ledger when sharing attribution-required media. This disposition covers a supervised beta only, not public release or broadcast certification.

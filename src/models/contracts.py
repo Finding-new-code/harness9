@@ -616,8 +616,8 @@ class ScriptScene(H9BaseModel):
     hero_frame_description: str = ""
     component_type: str = "reference_collage_hook"
     component_props: Dict[str, Any] = Field(default_factory=dict)
-    entrance_animation: str = "fade"
-    transition_out: str = "fade"
+    entrance_animation: str = "rise"
+    transition_out: str = "cut"
     beats: List[ScriptBeat] = Field(default_factory=list)
 
     @model_validator(mode="before")

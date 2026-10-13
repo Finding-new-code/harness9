@@ -169,6 +169,11 @@ class Pipeline:
         t0 = time.time()
         try:
             script_pipeline = ScriptwritingPipeline()
+            model_client = None
+            if self.model_assisted_scripts:
+                from adapters.hermes.narration import resolve_narration_model
+
+                model_client = resolve_narration_model()
             script_res = script_pipeline.run(
                 dossier=dossier,
                 ledger=ledger,
@@ -177,6 +182,7 @@ class Pipeline:
                 voice=self.voice,
                 format_aspect=self.format,
                 model_assisted=self.model_assisted_scripts,
+                model_client=model_client,
             )
             audio_duration = float(script_res.audio.duration_seconds)
             if script_res.audio.provider_used == "harmonic_synthesizer":

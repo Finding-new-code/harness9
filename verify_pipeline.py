@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
-"""
-verify_pipeline.py — Automated Acceptance Verification Harness for Harness 9
+"""Run the production pipeline and verify the artifacts it actually created.
 
-Validates the end-to-end video generation pipeline against all acceptance criteria:
-1. Research Dossier (JSON/YAML, >= 3 verifiable claims with sources & confidence scores).
-2. Asset Ledger (JSON/YAML, license types, source URLs, author attribution, SHA-256, local frozen files).
-3. Audio Narration (non-empty WAV/MP3, duration aligned with beatmap).
-4. HyperFrames Project Files (BRIEF.md, DESIGN.md, SCRIPT.md, STORYBOARD.md, index.html).
-5. HyperFrames Composition Validation (zero broken local paths, no remote http(s) URLs, GSAP timelines, finite repeats).
-6. Rendered Video (valid, non-empty, playable MP4 with video and audio streams).
-
-Usage:
-    python verify_pipeline.py --test-mode --output-dir output/test_verification_run
-    python verify_pipeline.py --topic "The History of the Transistor" --offline --format 16:9
+Use ``run_harness9.py`` to generate a video directly, or this command to run
+the production pipeline and then evaluate its output. Validation never creates
+replacement research, media, or renders when a pipeline stage fails.
 """
 
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
 import struct
@@ -27,6 +19,7 @@ import time
 import wave
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlsplit
 
 try:
     import yaml
@@ -35,7 +28,7 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-# Fallback / Built-in Pipeline Runner (for test/offline mode)
+# Production Pipeline Runner
 # ---------------------------------------------------------------------------
 
 def run_pipeline_flow(
@@ -45,594 +38,37 @@ def run_pipeline_flow(
     format_aspect: str = "16:9",
     duration: int = 30,
     voice: str = "default",
+    online_assets: bool = False,
+    model_assisted_scripts: bool = False,
+    render_backend: Optional[str] = None,
 ) -> bool:
     """
-    Executes the end-to-end pipeline. First attempts to use src.orchestrator.pipeline,
-    and if unavailable, falls back to a deterministic self-contained generator to ensure
-    acceptance verification can always run hermetically in all environments.
+    Execute the production pipeline. Errors propagate; this wrapper does not
+    synthesize substitute research or artifacts when the production path fails.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Try importing public pipeline
-    try:
-        from src.orchestrator.pipeline import Pipeline
-        pipeline = Pipeline(
-            topic=topic,
-            output_dir=str(output_dir),
-            offline=offline,
-            format=format_aspect,
-            duration=duration,
-            voice=voice,
-        )
-        return pipeline.run()
-    except Exception:
-        # Fallback to direct stage execution or self-contained synthesis
-        return _execute_self_contained_pipeline(
-            topic=topic,
-            output_dir=output_dir,
-            offline=offline,
-            format_aspect=format_aspect,
-            duration=duration,
-            voice=voice,
-        )
+    from src.orchestrator.pipeline import Pipeline
+
+    pipeline = Pipeline(
+        topic=topic,
+        output_dir=str(output_dir),
+        offline=offline,
+        format=format_aspect,
+        duration=duration,
+        voice=voice,
+        online_assets=online_assets,
+        model_assisted_scripts=model_assisted_scripts,
+        render_backend=render_backend,
+    )
+    if not pipeline.run():
+        return False
+    summary_path = output_dir / "pipeline_summary.json"
+    if not summary_path.is_file():
+        return False
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    return summary.get("status") == "SUCCESS"
 
 
-def _execute_self_contained_pipeline(
-    topic: str,
-    output_dir: Path,
-    offline: bool,
-    format_aspect: str,
-    duration: int,
-    voice: str,
-) -> bool:
-    """Hermetic deterministic pipeline execution producing all stage artifacts."""
-    assets_dir = output_dir / "assets"
-    images_dir = assets_dir / "images"
-    audio_dir = assets_dir / "audio"
-    renders_dir = output_dir / "renders"
-    
-    images_dir.mkdir(parents=True, exist_ok=True)
-    audio_dir.mkdir(parents=True, exist_ok=True)
-    renders_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Check if M1 research engine is available
-    dossier_data: Optional[Dict[str, Any]] = None
-    try:
-        from src.research.engine import ResearchEngine
-        engine = ResearchEngine()
-        dossier = engine.synthesize_research(topic, offline=offline, target_duration=duration)
-        if hasattr(dossier, "model_dump"):
-            dossier_data = dossier.model_dump()
-        elif hasattr(dossier, "to_dict"):
-            dossier_data = dossier.to_dict()
-        elif isinstance(dossier, dict):
-            dossier_data = dossier
-    except Exception:
-        pass
-
-    if dossier_data is None:
-        # Generate deterministic dossier data
-        dossier_data = _generate_default_dossier(topic, duration, offline)
-
-    # Write research_dossier.json and research_dossier.yaml
-    with open(output_dir / "research_dossier.json", "w", encoding="utf-8") as f:
-        json.dump(dossier_data, f, indent=2)
-    if yaml:
-        with open(output_dir / "research_dossier.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(dossier_data, f, default_flow_style=False)
-
-    # Stage 2: Generate visual assets & asset ledger
-    asset_records = []
-    width, height = (1920, 1080) if format_aspect == "16:9" else (1080, 1920)
-    
-    # Try importing asset engine
-    try:
-        from src.assets.procedural import ProceduralSVGGenerator
-        from src.assets.ledger import LedgerManager
-        svg_gen = ProceduralSVGGenerator()
-        ledger_mgr = LedgerManager(output_dir=output_dir)
-        
-        for i, q in enumerate(dossier_data.get("suggested_visual_queries", ["hero", "diagram", "future"])):
-            asset_filename = f"asset_{i+1:02d}.svg"
-            asset_path = images_dir / asset_filename
-            svg_content = svg_gen.generate_topic_svg(topic, q, width=width, height=height)
-            svg_bytes = svg_content.encode("utf-8")
-            with open(asset_path, "wb") as f:
-                f.write(svg_bytes)
-            sha = hashlib.sha256(svg_bytes).hexdigest()
-            asset_records.append({
-                "asset_id": f"asset_{i+1:02d}",
-                "claim_id_refs": [f"claim_{i+1:02d}"],
-                "scene_target": f"scene_{i+1}",
-                "media_type": "image/svg+xml",
-                "local_path": f"assets/images/{asset_filename}",
-                "file_size_bytes": len(svg_bytes),
-                "file_sha256": sha,
-                "dimensions": {"width": width, "height": height},
-                "source_provider": "procedural_vector_generator",
-                "source_url": f"https://commons.wikimedia.org/wiki/Special:Search?search={q.replace(' ', '+')}",
-                "creator": "Harness 9 Procedural Asset Engine",
-                "license": "CC0-1.0 (Public Domain)",
-                "verification_status": "verified_offline",
-            })
-    except Exception:
-        # Self-contained SVG asset generation
-        for i, q in enumerate(dossier_data.get("suggested_visual_queries", ["hero_overview", "technical_schematic", "modern_impact"])):
-            asset_filename = f"asset_{i+1:02d}.svg"
-            asset_path = images_dir / asset_filename
-            svg_content = _generate_sample_svg(topic, q, width, height, i+1)
-            svg_bytes = svg_content.encode("utf-8")
-            with open(asset_path, "wb") as f:
-                f.write(svg_bytes)
-            sha = hashlib.sha256(svg_bytes).hexdigest()
-            asset_records.append({
-                "asset_id": f"asset_{i+1:02d}",
-                "claim_id_refs": [f"claim_{i+1:02d}"],
-                "scene_target": f"scene_{i+1}",
-                "media_type": "image/svg+xml",
-                "local_path": f"assets/images/{asset_filename}",
-                "file_size_bytes": len(svg_bytes),
-                "file_sha256": sha,
-                "dimensions": {"width": width, "height": height},
-                "source_provider": "procedural_vector_generator",
-                "source_url": f"https://commons.wikimedia.org/wiki/Special:Search?search={q.replace(' ', '+')}",
-                "creator": "Harness 9 Procedural Asset Engine",
-                "license": "CC-BY-4.0",
-                "verification_status": "verified_local",
-            })
-
-    ledger_data = {
-        "schema_version": "1.0.0",
-        "project_id": f"proj_{int(time.time())}",
-        "total_assets": len(asset_records),
-        "license_summary": {"CC-BY-4.0": len(asset_records)},
-        "assets": asset_records,
-    }
-    with open(output_dir / "asset_ledger.json", "w", encoding="utf-8") as f:
-        json.dump(ledger_data, f, indent=2)
-    if yaml:
-        with open(output_dir / "asset_ledger.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(ledger_data, f, default_flow_style=False)
-
-    # Stage 3: Script, Storyboard & Voiceover
-    brief_content = f"# BRIEF: {topic}\n\n**Format**: {format_aspect}\n**Target Duration**: {duration}s\n**Audience**: General Tech Enthusiasts\n\n## Narrative Arc\nExplore the breakthrough discovery, technical architecture, and monumental modern impact of {topic}.\n"
-    with open(output_dir / "BRIEF.md", "w", encoding="utf-8") as f:
-        f.write(brief_content)
-
-    design_content = f"# DESIGN: {topic}\n\n## Brand\n- Name: TechChronicles\n- Tone: Authoritative, Cinematic, Modern\n\n## Colors\n- Background: #0a0e17\n- Primary Accent: #00d2ff\n- Secondary Text: #8fa3bf\n- Base Text: #ffffff\n- Warning/Alert: #ff5252\n\n## Typography\n- Display: 'Inter Tight', sans-serif (700)\n- Body: 'Inter', sans-serif (400)\n\n## Motion\n- Mood: Cinematic & Fluid\n- Standard Easing: power2.out\n\n## What NOT to Do\n- Never use unbranded neon greens.\n- Never use pure black #000000 background.\n- Never hardcode exit fades on intermediate scenes.\n"
-    with open(output_dir / "DESIGN.md", "w", encoding="utf-8") as f:
-        f.write(design_content)
-
-    num_scenes = max(1, len(asset_records))
-    dur_per_scene = max(1.0, duration / float(num_scenes))
-    script_scenes = []
-    for i, a in enumerate(asset_records):
-        st = i * dur_per_scene
-        script_scenes.append({
-            "scene_id": f"scene_{i+1}",
-            "start": round(st, 2),
-            "duration": round(dur_per_scene, 2),
-            "narration": f"Key breakthrough {i+1} regarding {topic}, driving engineering progress.",
-            "visual": a["local_path"],
-        })
-
-    script_md = f"# SCRIPT: {topic}\n\n"
-    for s in script_scenes:
-        script_md += f"## Scene {s['scene_id']} [{s['start']:.1f}s - {s['start']+s['duration']:.1f}s]\n**Voiceover**: \"{s['narration']}\"\n**Visual Cue**: Display {s['visual']}\n\n"
-    with open(output_dir / "SCRIPT.md", "w", encoding="utf-8") as f:
-        f.write(script_md)
-
-    storyboard_md = f"# STORYBOARD: {topic}\n\n"
-    for s in script_scenes:
-        storyboard_md += f"## {s['scene_id'].upper()}\n- **Time**: {s['start']}s - {s['start']+s['duration']}s ({s['duration']}s)\n- **Hero Frame**: Central typographic card with {s['visual']} visual backing.\n- **Entrance**: `gsap.from('.{s['scene_id']}', {{ opacity: 0, y: 30, duration: 0.8 }})`\n- **Transition Out**: Seamless push-slide transition into next scene.\n\n"
-    with open(output_dir / "STORYBOARD.md", "w", encoding="utf-8") as f:
-        f.write(storyboard_md)
-
-    # Generate synthetic WAV audio
-    audio_path = audio_dir / "narration.wav"
-    _generate_synthetic_wav(audio_path, duration_seconds=duration)
-
-    # Stage 4: HyperFrames composition (index.html, styles.css, main.js)
-    html_content = _generate_hyperframes_html(topic, format_aspect, duration, script_scenes)
-    with open(output_dir / "index.html", "w", encoding="utf-8") as f:
-        f.write(html_content)
-
-    css_content = _generate_hyperframes_css(format_aspect)
-    with open(output_dir / "styles.css", "w", encoding="utf-8") as f:
-        f.write(css_content)
-
-    js_content = _generate_hyperframes_js(duration, script_scenes)
-    with open(output_dir / "main.js", "w", encoding="utf-8") as f:
-        f.write(js_content)
-
-    # Render final MP4
-    mp4_path = renders_dir / "final.mp4"
-    _render_playable_mp4(html_path=output_dir / "index.html", audio_path=audio_path, output_mp4=mp4_path, duration=duration, width=width, height=height)
-
-    # Pipeline summary
-    summary_data = {
-        "status": "success",
-        "topic": topic,
-        "format": format_aspect,
-        "target_duration_seconds": duration,
-        "render_path": str(mp4_path),
-        "total_assets": len(asset_records),
-        "verified_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-    }
-    with open(output_dir / "pipeline_summary.json", "w", encoding="utf-8") as f:
-        json.dump(summary_data, f, indent=2)
-    if yaml:
-        with open(output_dir / "pipeline_summary.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(summary_data, f, default_flow_style=False)
-
-    return True
-
-
-def _generate_default_dossier(topic: str, duration: int, offline: bool) -> Dict[str, Any]:
-    return {
-        "schema_version": "1.0.0",
-        "topic": topic,
-        "metadata": {
-            "run_id": f"run_{int(time.time())}",
-            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "mode": "offline_fallback" if offline else "online",
-            "target_duration_seconds": duration,
-            "search_backend": "curated_presets_and_synthesis",
-        },
-        "summary": {
-            "headline": f"{topic}: The Foundation of Modern Computation",
-            "executive_summary": f"An authoritative analysis of {topic}, charting its origins, solid-state mechanisms, and vast computing revolution.",
-            "key_takeaways": [
-                f"Discovered through groundbreaking research at Bell Labs.",
-                f"Replaced fragile vacuum tubes with solid-state semiconductors.",
-                f"Enabled exponential scaling described by Moore's Law.",
-            ],
-        },
-        "claims": [
-            {
-                "claim_id": "claim_01",
-                "claim_text": f"The invention of the point-contact transistor in December 1947 marked the start of the solid-state electronics era.",
-                "category": "origin_history",
-                "confidence_score": 0.98,
-                "primary_source": "https://www.nobelprize.org/prizes/physics/1956/summary/",
-                "visual_cue_suggestion": "Historical Bell Labs laboratory setup and original germanium crystal apparatus",
-            },
-            {
-                "claim_id": "claim_02",
-                "claim_text": "Transistors control electrical current by altering semiconductor conductivity through applied voltage.",
-                "category": "technical_mechanism",
-                "confidence_score": 0.94,
-                "primary_source": "https://ieee.org/history/transistor-physics",
-                "visual_cue_suggestion": "3D atomic schematic showing electron-hole conduction across p-n junction",
-            },
-            {
-                "claim_id": "claim_03",
-                "claim_text": "Modern microprocessors integrate over 100 billion transistors on a single silicon die.",
-                "category": "quantitative_metric",
-                "confidence_score": 0.92,
-                "primary_source": "https://en.wikipedia.org/wiki/Transistor_count",
-                "visual_cue_suggestion": "Silicon wafer nanometer electron micrograph",
-            },
-        ],
-        "talking_points": [
-            {
-                "beat_index": 1,
-                "title": "The Breakthrough of 1947",
-                "narrative_hook": "How three physicists revolutionized human technology forever.",
-                "supported_claim_ids": ["claim_01"],
-                "estimated_duration_sec": 10.0,
-            },
-            {
-                "beat_index": 2,
-                "title": "Solid-State Physics in Action",
-                "narrative_hook": "Why solid silicon and germanium changed everything.",
-                "supported_claim_ids": ["claim_02"],
-                "estimated_duration_sec": 10.0,
-            },
-            {
-                "beat_index": 3,
-                "title": "Billions of Switches",
-                "narrative_hook": "From a single laboratory bench to global AI infrastructure.",
-                "supported_claim_ids": ["claim_03"],
-                "estimated_duration_sec": 10.0,
-            },
-        ],
-        "statistics": [
-            {"metric": "Initial Transistor Size", "value": "1.5 cm", "unit": "centimeters", "context": "1947 Bell Labs prototype"},
-            {"metric": "Modern Gate Length", "value": "3", "unit": "nanometers", "context": "Leading-edge semiconductor fabrication"},
-        ],
-        "suggested_visual_queries": [
-            f"{topic} invention origins",
-            f"{topic} schematic diagram",
-            f"{topic} modern microprocessor",
-        ],
-    }
-
-
-def _generate_sample_svg(topic: str, query: str, width: int, height: int, idx: int) -> str:
-    color_schemes = [
-        ("#0f172a", "#00d2ff", "#3b82f6"),
-        ("#111827", "#10b981", "#06b6d4"),
-        ("#18181b", "#f59e0b", "#ef4444"),
-    ]
-    bg, acc1, acc2 = color_schemes[(idx - 1) % len(color_schemes)]
-    
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}">
-  <defs>
-    <linearGradient id="grad_{idx}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="{bg}" />
-      <stop offset="100%" stop-color="#020617" />
-    </linearGradient>
-    <linearGradient id="acc_{idx}" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="{acc1}" />
-      <stop offset="100%" stop-color="{acc2}" />
-    </linearGradient>
-  </defs>
-  <rect width="{width}" height="{height}" fill="url(#grad_{idx})" />
-  <circle cx="{width//2}" cy="{height//2}" r="{min(width, height)//3}" fill="none" stroke="url(#acc_{idx})" stroke-width="4" opacity="0.3" />
-  <circle cx="{width//2}" cy="{height//2}" r="{min(width, height)//4}" fill="none" stroke="url(#acc_{idx})" stroke-width="2" stroke-dasharray="12 8" opacity="0.6" />
-  <rect x="{width//2 - 250}" y="{height//2 - 120}" width="500" height="240" rx="16" fill="rgba(15, 23, 42, 0.85)" stroke="{acc1}" stroke-width="2" />
-  <text x="{width//2}" y="{height//2 - 40}" font-family="sans-serif" font-size="32" font-weight="bold" fill="#ffffff" text-anchor="middle">SCENE {idx}: {topic.upper()}</text>
-  <text x="{width//2}" y="{height//2 + 20}" font-family="sans-serif" font-size="20" fill="{acc1}" text-anchor="middle">{query}</text>
-  <text x="{width//2}" y="{height//2 + 70}" font-family="sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle">Harness 9 Verified Asset • CC-BY-4.0</text>
-</svg>"""
-
-
-def _generate_synthetic_wav(wav_path: Path, duration_seconds: float = 30.0, sample_rate: int = 24000) -> None:
-    """Generates a clean synthetic PCM WAV file with gentle audio tones."""
-    num_samples = int(duration_seconds * sample_rate)
-    with wave.open(str(wav_path), "wb") as wf:
-        wf.setnchannels(1)  # Mono
-        wf.setsampwidth(2)  # 16-bit
-        wf.setframerate(sample_rate)
-        
-        frames = bytearray()
-        import math
-        freq = 440.0  # A4 note
-        for i in range(num_samples):
-            # Soft modulated tone
-            envelope = 0.5 * (1.0 + math.sin(2.0 * math.pi * 0.2 * (i / sample_rate)))
-            val = int(envelope * 8000.0 * math.sin(2.0 * math.pi * freq * (i / sample_rate)))
-            frames.extend(struct.pack("<h", max(-32767, min(32767, val))))
-        wf.writeframes(frames)
-
-
-def _generate_hyperframes_html(topic: str, format_aspect: str, duration: int, scenes: List[Dict[str, Any]]) -> str:
-    width, height = (1920, 1080) if format_aspect == "16:9" else (1080, 1920)
-    
-    scenes_html = ""
-    for s in scenes:
-        scenes_html += f"""
-    <section class="scene {s['scene_id']}" data-start="{s['start']}" data-duration="{s['duration']}">
-      <div class="scene-backdrop">
-        <img class="scene-img" src="{s['visual']}" alt="Visual for {s['scene_id']}" />
-      </div>
-      <div class="scene-content">
-        <span class="badge">{topic}</span>
-        <h2 class="scene-title">{s['scene_id'].replace('_', ' ').title()}</h2>
-        <p class="scene-narration">{s['narration']}</p>
-      </div>
-    </section>"""
-
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{topic} - HyperFrames</title>
-  <link rel="stylesheet" href="styles.css" />
-  <!-- GSAP CDN or local bundle for frame capture -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-</head>
-<body>
-  <div id="composition"
-       data-composition-id="root"
-       data-width="{width}"
-       data-height="{height}"
-       data-start="0"
-       data-duration="{duration}">
-    
-    <div class="video-container">
-      {scenes_html}
-    </div>
-
-    <!-- Decoupled audio element for playback -->
-    <audio id="narration-audio" src="assets/audio/narration.wav" data-track-index="1"></audio>
-  </div>
-
-  <script src="main.js"></script>
-</body>
-</html>"""
-
-
-def _generate_hyperframes_css(format_aspect: str) -> str:
-    width, height = ("1920px", "1080px") if format_aspect == "16:9" else ("1080px", "1920px")
-    return f"""* {{
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}}
-
-body {{
-  background-color: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}}
-
-#composition {{
-  position: relative;
-  width: {width};
-  height: {height};
-  background-color: #0a0e17;
-  overflow: hidden;
-  color: #ffffff;
-}}
-
-.video-container {{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}}
-
-.scene {{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 64px;
-  opacity: 0;
-  pointer-events: none;
-}}
-
-.scene-backdrop {{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}}
-
-.scene-img {{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.7;
-}}
-
-.scene-content {{
-  position: relative;
-  z-index: 2;
-  background: linear-gradient(to top, rgba(10, 14, 23, 0.95), rgba(10, 14, 23, 0.4), transparent);
-  padding: 32px;
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-  max-width: 90%;
-}}
-
-.badge {{
-  display: inline-block;
-  background: rgba(0, 210, 255, 0.2);
-  color: #00d2ff;
-  border: 1px solid #00d2ff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}}
-
-.scene-title {{
-  font-size: 40px;
-  font-weight: 800;
-  color: #ffffff;
-  margin-bottom: 12px;
-  line-height: 1.2;
-}}
-
-.scene-narration {{
-  font-size: 22px;
-  color: #cbd5e1;
-  line-height: 1.5;
-}}
-"""
-
-
-def _generate_hyperframes_js(total_duration: int, scenes: List[Dict[str, Any]]) -> str:
-    return f"""// HyperFrames GSAP Composition Controller
-window.__timelines = window.__timelines || {{}};
-
-// Initialize root timeline with paused state for frame capture engine
-const tl = gsap.timeline({{ paused: true, defaults: {{ ease: "power2.out" }} }});
-window.__timelines["root"] = tl;
-
-// Synchronous Scene Choreography
-{_generate_scene_tweens_js(scenes)}
-
-// Finite repeat math calculation (bounded cycle duration)
-const cycleDuration = 2.0;
-const repeatCount = Math.ceil({total_duration} / cycleDuration) - 1;
-
-// Global hook for capture engine
-window.seekComposition = function(seconds) {{
-  tl.seek(seconds);
-}};
-"""
-
-
-def _generate_scene_tweens_js(scenes: List[Dict[str, Any]]) -> str:
-    js_lines = []
-    for s in scenes:
-        sid = s["scene_id"]
-        st = s["start"]
-        dur = s["duration"]
-        js_lines.append(f"""
-// {sid} [start: {st}s, dur: {dur}s]
-tl.set(".{sid}", {{ opacity: 1, visibility: "visible" }}, {st});
-tl.from(".{sid} .scene-content", {{ y: 40, opacity: 0, duration: 0.8 }}, {st});
-tl.from(".{sid} .scene-img", {{ scale: 1.08, duration: {dur}, ease: "none" }}, {st});
-tl.set(".{sid}", {{ opacity: 0, visibility: "hidden" }}, {st + dur});
-""")
-    return "\n".join(js_lines)
-
-
-def _render_playable_mp4(
-    html_path: Path,
-    audio_path: Path,
-    output_mp4: Path,
-    duration: int,
-    width: int,
-    height: int,
-    fps: int = 30,
-) -> None:
-    """Renders a standard, broadcast-compliant playable MP4 video using FFmpeg."""
-    # Build an MP4 with test video pattern / background and mux the narration audio
-    cmd = [
-        "ffmpeg",
-        "-y",
-        "-f", "lavfi",
-        "-i", f"color=c=0x0a0e17:s={width}x{height}:r={fps}:d={duration}",
-        "-i", str(audio_path),
-        "-c:v", "libx264",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        "-shortest",
-        "-movflags", "+faststart",
-        str(output_mp4),
-    ]
-    try:
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
-    except Exception:
-        # Fallback raw MP4 creation if ffmpeg is unavailable
-        _create_mock_mp4_file(output_mp4, duration=duration)
-
-
-def _create_mock_mp4_file(file_path: Path, duration: int = 30) -> None:
-    """Creates a basic valid MP4 file container for hermetic testing."""
-    # Standard ISO Base Media File (MP4) header signature (ftyp + moov + mdat)
-    ftyp = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2mp41"
-    mdat_header = b"\x00\x00\x04\x00mdat"
-    dummy_payload = b"\x00" * 1024
-    with open(file_path, "wb") as f:
-        f.write(ftyp)
-        f.write(mdat_header)
-        f.write(dummy_payload)
-
-
-# ---------------------------------------------------------------------------
 # Verification Engine & Assertions
 # ---------------------------------------------------------------------------
 
@@ -697,6 +133,15 @@ class PipelineVerifier:
         if missing_keys:
             self.record_check("CP_DOSSIER_SCHEMA", "Research Dossier Required Fields", False, f"Missing keys: {missing_keys}")
             return
+        if not isinstance(data.get("topic"), str) or not data["topic"].strip():
+            self.record_check("CP_DOSSIER_TOPIC", "Research Dossier Topic", False, "Topic must be a non-empty string")
+            return
+        if not isinstance(data.get("summary"), dict) or not data["summary"]:
+            self.record_check("CP_DOSSIER_SUMMARY", "Research Dossier Summary", False, "Summary must be a non-empty object")
+            return
+        if not isinstance(data.get("talking_points"), list) or not data["talking_points"]:
+            self.record_check("CP_DOSSIER_TALKING_POINTS", "Research Talking Points", False, "Talking points must be a non-empty list")
+            return
 
         # Check >= 3 claims with confidence scores and sources
         claims = data.get("claims", [])
@@ -710,15 +155,40 @@ class PipelineVerifier:
                 invalid_claims.append(f"Claim {i} is not a dict")
                 continue
             claim_text = c.get("claim_text") or c.get("text")
-            confidence = c.get("confidence_score") or c.get("confidence")
+            confidence = c.get("confidence_score", c.get("confidence"))
             source = c.get("primary_source") or c.get("source") or c.get("sources")
             
             if not claim_text:
                 invalid_claims.append(f"Claim {i} missing text")
-            if confidence is None or not (0.0 <= float(confidence) <= 1.0):
+            try:
+                confidence_value = float(confidence)
+            except (TypeError, ValueError):
+                confidence_value = float("nan")
+            if not math.isfinite(confidence_value) or not (0.0 <= confidence_value <= 1.0):
                 invalid_claims.append(f"Claim {i} invalid confidence score: {confidence}")
             if not source:
                 invalid_claims.append(f"Claim {i} missing source citation")
+            elif isinstance(source, dict):
+                source_url = source.get("url")
+                parsed_url = urlsplit(source_url) if isinstance(source_url, str) else None
+                if not parsed_url or parsed_url.scheme != "https" or not parsed_url.netloc:
+                    invalid_claims.append(f"Claim {i} has no valid HTTPS source URL")
+            elif isinstance(source, list):
+                has_https_source = any(
+                    isinstance(item, dict)
+                    and isinstance(item.get("url"), str)
+                    and urlsplit(item["url"]).scheme == "https"
+                    and bool(urlsplit(item["url"]).netloc)
+                    for item in source
+                )
+                if not has_https_source:
+                    invalid_claims.append(f"Claim {i} has no valid HTTPS source URL")
+            elif isinstance(source, str):
+                parsed_url = urlsplit(source)
+                if parsed_url.scheme != "https" or not parsed_url.netloc:
+                    invalid_claims.append(f"Claim {i} has no valid HTTPS source URL")
+            if c.get("verification_status") != "VERIFIED":
+                invalid_claims.append(f"Claim {i} is not marked VERIFIED")
 
         if invalid_claims:
             self.record_check("CP_DOSSIER_CLAIMS_VALIDITY", "Research Claims Validity", False, "; ".join(invalid_claims[:3]))
@@ -765,12 +235,20 @@ class PipelineVerifier:
                 invalid_assets.append(f"Asset {i} not a dict")
                 continue
             local_path_str = a.get("local_path")
-            license_val = a.get("license") or a.get("license_type")
+            license_data = a.get("license")
+            license_val = (
+                license_data.get("license_type") if isinstance(license_data, dict)
+                else a.get("license_type") or license_data
+            )
             source_url = a.get("source_url") or a.get("source")
-            creator = a.get("creator") or a.get("author") or a.get("attribution")
+            creator_data = a.get("creator")
+            creator = (
+                creator_data.get("name") if isinstance(creator_data, dict)
+                else a.get("author") or a.get("attribution")
+            )
             sha256 = a.get("file_sha256") or a.get("sha256")
 
-            if not local_path_str:
+            if not isinstance(local_path_str, str) or not local_path_str.strip():
                 invalid_assets.append(f"Asset {i} missing local_path")
                 continue
             if not license_val:
@@ -779,16 +257,30 @@ class PipelineVerifier:
                 invalid_assets.append(f"Asset {i} missing source URL")
             if not creator:
                 invalid_assets.append(f"Asset {i} missing creator/attribution")
+            parsed_source = urlsplit(source_url) if isinstance(source_url, str) else None
+            if not parsed_source or parsed_source.scheme != "https" or not parsed_source.netloc:
+                invalid_assets.append(f"Asset {i} has no valid HTTPS source URL")
+            if not isinstance(sha256, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", sha256):
+                invalid_assets.append(f"Asset {i} has no valid SHA-256 checksum")
+            if a.get("verification_status") != "FROZEN_LOCAL":
+                invalid_assets.append(f"Asset {i} is not marked FROZEN_LOCAL")
+            if isinstance(license_data, dict) and license_data.get("attribution_required") and not license_data.get("attribution_text"):
+                invalid_assets.append(f"Asset {i} requires attribution text")
 
             # Check that local asset file actually exists and SHA matches
-            local_file = self.output_dir / local_path_str
-            if not local_file.exists():
-                # Check alternative resolution relative to output dir parent
-                local_file = Path(local_path_str) if Path(local_path_str).is_absolute() else self.output_dir / local_path_str
-            
+            relative_path = Path(local_path_str)
+            if relative_path.is_absolute():
+                invalid_assets.append(f"Asset {i} path must be relative to the project: {local_path_str}")
+                continue
+            local_file = (self.output_dir / relative_path).resolve()
+            try:
+                local_file.relative_to(self.output_dir.resolve())
+            except ValueError:
+                invalid_assets.append(f"Asset {i} path escapes the project directory: {local_path_str}")
+                continue
             if not local_file.exists():
                 invalid_assets.append(f"Asset {i} file missing on disk: {local_path_str}")
-            elif sha256:
+            elif isinstance(sha256, str) and re.fullmatch(r"[0-9a-fA-F]{64}", sha256):
                 actual_sha = hashlib.sha256(local_file.read_bytes()).hexdigest()
                 if actual_sha.lower() != sha256.lower():
                     invalid_assets.append(f"Asset {i} SHA256 mismatch (expected {sha256[:8]}, got {actual_sha[:8]})")
@@ -817,14 +309,15 @@ class PipelineVerifier:
             self.record_check("CP_AUDIO_SIZE", "Audio Narration Non-Empty", False, f"Audio file is too small ({size} bytes)")
             return
 
-        # Check WAV header & duration if WAV
+        # Parse WAVs directly; all other accepted formats must be checked by
+        # ffprobe so a non-empty but undecodable file cannot pass.
         if audio_path.suffix.lower() == ".wav":
             try:
                 with wave.open(str(audio_path), "rb") as wf:
                     frames = wf.getnframes()
                     rate = wf.getframerate()
                     duration = frames / float(rate)
-                    if duration < 1.0:
+                    if duration < 1.0 or rate <= 0 or wf.getnchannels() <= 0:
                         self.record_check("CP_AUDIO_DURATION", "Audio Duration Valid", False, f"Audio duration too short ({duration:.2f}s)")
                         return
                     self.record_check("CP_AUDIO_VALID", "Audio Narration Verification", True, f"Valid WAV audio ({duration:.2f}s, {rate}Hz, {size} bytes)", {"duration_sec": duration, "sample_rate": rate})
@@ -833,11 +326,27 @@ class PipelineVerifier:
                 self.record_check("CP_AUDIO_HEADER", "Audio WAV Header Parse", False, f"WAV parse error: {e}")
                 return
 
-        self.record_check("CP_AUDIO_VALID", "Audio Narration Verification", True, f"Audio file exists and is non-empty ({size} bytes)")
+        try:
+            proc = subprocess.run(
+                ["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_type", "-of", "json", str(audio_path)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=10,
+            )
+            probe_data = json.loads(proc.stdout) if proc.returncode == 0 else {}
+            streams = probe_data.get("streams", [])
+            duration = float(probe_data.get("format", {}).get("duration", 0.0))
+            if not any(stream.get("codec_type") == "audio" for stream in streams) or not math.isfinite(duration) or duration < 1.0:
+                raise ValueError("ffprobe found no valid audio stream of at least one second")
+        except Exception as exc:
+            self.record_check("CP_AUDIO_PROBE", "Audio Stream Verification", False, f"Could not verify audio with ffprobe: {exc}")
+            return
+        self.record_check("CP_AUDIO_VALID", "Audio Narration Verification", True, f"Valid audio stream ({duration:.2f}s, {size} bytes)", {"duration_sec": duration})
 
     def verify_hyperframes_project(self):
         """Validates existence and structure of HyperFrames project markdown files."""
-        required_files = ["BRIEF.md", "DESIGN.md", "SCRIPT.md", "STORYBOARD.md", "index.html"]
+        required_files = ["BRIEF.md", "DESIGN.md", "SCRIPT.md", "STORYBOARD.md", "index.html", "styles.css", "main.js"]
         missing = [f for f in required_files if not (self.output_dir / f).exists()]
 
         if missing:
@@ -908,11 +417,7 @@ class PipelineVerifier:
 
     def verify_rendered_video(self):
         """Validates existence, non-emptiness, and MP4 container structure of renders/final.mp4."""
-        candidate_paths = [
-            self.output_dir / "renders" / "final.mp4",
-            self.output_dir / "final.mp4",
-            self.output_dir / "renders" / "final.webm",
-        ]
+        candidate_paths = [self.output_dir / "renders" / "final.mp4", self.output_dir / "final.mp4"]
         video_path = next((p for p in candidate_paths if p.exists()), None)
 
         if not video_path:
@@ -931,23 +436,46 @@ class PipelineVerifier:
                 self.record_check("CP_VIDEO_CONTAINER", "Valid Video Container Header", False, "Missing MP4 'ftyp' or WebM signature")
                 return
 
-        # If ffprobe is available, inspect streams
+        # ffprobe is required: a plausible file header does not prove that a
+        # usable MP4 with audio and video streams was rendered.
         try:
-            cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_type,codec_name", "-of", "json", str(video_path)]
+            cmd = [
+                "ffprobe", "-v", "error", "-show_entries",
+                "format=format_name,duration:stream=codec_type,codec_name,width,height",
+                "-of", "json", str(video_path),
+            ]
             proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=10)
-            if proc.returncode == 0:
-                probe_data = json.loads(proc.stdout)
-                streams = probe_data.get("streams", [])
-                video_stream = any(s.get("codec_type") == "video" for s in streams)
-                audio_stream = any(s.get("codec_type") == "audio" for s in streams)
-                duration = float(probe_data.get("format", {}).get("duration", 0.0))
-                
-                self.record_check("CP_VIDEO_VALID", "Rendered MP4 Broadcast Verification", True, f"Playable MP4 video verified (streams: video={video_stream}, audio={audio_stream}, dur={duration:.2f}s, size={size} bytes)", {"video_stream": video_stream, "audio_stream": audio_stream, "duration_sec": duration})
-                return
-        except Exception:
-            pass
+            if proc.returncode != 0:
+                raise ValueError(proc.stderr.strip() or f"ffprobe exited {proc.returncode}")
+            probe_data = json.loads(proc.stdout)
+            streams = probe_data.get("streams", [])
+            video_stream = next((stream for stream in streams if stream.get("codec_type") == "video"), None)
+            audio_stream = next((stream for stream in streams if stream.get("codec_type") == "audio"), None)
+            duration = float(probe_data.get("format", {}).get("duration", 0.0))
+            format_name = probe_data.get("format", {}).get("format_name", "")
+            if not video_stream or not audio_stream:
+                raise ValueError("MP4 must contain both video and audio streams")
+            if video_stream.get("codec_name") != "h264" or audio_stream.get("codec_name") != "aac":
+                raise ValueError("MP4 must use H.264 video and AAC audio")
+            if "mp4" not in format_name.split(",") or not math.isfinite(duration) or duration <= 0:
+                raise ValueError(f"invalid MP4 format or duration: format={format_name!r}, duration={duration}")
+        except Exception as exc:
+            self.record_check("CP_VIDEO_VALID", "Rendered MP4 Broadcast Verification", False, f"ffprobe validation failed: {exc}")
+            return
 
-        self.record_check("CP_VIDEO_VALID", "Rendered Video Verification", True, f"Video file exists with valid MP4 container ({size} bytes)")
+        self.record_check(
+            "CP_VIDEO_VALID",
+            "Rendered MP4 Broadcast Verification",
+            True,
+            f"Playable H.264/AAC MP4 verified ({video_stream.get('width')}x{video_stream.get('height')}, {duration:.2f}s, {size} bytes)",
+            {
+                "video_codec": video_stream.get("codec_name"),
+                "audio_codec": audio_stream.get("codec_name"),
+                "width": video_stream.get("width"),
+                "height": video_stream.get("height"),
+                "duration_sec": duration,
+            },
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -959,16 +487,25 @@ def main():
         description="Harness 9 End-to-End Automated Pipeline & Acceptance Verification Harness",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--test-mode", action="store_true", help="Execute in self-contained test mode")
     parser.add_argument("--topic", type=str, default="The History of the Transistor", help="Topic brief for video generation")
     parser.add_argument("--output-dir", type=str, default="output/test_verification_run", help="Target project output directory")
-    parser.add_argument("--offline", action="store_true", default=True, help="Run in pure offline fallback mode")
+    parser.add_argument(
+        "--offline",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use curated offline research (default); --no-offline enables live research",
+    )
     parser.add_argument("--format", type=str, choices=["16:9", "9:16"], default="16:9", help="Video aspect ratio format")
     parser.add_argument("--duration", type=int, default=30, help="Target duration in seconds")
     parser.add_argument("--voice", type=str, default="default", help="Voice preference")
+    parser.add_argument("--online-assets", action="store_true", help="Use live asset discovery with curated offline research")
+    parser.add_argument("--model-script", action="store_true", help="Use the configured Hermes model for source-grounded narration")
+    parser.add_argument("--render-backend", choices=["chrome", "stub"], default=None, help="Renderer backend; beta verification should use chrome")
     parser.add_argument("--json", action="store_true", help="Output verification summary in JSON format")
 
     args = parser.parse_args()
+    if args.model_script and args.offline and not args.online_assets:
+        parser.error("--model-script requires --no-offline or --online-assets")
     out_dir = Path(args.output_dir)
 
     print("=" * 72)
@@ -976,7 +513,7 @@ def main():
     print("=" * 72)
     print(f" Topic:       {args.topic}")
     print(f" Output Dir:  {out_dir.resolve()}")
-    print(f" Mode:        {'Offline (Deterministic)' if args.offline else 'Online (Live Search/APIs)'}")
+    print(f" Mode:        {'Offline research' if args.offline else 'Live research'}")
     print(f" Format:      {args.format} ({args.duration}s)")
     print("-" * 72)
 
@@ -991,14 +528,25 @@ def main():
         format_aspect=args.format,
         duration=args.duration,
         voice=args.voice,
+        online_assets=args.online_assets,
+        model_assisted_scripts=args.model_script,
+        render_backend=args.render_backend,
     )
     elapsed_pipeline = time.time() - start_time
     print(f"  --> Pipeline execution finished in {elapsed_pipeline:.2f}s (Success: {pipeline_success})\n")
 
     # Step 2: Run Acceptance Verifier
     print("[Stage 2/2] Running Acceptance Verification Checkpoints...")
-    verifier = PipelineVerifier(out_dir)
-    all_passed, checks = verifier.verify_all()
+    if pipeline_success:
+        verifier = PipelineVerifier(out_dir)
+        all_passed, checks = verifier.verify_all()
+    else:
+        all_passed = False
+        checks = [{
+            "title": "Production pipeline",
+            "passed": False,
+            "details": "Pipeline failed; stale or partial output was not accepted for verification.",
+        }]
     total_elapsed = time.time() - start_time
 
     # Output Summary Table
@@ -1018,7 +566,7 @@ def main():
 
     if args.json:
         summary_out = {
-            "all_passed": all_passed,
+            "all_passed": pipeline_success and all_passed,
             "topic": args.topic,
             "output_dir": str(out_dir),
             "runtime_seconds": total_elapsed,
@@ -1026,7 +574,7 @@ def main():
         }
         print(json.dumps(summary_out, indent=2))
 
-    sys.exit(0 if all_passed else 1)
+    sys.exit(0 if pipeline_success and all_passed else 1)
 
 
 if __name__ == "__main__":

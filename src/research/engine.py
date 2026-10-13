@@ -27,6 +27,7 @@ from src.research.scoring import score_claim
 from src.utils.filesystem import ensure_dir
 
 logger = logging.getLogger(__name__)
+MAX_TOPIC_LENGTH = 240
 
 
 class ResearchUnavailableError(RuntimeError):
@@ -57,6 +58,7 @@ class ResearchEngine:
             "the invention of the transistor": "transistor_history.yaml",
             "transistor invention": "transistor_history.yaml",
             "how gpus work": "how_gpus_work.yaml",
+            "how gpus work: parallel computing": "how_gpus_work.yaml",
             "how gpu works": "how_gpus_work.yaml",
             "gpu parallel computing": "how_gpus_work.yaml",
             "the apollo guidance computer": "apollo_computer.yaml",
@@ -71,14 +73,10 @@ class ResearchEngine:
         if not self.presets_dir.exists():
             return None
 
-        topic_clean = topic.lower().strip()
-
-        # Direct file check or keyword lookup
-        matched_filename: Optional[str] = None
-        for kw, filename in self.preset_keywords.items():
-            if kw == topic_clean or topic_clean.startswith(kw) or kw in topic_clean:
-                matched_filename = filename
-                break
+        # Curated dossiers are whole-topic matches. Substring and prefix
+        # matching lets unrelated or adversarial briefs inherit trusted claims.
+        topic_clean = re.sub(r"\s+", " ", topic.casefold()).strip()
+        matched_filename = self.preset_keywords.get(topic_clean)
 
         if matched_filename:
             preset_path = self.presets_dir / matched_filename
@@ -347,6 +345,11 @@ class ResearchEngine:
             raise ValueError("Topic string cannot be empty")
 
         clean_topic = topic.strip()
+        if len(clean_topic) > MAX_TOPIC_LENGTH:
+            raise ResearchUnavailableError(
+                f"Topic exceeds the {MAX_TOPIC_LENGTH}-character limit. "
+                "Shorten the brief and try again."
+            )
         effective_offline = offline or self.config.offline_mode
 
         dossier: Optional[ResearchDossier] = None
@@ -361,7 +364,7 @@ class ResearchEngine:
                     "How Quantum Computers Work",
                 )
                 raise ResearchUnavailableError(
-                    f"No offline research preset matches '{clean_topic}'. "
+                    f"No offline research preset matches {clean_topic[:80]!r}. "
                     f"Available curated topics: {', '.join(available)}. "
                     "Use online research for other topics."
                 )

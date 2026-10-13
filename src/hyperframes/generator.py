@@ -6,8 +6,8 @@ broadcast-grade, deterministic HyperFrames compositions adhering to all specific
 - Root composition element with data-composition-id="root"
 - Global GSAP registry binding: window.__timelines["root"] = gsap.timeline({ paused: true })
 - Decoupled media: <video muted playsinline> + <audio data-track-index="...">
-- Finite animation repeat math: Math.ceil(...) - 1 (never repeat: -1)
-- Scene entrance hierarchy: gsap.from() on all elements, zero intermediate exit fades
+- Finite, bounded animation timelines (never repeat: -1)
+- Safe entrance presets mapped to finite GSAP timelines; scene cuts by default
 - Kinetic caption alignment with Hard Kill Guarantee: tl.set(..., { opacity: 0, visibility: "hidden" })
 - Strict local relative paths: assets/... (zero remote URLs)
 """
@@ -116,7 +116,6 @@ class HyperFramesGenerator:
             start = s.get("start", s.get("start_time", 0.0))
             dur = s.get("duration", 5.0)
             scene_title = html.escape(s.get("title", f"Scene {i+1}"))
-            narration = html.escape(s.get("narration", s.get("narration_text", "")))
             visual_path = s.get("visual", s.get("visual_asset_path", f"assets/images/asset_{i+1:02d}.svg"))
 
             scene_block = f"""    <!-- Scene {i+1}: {scene_id} -->
@@ -126,9 +125,7 @@ class HyperFramesGenerator:
         <div class="scrim-overlay"></div>
       </div>
       <div class="scene-content">
-        <div class="badge-tag">PART {i+1:02d} • HARNESS 9</div>
         <h2 class="scene-title">{scene_title}</h2>
-        <p class="scene-narration">{narration}</p>
       </div>
     </div>"""
             scenes_html_lines.append(scene_block)
@@ -173,11 +170,7 @@ class HyperFramesGenerator:
     ) -> str:
         # Extract color roles from BrandGuidelines or defaults
         bg_color = "#0a0e17"
-        primary_color = "#00d2ff"
-        secondary_color = "#3a7bd5"
         text_color = "#ffffff"
-        muted_text = "#8fa3bf"
-        card_bg = "rgba(15, 23, 42, 0.85)"
 
         if brand and hasattr(brand, "colors") and brand.colors:
             for c in brand.colors:
@@ -185,16 +178,11 @@ class HyperFramesGenerator:
                 hex_code = getattr(c, "hex_code", "")
                 if "background" in role_name:
                     bg_color = hex_code
-                elif "primary" in role_name:
-                    primary_color = hex_code
-                elif "secondary" in role_name:
-                    muted_text = hex_code
                 elif "base" in role_name:
                     text_color = hex_code
 
         is_portrait = self.format_aspect == "9:16"
         title_size = "48px" if is_portrait else "56px"
-        narration_size = "28px" if is_portrait else "24px"
         caption_size = "44px" if is_portrait else "36px"
         bottom_padding = "600px" if is_portrait else "100px"
 
@@ -288,27 +276,9 @@ body {{
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
   max-width: {'900px' if not is_portrait else '100%'};
-  background: {card_bg};
-  padding: 36px 44px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(0, 210, 255, 0.3);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-}}
-
-.badge-tag {{
-  align-self: flex-start;
-  font-size: 14px;
-  font-weight: 700;
-  color: {primary_color};
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: rgba(0, 210, 255, 0.1);
-  padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 210, 255, 0.25);
+  padding: 0;
 }}
 
 .scene-title {{
@@ -317,13 +287,10 @@ body {{
   line-height: 1.15;
   color: {text_color};
   letter-spacing: -0.5px;
-}}
-
-.scene-narration {{
-  font-size: {narration_size};
-  font-weight: 400;
-  line-height: 1.5;
-  color: {muted_text};
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.9);
 }}
 
 /* Captions Overlay */
@@ -345,11 +312,9 @@ body {{
   font-weight: 800;
   color: #ffffff;
   text-align: center;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 12px 28px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+  max-width: 100%;
+  padding: 8px 12px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
   opacity: 0;
   visibility: hidden;
 }}
@@ -367,31 +332,46 @@ body {{
             scene_id = s.get("scene_id", f"scene_{i+1}")
             start = float(s.get("start", s.get("start_time", 0.0)))
             dur = float(s.get("duration", 5.0))
+            entrance = self._resolve_entrance_animation(s.get("entrance_animation"))
+            transition = self._resolve_transition_out(
+                s.get("transition_out"), is_final=i == len(scenes) - 1
+            )
+            selector = f"#{scene_id}"
+            content_selector = f"{selector} .scene-content"
 
-            # Finite repeat calculation for subtle background pulse
-            cycle = 4.0
-            repeats = max(0, int(dur // cycle))
+            if entrance == "rise":
+                entrance_code = f'''  tl.fromTo("{content_selector}", {{ autoAlpha: 0, y: 42 }}, {{ autoAlpha: 1, y: 0, duration: {self._bounded_motion_duration(dur, 10):.3f}, ease: "power3.out" }}, {start});'''
+            elif entrance == "slide_left":
+                entrance_code = f'''  tl.fromTo("{content_selector}", {{ autoAlpha: 0, x: 54 }}, {{ autoAlpha: 1, x: 0, duration: {self._bounded_motion_duration(dur, 10):.3f}, ease: "power3.out" }}, {start});'''
+            elif entrance == "zoom":
+                entrance_code = f'''  tl.fromTo("{content_selector}", {{ autoAlpha: 0, scale: 0.96 }}, {{ autoAlpha: 1, scale: 1, duration: {self._bounded_motion_duration(dur, 12):.3f}, ease: "power2.out" }}, {start});'''
+            elif entrance == "reveal":
+                entrance_code = f'''  tl.fromTo("{content_selector}", {{ clipPath: "inset(0 0 100% 0)" }}, {{ clipPath: "inset(0 0 0% 0)", duration: {self._bounded_motion_duration(dur, 12):.3f}, ease: "power2.out" }}, {start});'''
+            elif entrance == "fade":
+                entrance_code = f'''  tl.fromTo("{content_selector}", {{ autoAlpha: 0 }}, {{ autoAlpha: 1, duration: {self._bounded_motion_duration(dur, 6):.3f}, ease: "power1.out" }}, {start});'''
+            else:
+                entrance_code = f'''  tl.set("{content_selector}", {{ autoAlpha: 1 }}, {start});'''
 
             anim_code = f"""  // Scene {i+1}: {scene_id} (t={start}s to {start + dur}s)
-  tl.set("#{scene_id}", {{ autoAlpha: 1 }}, {start});
-  tl.from("#{scene_id} .scene-content", {{
-    y: 60,
-    opacity: 0,
-    duration: 0.8,
-    ease: "power3.out"
-  }}, {start});
-  tl.from("#{scene_id} .hero-image", {{
+  tl.set("{selector}", {{ autoAlpha: 1 }}, {start});
+{entrance_code}
+  tl.from("{selector} .hero-image", {{
     scale: 1.15,
     duration: {dur},
     ease: "none"
   }}, {start});"""
-            
-            # If not final scene, hide at boundary without intermediate fade glitches
+
             if i < len(scenes) - 1:
-                anim_code += f"""\n  tl.set("#{scene_id}", {{ autoAlpha: 0 }}, {start + dur});"""
+                if transition == "fade":
+                    fade_duration = self._bounded_motion_duration(dur, 6)
+                    anim_code += f'''\n  tl.to("{selector}", {{ autoAlpha: 0, duration: {fade_duration:.3f}, ease: "power1.in" }}, {start + dur - fade_duration});'''
+                else:
+                    anim_code += f'''\n  tl.set("{selector}", {{ autoAlpha: 0 }}, {start + dur});'''
             else:
-                # Final scene can fade out
-                anim_code += f"""\n  tl.to("#{scene_id}", {{ opacity: 0, duration: 0.5, ease: "power2.in" }}, {start + dur - 0.5});"""
+                # Keep a resolved final frame unless the storyboard asks to fade.
+                if transition == "fade":
+                    fade_duration = self._bounded_motion_duration(dur, 6)
+                    anim_code += f'''\n  tl.to("{selector}", {{ autoAlpha: 0, duration: {fade_duration:.3f}, ease: "power1.in" }}, {start + dur - fade_duration});'''
 
             scene_animations.append(anim_code)
 
@@ -453,6 +433,45 @@ window.__timelines["root"] = tl;
 // 5. Total Composition Duration Anchor
 tl.to({{}}, {{ duration: 0.01 }}, {total_duration});
 """
+
+    def _bounded_motion_duration(self, scene_duration: float, frames: int) -> float:
+        """Keep entry and exit movement short and within its scene."""
+        frame_duration = float(frames) / max(1, self.fps)
+        return max(0.001, min(frame_duration, max(0.001, scene_duration * 0.35)))
+
+    @staticmethod
+    def _resolve_entrance_animation(value: Any) -> str:
+        """Map storyboard labels and legacy notes to safe GSAP presets.
+
+        Animation text is treated as data; arbitrary storyboard strings are
+        never copied into executable JavaScript.
+        """
+        normalized = str(value or "").strip().lower().replace("-", "_")
+        if normalized in {"cut", "none", "hold"}:
+            return "cut"
+        if "reveal" in normalized or "wipe" in normalized:
+            return "reveal"
+        if "zoom" in normalized or "scale" in normalized:
+            return "zoom"
+        if "slide" in normalized or "push" in normalized or "x:" in normalized:
+            return "slide_left"
+        if "rise" in normalized or "y:" in normalized:
+            return "rise"
+        if "fade" in normalized or "opacity" in normalized:
+            return "fade"
+        return "rise"
+
+    @staticmethod
+    def _resolve_transition_out(value: Any, *, is_final: bool) -> str:
+        """Resolve exits to a bounded cut, fade, or final-frame hold."""
+        normalized = str(value or "").strip().lower()
+        if "fade" in normalized:
+            return "fade"
+        if "hold" in normalized or "none" in normalized:
+            return "hold"
+        if "cut" in normalized:
+            return "cut"
+        return "hold" if is_final else "cut"
 
     def _normalize_scenes(
         self,

@@ -176,8 +176,8 @@ class IRVisualBlockNode(BaseModel):
 # ===========================================================================
 class IRTransitionSpec(BaseModel):
     """Scene entrance and exit transition dynamics."""
-    entrance_type: str = Field(default="fade")
-    exit_type: str = Field(default="fade")
+    entrance_type: str = Field(default="rise")
+    exit_type: str = Field(default="cut")
     transition_duration_sec: float = Field(default=0.4, ge=0.0, le=2.0)
 
 
@@ -654,8 +654,8 @@ def compile_script_to_ir(
         )
 
         transitions = IRTransitionSpec(
-            entrance_type=sc_dict.get("entrance_animation", "fade"),
-            exit_type=sc_dict.get("transition_out", "fade"),
+            entrance_type=sc_dict.get("entrance_animation", "rise"),
+            exit_type=sc_dict.get("transition_out", "cut"),
             transition_duration_sec=0.4,
         )
 

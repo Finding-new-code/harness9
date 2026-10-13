@@ -220,9 +220,9 @@ class TestResearchEngineBoundary(unittest.TestCase):
             self._get_dossier(obscure_topic, duration=20)
 
     def test_18_excessive_topic_length_truncation(self):
-        """F1: Test long topic briefs (e.g. 500 characters) are handled gracefully."""
+        """Overlong briefs are rejected before matching or provider work."""
         long_topic = "A" * 300 + " Transistor History"
-        with self.assertRaisesRegex(RuntimeError, "Available curated topics"):
+        with self.assertRaisesRegex(RuntimeError, "character limit"):
             self._get_dossier(long_topic, duration=30)
 
     def test_19_conflict_penalty_scoring_reduction(self):

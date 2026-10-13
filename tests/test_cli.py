@@ -35,8 +35,9 @@ class TestCliCoverage(unittest.TestCase):
         cmd = [sys.executable, "verify_pipeline.py", "--help"]
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         self.assertEqual(res.returncode, 0)
-        self.assertIn("--test-mode", res.stdout)
         self.assertIn("--topic", res.stdout)
+        self.assertIn("--output-dir", res.stdout)
+        self.assertNotIn("--test-mode", res.stdout)
 
     def test_02_cli_standard_execution_args(self):
         """F11: Test CLI argument parsing."""
@@ -136,14 +137,12 @@ class TestCliBoundary(unittest.TestCase):
         payload = {"status": "success", "assets": 3}
         self.assertEqual(json.loads(json.dumps(payload)), payload)
 
-    def test_15_cli_test_mode_flag_defaults(self):
-        """F11: Test --test-mode flag applies benchmark topic."""
-        import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--test-mode", action="store_true")
-        parser.add_argument("--topic", default="The History of the Transistor")
-        args = parser.parse_args(["--test-mode"])
-        self.assertTrue(args.test_mode)
+    def test_15_cli_rejects_legacy_synthetic_output_flag(self):
+        """The CLI rejects the removed synthetic-output mode."""
+        cmd = [sys.executable, "verify_pipeline.py", "--test-mode"]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.assertEqual(res.returncode, 2)
+        self.assertIn("unrecognized arguments", res.stderr)
 
     def test_16_cli_unrecognized_argument_exit_code(self):
         """F11: Test that unrecognized CLI arguments exit with error code."""

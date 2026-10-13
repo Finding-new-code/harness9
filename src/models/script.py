@@ -52,8 +52,8 @@ class Scene:
     narration_text: str
     visual_asset_path: str = ""
     hero_frame_description: str = ""
-    entrance_animation: str = "fade"
-    transition_out: str = "fade"
+    entrance_animation: str = "rise"
+    transition_out: str = "cut"
     beats: List[Beat] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -83,8 +83,8 @@ class Scene:
             narration_text=str(data.get("narration_text", "")),
             visual_asset_path=str(data.get("visual_asset_path", "")),
             hero_frame_description=str(data.get("hero_frame_description", "")),
-            entrance_animation=str(data.get("entrance_animation", "fade")),
-            transition_out=str(data.get("transition_out", "fade")),
+            entrance_animation=str(data.get("entrance_animation", "rise")),
+            transition_out=str(data.get("transition_out", "cut")),
             beats=beats,
         )
 

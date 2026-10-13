@@ -96,7 +96,9 @@ class TestSubagentToolScopingAdversarial(unittest.TestCase):
             allowed_toolsets=forbidden_tools,
         )
 
-        self.assertEqual(result.status, SubagentStatus.COMPLETED)
+        self.assertEqual(result.status, SubagentStatus.FAILED)
+        self.assertIn("No live Hermes parent agent", result.error_message)
+        self.assertEqual(result.structured_data["status"], "FAILED")
         granted_tools = result.structured_data.get("allowed_tools", [])
         
         # Verify not a single forbidden tool survived sanitization
@@ -545,15 +547,26 @@ class TestPromptCachingIsolationAdversarial(unittest.TestCase):
         initial_iteration_count = parent_state.iteration_count
         initial_active_tools = list(parent_state.active_tools)
 
-        # Execute 5 successive subagents with various tasks
-        for i in range(5):
-            sub_res = agent_rt.delegate_subagent(
-                parent_session_id=parent_session_id,
-                goal=f"Investigate subsystem component {i}",
-                role="researcher",
-                context={"subsystem_id": i, "topic": f"Subsystem {i}"},
-            )
-            self.assertEqual(sub_res.status, SubagentStatus.COMPLETED)
+        # Model a real completed delegation at the Hermes boundary. The runtime
+        # must not invent success when no parent agent or delegate result exists.
+        def completed_delegation(goal, **_kwargs):
+            return json.dumps({"results": [{
+                "status": "completed",
+                "api_calls": 1,
+                "summary": f"Completed: {goal}",
+            }]})
+
+        with patch("tools.delegate_tool.delegate_task", side_effect=completed_delegation):
+            for i in range(5):
+                sub_res = agent_rt.delegate_subagent(
+                    parent_session_id=parent_session_id,
+                    goal=f"Inspect subsystem component {i}",
+                    role="editor",
+                    context={"subsystem_id": i, "topic": f"Subsystem {i}"},
+                    parent_agent=object(),
+                )
+                self.assertEqual(sub_res.status, SubagentStatus.COMPLETED)
+                self.assertIn("Completed:", sub_res.output)
 
         # Assert parent iteration count did NOT change
         self.assertEqual(parent_state.iteration_count, initial_iteration_count)
@@ -564,8 +577,8 @@ class TestPromptCachingIsolationAdversarial(unittest.TestCase):
         children = parent_state.metadata.get("child_subagents", [])
         self.assertEqual(len(children), 5)
 
-    def test_13_parent_message_list_and_system_prompt_immutable_during_delegation(self):
-        """Verify that parent's message history is strictly immutable across subagent execution."""
+    def test_13_caller_message_list_and_system_prompt_immutable_during_research(self):
+        """Verify that research leaves caller-owned message history and prompt unchanged."""
         # Emulate a parent agent conversation message list
         parent_system_prompt = (
             "You are Hermes Agent for Harness 9 content production. "
@@ -573,7 +586,7 @@ class TestPromptCachingIsolationAdversarial(unittest.TestCase):
         )
         parent_messages = [
             {"role": "system", "content": parent_system_prompt},
-            {"role": "user", "content": "Conduct deep research into Quantum Cryptography."},
+            {"role": "user", "content": "Conduct deep research into How GPUs Work."},
             {"role": "assistant", "content": "I will delegate this research to an isolated subagent."},
         ]
 
@@ -583,10 +596,10 @@ class TestPromptCachingIsolationAdversarial(unittest.TestCase):
 
         # Execute deep research via handle_h9_research tool
         tool_output = handle_h9_research(
-            {"topic": "Quantum Cryptography", "depth": "deep"},
+            {"topic": "How GPUs Work", "depth": "deep"},
             session_id="sess_parent_msg_immutable",
         )
-        self.assertNotIn('"error"', tool_output)
+        self.assertTrue(json.loads(tool_output)["success"], tool_output)
 
         # Verify parent messages list was completely untouched
         self.assertEqual(len(parent_messages), len(messages_snapshot))

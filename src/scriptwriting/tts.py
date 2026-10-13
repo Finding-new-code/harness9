@@ -55,6 +55,91 @@ class AudioMetadata:
         }
 
 
+def fit_audio_duration(
+    metadata: AudioMetadata,
+    target_duration: float,
+    *,
+    max_speedup: float = 1.05,
+) -> AudioMetadata:
+    """Gently time-compress a WAV that barely exceeds its target.
+
+    The narration remains complete; small provider timing overruns are handled
+    with FFmpeg's pitch-preserving ``atempo`` filter. Larger overruns are left
+    untouched so the pipeline's duration gate can reject them.
+    """
+    target = float(target_duration)
+    if target <= 0 or metadata.duration_seconds <= target + 0.01:
+        return metadata
+    if metadata.format.lower() != "wav" or metadata.sample_width_bytes != 2:
+        return metadata
+
+    safety_margin = min(0.05, target * 0.005)
+    adjusted_target = target - safety_margin
+    speedup = metadata.duration_seconds / adjusted_target
+    if speedup > max_speedup:
+        return metadata
+
+    ffmpeg = shutil.which("ffmpeg")
+    audio_path = Path(metadata.file_path).resolve()
+    if not ffmpeg or not audio_path.is_file():
+        return metadata
+
+    with tempfile.TemporaryDirectory(prefix="h9-audio-fit-", dir=str(audio_path.parent)) as temp_dir:
+        fitted_path = Path(temp_dir) / audio_path.name
+        try:
+            subprocess.run(
+                [
+                    ffmpeg,
+                    "-nostdin",
+                    "-y",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-i",
+                    str(audio_path),
+                    "-filter:a",
+                    f"atempo={speedup:.8f}",
+                    "-ac",
+                    str(metadata.channels),
+                    "-ar",
+                    str(metadata.sample_rate),
+                    "-c:a",
+                    "pcm_s16le",
+                    str(fitted_path),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=True,
+            )
+            with wave.open(str(fitted_path), "rb") as fitted_wav:
+                sample_rate = fitted_wav.getframerate()
+                frames = fitted_wav.getnframes()
+                channels = fitted_wav.getnchannels()
+                sample_width = fitted_wav.getsampwidth()
+                if sample_rate <= 0 or frames <= 0 or sample_width != 2:
+                    raise ValueError("FFmpeg produced an invalid narration WAV")
+                actual_duration = frames / float(sample_rate)
+                if actual_duration > target + 0.01:
+                    raise ValueError(
+                        f"FFmpeg narration remains over target ({actual_duration:.3f}s > {target:.3f}s)"
+                    )
+            os.replace(fitted_path, audio_path)
+        except (OSError, ValueError, wave.Error, subprocess.SubprocessError) as exc:
+            raise RuntimeError(f"Could not fit narration WAV to its target duration: {exc}") from exc
+
+    return AudioMetadata(
+        file_path=str(audio_path),
+        duration_seconds=actual_duration,
+        sample_rate=sample_rate,
+        channels=channels,
+        sample_width_bytes=sample_width,
+        file_size_bytes=audio_path.stat().st_size,
+        provider_used=metadata.provider_used,
+        format="wav",
+    )
+
+
 class TTSProvider(ABC):
     """Abstract Base Class for TTS Providers."""
 
@@ -222,15 +307,37 @@ class WindowsSAPITTSProvider(TTSProvider):
     def is_available(self) -> bool:
         if os.name != "nt":
             return False
-        # Verify powershell is accessible
+        # Verify that SAPI can actually render audio in this process. Listing
+        # installed voices alone is insufficient: service or locked-down
+        # Windows sessions can enumerate voices but cannot select or use them.
+        probe_script = r"""
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Speech
+$synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
+$stream = New-Object System.IO.MemoryStream
+try {
+    $voices = @($synth.GetInstalledVoices() | Where-Object { $_.Enabled })
+    if ($voices.Count -eq 0) { throw 'No enabled SAPI voice is installed.' }
+    $synth.SelectVoice($voices[0].VoiceInfo.Name)
+    $synth.SetOutputToWaveStream($stream)
+    $synth.Speak('Test.')
+    if ($stream.Length -le 44) { throw 'SAPI returned an empty WAV stream.' }
+    Write-Output 'ok'
+} catch {
+    exit 1
+} finally {
+    $synth.Dispose()
+    $stream.Dispose()
+}
+"""
         try:
             res = subprocess.run(
-                ["powershell", "-NoProfile", "-Command", "Write-Output 'ok'"],
+                ["powershell", "-NoProfile", "-Command", probe_script],
                 capture_output=True,
                 text=True,
-                timeout=5,
+                timeout=10,
             )
-            return "ok" in res.stdout.strip().lower()
+            return res.returncode == 0 and "ok" in res.stdout.strip().lower()
         except Exception:
             return False
 
@@ -260,6 +367,7 @@ class WindowsSAPITTSProvider(TTSProvider):
         def synthesize_at_rate(speech_rate: int) -> AudioMetadata:
             out_file.unlink(missing_ok=True)
             ps_script = f"""
+$ErrorActionPreference = 'Stop';
 Add-Type -AssemblyName System.Speech;
 $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;
 $synth.Rate = {speech_rate};

@@ -615,7 +615,7 @@ class HermesCapabilityBridge:
         parent_agent: Optional[Any] = None,
         **kwargs: Any,
     ) -> ResearchDossier:
-        """Delegate research returning a structured ResearchDossier with verified claims."""
+        """Return source-linked research claims without inventing missing evidence."""
         sid = session_id or self.session_id
         dossier = self.plan_research(
             topic=topic,
@@ -625,54 +625,34 @@ class HermesCapabilityBridge:
             constraints=constraints,
             parent_agent=parent_agent,
         )
-        from src.models.contracts import ClaimRecord, SourceRecord
-        if not getattr(dossier, "claims", None):
-            claim = ClaimRecord(
-                claim_id="claim_01",
-                claim_text=f"Core discovery and foundational research on {topic}.",
-                confidence_score=0.95,
-                primary_source=SourceRecord(
-                    title=f"Verified Reference on {topic}",
-                    url="https://en.wikipedia.org/wiki/" + topic.replace(" ", "_"),
-                    reliability_score=0.98,
-                ),
-            )
-            dossier.claims = [claim]
-        else:
-            fixed_claims = []
-            for c in dossier.claims:
-                if isinstance(c, dict):
-                    src = c.get("primary_source")
-                    if isinstance(src, dict):
-                        src_obj = SourceRecord(**src)
-                    elif isinstance(src, SourceRecord):
-                        src_obj = src
-                    else:
-                        src_obj = SourceRecord(
-                            title=f"Source for {c.get('claim_id', 'claim')}",
-                            url="https://harness9.local/source",
-                            reliability_score=0.95,
-                        )
-                    fixed_claims.append(
-                        ClaimRecord(
-                            claim_id=c.get("claim_id", "claim_01"),
-                            claim_text=c.get("claim_text", f"Verified fact regarding {topic}"),
-                            confidence_score=float(c.get("confidence_score", 0.95)),
-                            primary_source=src_obj,
-                        )
-                    )
-                elif isinstance(c, ClaimRecord):
-                    if not isinstance(c.primary_source, SourceRecord):
-                        if isinstance(c.primary_source, dict):
-                            c.primary_source = SourceRecord(**c.primary_source)
-                        else:
-                            c.primary_source = SourceRecord(
-                                title=f"Source for {c.claim_id}",
-                                url="https://harness9.local/source",
-                                reliability_score=0.95,
-                            )
-                    fixed_claims.append(c)
-            dossier.claims = fixed_claims
+        from src.models.contracts import ClaimRecord, ResearchDossier as ContractResearchDossier
+
+        if isinstance(dossier, dict):
+            dossier = ContractResearchDossier.model_validate(dossier)
+        elif not isinstance(dossier, ContractResearchDossier):
+            if hasattr(dossier, "to_dict"):
+                dossier = ContractResearchDossier.model_validate(dossier.to_dict())
+            elif hasattr(dossier, "model_dump"):
+                dossier = ContractResearchDossier.model_validate(dossier.model_dump())
+            else:
+                raise TypeError(f"Research returned an unsupported dossier type: {type(dossier).__name__}")
+
+        if not dossier.claims:
+            from src.research.engine import ResearchUnavailableError
+
+            raise ResearchUnavailableError(f"Research for {topic!r} returned no source-backed claims.")
+
+        normalized_claims = []
+        for claim in dossier.claims:
+            if isinstance(claim, ClaimRecord):
+                normalized_claims.append(claim)
+            elif isinstance(claim, dict):
+                if claim.get("confidence_score") is None or not claim.get("primary_source"):
+                    raise ValueError("Research claim is missing its measured score or primary source.")
+                normalized_claims.append(ClaimRecord.model_validate(claim))
+            else:
+                raise TypeError(f"Unsupported research claim type: {type(claim).__name__}")
+        dossier.claims = normalized_claims
         return dossier
 
     def evaluate_angles(
@@ -693,36 +673,18 @@ class HermesCapabilityBridge:
     ) -> Any:
         effective_dossier = dossier or kwargs.get("dossier")
         if isinstance(effective_dossier, dict):
-            claims = effective_dossier.get("claims") or []
-            for c in claims:
-                if isinstance(c, dict):
-                    if "claim_id" not in c and "id" in c:
-                        c["claim_id"] = c["id"]
-                    if "claim_text" not in c and "text" in c:
-                        c["claim_text"] = c["text"]
-                    if "confidence_score" not in c and "confidence" in c:
-                        c["confidence_score"] = c["confidence"]
-                    if "primary_source" not in c or not c.get("primary_source"):
-                        c["primary_source"] = {
-                            "title": f"Verified Source for {c.get('claim_id', 'claim')}",
-                            "url": "https://harness9.local/verified-source",
-                            "reliability_score": 0.95,
-                        }
-            dossier_obj = ResearchDossier(
-                topic=effective_dossier.get("topic", "Technology Overview"),
-                headline=effective_dossier.get("headline", ""),
-                executive_summary=effective_dossier.get("executive_summary", ""),
-                key_takeaways=effective_dossier.get("key_takeaways") or [],
-                claims=claims,
-                suggested_visual_queries=effective_dossier.get("suggested_visual_queries") or [],
-            )
-        elif effective_dossier is not None:
+            dossier_obj = ResearchDossier.model_validate(effective_dossier)
+        elif isinstance(effective_dossier, ResearchDossier):
             dossier_obj = effective_dossier
+        elif hasattr(effective_dossier, "to_dict"):
+            dossier_obj = ResearchDossier.model_validate(effective_dossier.to_dict())
+        elif hasattr(effective_dossier, "model_dump"):
+            dossier_obj = ResearchDossier.model_validate(effective_dossier.model_dump())
         else:
-            dossier_obj = ResearchDossier(
-                topic="Technology Overview",
-                claims=[],
-            )
+            raise ValueError("Script generation requires a structured research dossier.")
+
+        if not dossier_obj.claims:
+            raise ValueError("Script generation requires at least one source-backed claim.")
 
         effective_angle = angle or kwargs.get("angle")
         if effective_angle is None:

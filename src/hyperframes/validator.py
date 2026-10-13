@@ -67,6 +67,7 @@ class CompositionValidator:
         self._check_local_asset_paths(html_content)
         self._check_gsap_timeline_contract(js_content, html_content)
         self._check_wcag_contrast(css_content)
+        self._check_visual_design_hints(html_content)
 
         is_valid = len(self.errors) == 0
         return {
@@ -154,6 +155,27 @@ class CompositionValidator:
             if not asset_path.exists():
                 self.errors.append(f"Referenced local asset file does not exist on disk: {s}")
 
+    def _check_visual_design_hints(self, html: str) -> None:
+        """Report known template patterns that commonly make scenes feel like slides."""
+        badge_found = bool(re.search(
+            r'class=["\'][^"\']*\bbadge-tag\b', html, re.IGNORECASE
+        ))
+        narration_card_found = bool(re.search(
+            r'class=["\'][^"\']*\bscene-narration\b', html, re.IGNORECASE
+        ))
+        self.details["visual_design_hints"] = {
+            "decorative_scene_badge": badge_found,
+            "duplicated_narration_card": narration_card_found,
+        }
+        if badge_found:
+            self.warnings.append(
+                "Decorative scene badge detected; remove it unless it communicates useful, sourced context."
+            )
+        if narration_card_found:
+            self.warnings.append(
+                "Narration appears as a static scene card as well as timed captions; avoid duplicating the spoken copy."
+            )
+
     def _check_gsap_timeline_contract(self, js: str, html: str) -> None:
         """Verify GSAP timeline registry, paused state, and deterministic finite animation math."""
         combined_js = js
@@ -207,6 +229,9 @@ class CompositionValidator:
     def _compute_contrast_ratio(hex1: str, hex2: str) -> float:
         """Calculate relative luminance contrast ratio between two hex colors."""
         def _luminance(hex_code: str) -> float:
+            hex_code = hex_code.strip().removeprefix("#")
+            if len(hex_code) != 6:
+                raise ValueError("Color must be a six-digit hex value, optionally prefixed with '#'.")
             r = int(hex_code[0:2], 16) / 255.0
             g = int(hex_code[2:4], 16) / 255.0
             b = int(hex_code[4:6], 16) / 255.0

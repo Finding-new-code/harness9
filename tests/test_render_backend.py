@@ -196,18 +196,19 @@ class TestChromeBackendSemantics(_TmpDirTest):
 @unittest.skipUnless(FFMPEG, "ffmpeg not installed")
 class TestPipelineSemantics(_TmpDirTest):
     def pipeline(self, **kw):
-        return Pipeline(topic="How GPUs Work", output_dir=self.tmp / "run", offline=True, duration=3, **kw)
+        return Pipeline(topic="How GPUs Work", output_dir=self.tmp / "run", offline=True, duration=15, **kw)
 
     def summary(self):
         return json.loads((self.tmp / "run" / "pipeline_summary.json").read_text(encoding="utf-8"))
 
     def test_stub_run_is_partial_and_labelled(self):
-        self.assertTrue(self.pipeline(render_backend="stub").run())
+        self.assertFalse(self.pipeline(render_backend="stub").run())
         s = self.summary()
         self.assertEqual(s["status"], "PARTIAL")
         stage = next(x for x in s["stages"] if x["stage_name"] == "hyperframes_render")
         self.assertEqual(stage["metrics"]["validation_status"], "STUB")
         self.assertIsNone(stage["metrics"]["gate_passed"])
+        self.assertTrue((self.tmp / "run" / "renders" / "final.mp4").is_file())
 
     def test_unavailable_renderer_fails_the_run_with_an_actionable_error(self):
         with mock.patch.object(HyperFramesRenderer, "render", side_effect=RenderUnavailableError("install Chrome")):

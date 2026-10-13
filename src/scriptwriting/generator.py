@@ -5,7 +5,7 @@ Generates:
 1. BRIEF.md — Topic, audience, target duration, aspect ratio format (16:9 or 9:16), narrative arc.
 2. DESIGN.md — HARD GATE: Brand name, 3-5 explicit colors with functional roles, typography, motion mood, and anti-patterns.
 3. SCRIPT.md — Scene breakdown with timestamped voiceover beats, duration estimates, and visual cues.
-4. STORYBOARD.md — Hero frame descriptions, GSAP entrance animations (gsap.from()), and transitions.
+4. STORYBOARD.md — Hero frame descriptions, safe motion preset labels, and transitions.
 """
 
 from dataclasses import dataclass, field
@@ -325,13 +325,27 @@ def generate_storyboard(
         sb_lines.append(f"## {s.scene_id.upper()}: {s.title}")
         sb_lines.append(f"- **Time Window**: {s.start_time:.1f}s - {end_time:.1f}s ({s.duration:.1f}s duration)")
         sb_lines.append(f"- **Visual Asset**: `{s.visual_asset_path}`")
-        sb_lines.append(f"- **Hero Frame Description**: {s.hero_frame_description or 'Central visual card framed with ambient glow and typography'}")
+        sb_lines.append(f"- **Hero Frame Description**: {s.hero_frame_description or 'Full-frame composition led by the scene asset'}")
         sb_lines.append(f"- **Entrance Animation**: `{s.entrance_animation}`")
         sb_lines.append(f"- **Transition Out**: `{s.transition_out}`")
         sb_lines.append(f"- **Narration Beat**: \"{s.narration_text}\"")
         sb_lines.append("")
 
     return "\n".join(sb_lines)
+
+
+def _entrance_for_visual_cue(visual_cue: str, scene_index: int) -> str:
+    """Choose a small, safe motion vocabulary from the scene's visual subject."""
+    cue = (visual_cue or "").lower()
+    if any(word in cue for word in ("comparison", "compare", "versus", "contrast", "split-screen")):
+        return "slide_left"
+    if any(word in cue for word in ("timeline", "milestone", "evolution", "sequence", "progression")):
+        return "reveal"
+    if any(word in cue for word in ("statistic", "metric", "percentage", "multiplier", "benchmark")):
+        return "zoom"
+    # A single opening move establishes the film; later unclassified scenes
+    # enter on a cut and let the image's own camera move carry the beat.
+    return "rise" if scene_index == 0 else "cut"
 
 
 class ScriptGenerator:
@@ -395,7 +409,7 @@ class ScriptGenerator:
                     narration = supported_claims[0].claim_text.strip() if supported_claims else ""
                 if not narration:
                     raise ValueError(f"Talking point {tp.beat_index} has no source-backed narration text.")
-                visual_cue = supported_claims[0].visual_cue_suggestion if supported_claims and supported_claims[0].visual_cue_suggestion else f"Visual card highlighting {tp.title}"
+                visual_cue = supported_claims[0].visual_cue_suggestion if supported_claims and supported_claims[0].visual_cue_suggestion else f"Full-frame visual focused on {tp.title}"
             else:
                 raise ValueError(f"Storyboard scene {i + 1} has no corresponding dossier talking point.")
 
@@ -416,11 +430,8 @@ class ScriptGenerator:
             else:
                 asset_path = f"assets/images/asset_{i+1:02d}.svg"
 
-            # Entrance animation
-            entrance_anim = f"gsap.from('.scene_{i+1} .scene-content', {{ opacity: 0, y: 30, duration: 0.8, ease: 'power2.out' }})"
-
-            # Transition out
-            trans_out = "Final fade out" if i == num_scenes - 1 else "Seamless push-slide transition to next scene"
+            entrance_anim = _entrance_for_visual_cue(visual_cue, i)
+            trans_out = "hold" if i == num_scenes - 1 else "cut"
 
             # Generate beats
             beat1 = Beat(
@@ -429,7 +440,7 @@ class ScriptGenerator:
                 end_time=round(current_time + scene_dur * 0.5, 2),
                 duration=round(scene_dur * 0.5, 2),
                 text=title,
-                visual_cue=f"Header entrance for {title}",
+                visual_cue=f"Scene title resolves with {entrance_anim} motion",
             )
             beat2 = Beat(
                 beat_id=f"beat_{i+1}_2",
@@ -447,7 +458,7 @@ class ScriptGenerator:
                 duration=scene_dur,
                 narration_text=narration,
                 visual_asset_path=asset_path,
-                hero_frame_description=f"Hero frame showcasing {tp.title} with backing asset {asset_path} and kinetic typography.",
+                hero_frame_description=visual_cue,
                 entrance_animation=entrance_anim,
                 transition_out=trans_out,
                 beats=[beat1, beat2],
@@ -466,6 +477,7 @@ class ScriptGenerator:
         aspect_ratio: str = "16:9",
         output_dir: Optional[Union[str, Path]] = None,
         model_assisted: bool = False,
+        model_client: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """
         Synthesize BRIEF.md, DESIGN.md, SCRIPT.md, STORYBOARD.md, script.json, and script.yaml.
@@ -480,10 +492,13 @@ class ScriptGenerator:
         if model_assisted:
             from src.scriptwriting.model_writer import generate_narration
 
+            if model_client is None:
+                raise RuntimeError("Model-assisted scripts require a configured narration model adapter.")
             narration_provider, generated = generate_narration(
                 dossier=dossier,
                 scenes=scenes,
                 target_duration=target_duration,
+                model_client=model_client,
             )
             for scene in scenes:
                 scene.narration_text = generated[scene.scene_id]["narration_text"]

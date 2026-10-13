@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+from unittest import mock
 from pydantic import BaseModel
 
 from src.h9_runtime import (
@@ -158,8 +159,8 @@ class TestH9Runtime(unittest.TestCase):
         )
 
         self.assertIsInstance(subagent_res, SubagentResult)
-        self.assertEqual(subagent_res.status, SubagentStatus.COMPLETED)
-        self.assertIn("microchips", subagent_res.output.lower())
+        self.assertEqual(subagent_res.status, SubagentStatus.FAILED)
+        self.assertIn("No live Hermes parent agent", subagent_res.output)
         self.assertIsNotNone(subagent_res.structured_data)
         
         # Verify blocked tools were stripped
@@ -168,6 +169,7 @@ class TestH9Runtime(unittest.TestCase):
         self.assertIn("read_file", allowed)
         self.assertNotIn("delegate_task", allowed)
         self.assertNotIn("h9.render", allowed)
+        self.assertEqual(subagent_res.structured_data["status"], "FAILED")
 
     # -----------------------------------------------------------------------
     # 3. SkillRuntime Tests
@@ -422,9 +424,60 @@ class TestH9Runtime(unittest.TestCase):
 
         # 5. Render Video
         renders_dir = rt._get_session_renders(session_id)
-        render_art = rt.render_video(ir, output_dir=renders_dir, session_id=session_id)
-        self.assertTrue(Path(render_art.video_path).exists())
-        self.assertEqual(render_art.width, 1920)
+        with self.assertRaisesRegex(RuntimeError, "No completed Harness 9 production summary"):
+            rt.render_video(ir, output_dir=renders_dir, session_id=session_id)
+        self.assertFalse((renders_dir / "final.mp4").exists())
+
+    def test_render_video_exports_only_a_matching_gate_verified_run(self):
+        rt = DefaultContentRuntime(base_workspace_dir=self.base_dir / "render_ws")
+        session_id = "sess_verified_render"
+        workspace = rt._get_session_workspace(session_id)
+        candidate = workspace / "renders" / "final.mp4"
+        candidate.parent.mkdir(parents=True, exist_ok=True)
+        candidate.write_bytes(b"measured test media")
+        (workspace / "pipeline_summary.json").write_text(
+            json.dumps({
+                "status": "SUCCESS",
+                "topic": "How GPUs Work",
+                "final_video_path": "renders/final.mp4",
+                "metrics": {"format": "16:9", "target_duration_seconds": 5.0},
+                "stages": [{
+                    "stage_name": "hyperframes_render",
+                    "metrics": {"validation_status": "VERIFIED", "gate_passed": True},
+                }],
+            }),
+            encoding="utf-8",
+        )
+
+        report = mock.Mock()
+        report.metrics = {
+            "container": {
+                "video": {"codec_name": "h264"},
+                "audio": {"codec_name": "aac"},
+            },
+        }
+        gate = mock.Mock()
+        gate.enforce.return_value = report
+        gate.probe_summary.return_value = {
+            "has_video": True, "has_audio": True, "duration": 5.0,
+            "width": 1920, "height": 1080, "fps": 30,
+        }
+        ir = ProductionIR(
+            project_id="proj_verified",
+            aspect_ratio="16:9",
+            duration_seconds=5.0,
+            fps=30,
+            metadata={"topic": "How GPUs Work"},
+        )
+
+        with mock.patch("src.h9_runtime.content.MediaGate", return_value=gate):
+            artifact = rt.render_video(ir, self.base_dir / "verified_export", session_id)
+
+        self.assertEqual(artifact.validation_status, "VERIFIED")
+        self.assertEqual(artifact.video_codec, "h264")
+        self.assertEqual(artifact.audio_codec, "aac")
+        self.assertTrue(Path(artifact.video_path).is_file())
+        self.assertEqual(gate.enforce.call_count, 2)
 
 
 if __name__ == "__main__":

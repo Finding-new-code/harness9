@@ -35,6 +35,7 @@ from tools.registry import (
     CHECK_FN_CACHE_BYPASS,
     check_fn_cache_scope,
     discover_builtin_tools,
+    register_h9_content_tools,
     registry,
     tool_error,
 )
@@ -228,6 +229,10 @@ def _run_async(coro):
 # =============================================================================
 
 discover_builtin_tools()
+# H9 uses one grouped registrar rather than top-level registry.register calls,
+# so the generic AST discovery pass cannot see it. Registration keeps the
+# schemas behind the existing h9_content toolset and availability gate.
+register_h9_content_tools()
 
 # MCP tool discovery (external MCP servers from config) used to run here as
 # a module-level side effect.  It was removed because discover_mcp_tools()

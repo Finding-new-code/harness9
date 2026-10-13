@@ -71,16 +71,26 @@ python verify_pipeline.py [OPTIONS]
 
 | Flag | Type | Default | Description |
 |---|---|---|---|
-| `--test-mode` | `flag` | `False` | Run acceptance verification against all 6 production checkpoints. |
 | `--topic` | `str` | `"The History of the Transistor"` | Test topic to execute and verify. |
 | `--output-dir` | `str` | `output/test_verification_run` | Target output directory for the verification run. |
-| `--offline` | `flag` | `True` | Run verification in hermetic offline mode. |
+| `--offline` / `--no-offline` | `flag` | `True` | Use curated research by default; `--no-offline` enables live research. |
 | `--format` | `str` | `16:9` | Aspect ratio for test rendering. |
+| `--duration` | `int` | `30` | Target duration in seconds. |
+| `--voice` | `str` | `default` | Voice profile passed to the production pipeline. |
+| `--json` | `flag` | `False` | Include machine-readable checkpoint results. |
 
 ### Example
 ```bash
-python verify_pipeline.py --test-mode
+python verify_pipeline.py --topic "How GPUs Work" --duration 15 --output-dir output/verify-gpu
+
+# Explicitly use live research (unreviewed live claims should remain PARTIAL)
+python verify_pipeline.py --topic "A new topic" --no-offline --output-dir output/verify-live
 ```
+
+The verifier runs the real production pipeline first. It only runs acceptance
+checks after a `SUCCESS` result; `PARTIAL` and `FAILED` runs exit non-zero.
+The video check requires `ffprobe` to confirm an H.264/AAC MP4 with both
+streams and a positive duration.
 
 Output:
 ```

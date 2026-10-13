@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 import uuid
+from urllib.parse import urlsplit
 
 from src.h9_runtime.types import (
     SessionState,
@@ -217,7 +219,7 @@ class DefaultAgentRuntime:
            delegate_task, clarify, memory, h9.render, send_message.
         2. Structured output contract: injects ResearchDossier schema for research tasks.
         3. Prompt caching preservation: parent context never records subagent turns.
-        4. Graceful fallback to deterministic/procedural synthesis on failure.
+        4. Reports unavailable delegation instead of synthesizing a success result.
         """
         subagent_id = f"subagent_{uuid.uuid4().hex[:8]}"
         start_time = time.time()
@@ -286,8 +288,25 @@ class DefaultAgentRuntime:
         if parent_state:
             parent_state.metadata.setdefault("child_subagents", []).append(subagent_id)
 
-        # 4. Attempt live Hermes delegate_task if parent_agent is provided
-        live_result = None
+        topic = str(context.get("topic") or goal)
+        research_task = "research" in role.lower() or "research" in goal.lower()
+        structured_data: Dict[str, Any] = {
+            "subagent_id": subagent_id,
+            "parent_session_id": parent_session_id,
+            "role": role,
+            "goal": goal,
+            "task": goal,
+            "topic": topic,
+            "allowed_tools": sanitized_tools,
+            "output_schema_enforced": resolved_schema is not None,
+        }
+        output_text = ""
+        error_message: Optional[str] = None
+        iterations_used = 0
+        result_status = SubagentStatus.FAILED
+
+        # 4. Delegate only through a real Hermes parent agent. This runtime
+        # must not report locally invented content as completed work.
         if parent_agent is not None:
             try:
                 from tools.delegate_tool import delegate_task
@@ -300,117 +319,76 @@ class DefaultAgentRuntime:
                     max_iterations=max_iterations,
                     parent_agent=parent_agent,
                 )
-                if raw_delegation and not raw_delegation.startswith("Error:"):
-                    live_result = raw_delegation
+                if not raw_delegation or raw_delegation.startswith("Error:"):
+                    raise RuntimeError(raw_delegation or "Hermes delegation returned no result.")
+
+                envelope = json.loads(raw_delegation)
+                if not isinstance(envelope, dict):
+                    raise ValueError("Hermes delegation returned an invalid result envelope.")
+                entries = envelope.get("results")
+                if not isinstance(entries, list) or len(entries) != 1 or not isinstance(entries[0], dict):
+                    raise ValueError("Hermes delegation did not return one completed task result.")
+                entry = entries[0]
+                iterations_used = int(entry.get("api_calls") or 0)
+                if entry.get("status") != "completed":
+                    raise RuntimeError(str(entry.get("error") or "Hermes subagent did not complete the task."))
+                if resolved_schema is not None and entry.get("schema_valid") is False:
+                    raise ValueError("Hermes subagent output did not satisfy the requested schema.")
+                output_text = str(entry.get("summary") or "").strip()
+                if not output_text:
+                    raise ValueError("Hermes subagent returned an empty result.")
+
+                if research_task:
+                    from src.models.contracts import EpistemicStatus, ResearchDossier
+                    from src.research.scoring import score_claim
+
+                    dossier_text = re.sub(
+                        r"^```(?:json)?\s*|\s*```$", "", output_text, flags=re.IGNORECASE
+                    )
+                    dossier_data = json.loads(dossier_text)
+                    if isinstance(dossier_data, dict) and isinstance(dossier_data.get("dossier"), dict):
+                        dossier_data = dossier_data["dossier"]
+                    if not isinstance(dossier_data, dict):
+                        raise ValueError("Hermes research result must be a dossier object.")
+                    dossier = ResearchDossier.model_validate(dossier_data)
+                    if not dossier.claims:
+                        raise ValueError("Hermes research result contained no claims.")
+                    for claim in dossier.claims:
+                        source_url = urlsplit(claim.primary_source.url)
+                        if source_url.scheme not in {"http", "https"} or not source_url.netloc:
+                            raise ValueError(f"Research claim {claim.claim_id} has an invalid source URL.")
+                        # A schema-valid subagent citation has not been fetched
+                        # or independently checked here, so it cannot be marked
+                        # VERIFIED or retain a model-supplied confidence score.
+                        claim.epistemic_status = EpistemicStatus.UNVERIFIABLE
+                        claim.confidence_score = score_claim(
+                            claim.claim_text,
+                            claim.primary_source,
+                            claim.corroborating_sources,
+                        )
+                    structured_data["dossier"] = dossier.model_dump(mode="json")
+                else:
+                    structured_data["output"] = output_text
+                result_status = SubagentStatus.COMPLETED
             except Exception as exc:
-                logger.debug("Hermes delegate_task call fell back to local execution: %s", exc)
+                error_message = str(exc)
+                logger.warning("Hermes subagent delegation failed: %s", error_message)
+        else:
+            error_message = "No live Hermes parent agent was provided; this runtime will not synthesize a subagent result."
 
-        # 5. Build structured output conforming to ResearchDossier / task goal
-        topic = context.get("topic", goal)
-        claims = [
-            {
-                "claim_id": f"claim_{uuid.uuid4().hex[:6]}",
-                "claim_text": f"Empirical benchmark confirms {topic} operates within optimal parameters.",
-                "category": "technical",
-                "confidence_score": 0.96,
-                "primary_source": {
-                    "title": f"Primary Investigation on {topic}",
-                    "url": f"https://archive.org/spec/{topic.lower().replace(' ', '_')}",
-                    "publisher": "Institute of Technical Standards",
-                    "reliability_score": 0.95,
-                },
-                "corroborating_sources": [],
-                "visual_cue_suggestion": f"High-contrast schematic diagram of {topic}",
-                "verification_notes": "Cross-referenced with benchmark telemetry.",
-            },
-            {
-                "claim_id": f"claim_{uuid.uuid4().hex[:6]}",
-                "claim_text": f"Historical deployment of {topic} marked a decisive architectural shift.",
-                "category": "historical",
-                "confidence_score": 0.92,
-                "primary_source": {
-                    "title": f"Annals of Computing: {topic}",
-                    "url": f"https://history.tech/archive/{topic.lower().replace(' ', '_')}",
-                    "publisher": "Computing Heritage Society",
-                    "reliability_score": 0.90,
-                },
-                "corroborating_sources": [],
-                "visual_cue_suggestion": f"Archival photo of early {topic} implementation",
-                "verification_notes": "Verified against primary patent documents.",
-            },
-        ]
-
-        structured_data: Dict[str, Any] = {
-            "subagent_id": subagent_id,
-            "parent_session_id": parent_session_id,
-            "role": role,
-            "goal": goal,
-            "task": goal,
-            "topic": topic,
-            "allowed_tools": sanitized_tools,
-            "status": "COMPLETED",
-            "output_schema_enforced": resolved_schema is not None,
-        }
-
-        # If subtask is research, package complete research dossier and summary
-        if "research" in role.lower() or "research" in goal.lower():
-            structured_data["dossier_summary"] = {
-                "headline": f"Deep Research Synthesis: {topic}",
-                "topic": topic,
-                "confidence_score": 0.95,
-                "claims_count": len(claims),
-            }
-            structured_data["dossier"] = {
-                "topic": topic,
-                "schema_version": "2.0.0",
-                "run_id": f"run_{uuid.uuid4().hex[:8]}",
-                "headline": f"Deep Research Synthesis: {topic}",
-                "executive_summary": f"Comprehensive multi-source technical investigation into {topic}.",
-                "key_takeaways": [
-                    f"Foundational architectural principles of {topic}",
-                    f"Empirical validation across reproducible benchmark suites",
-                ],
-                "claims": claims,
-                "talking_points": [
-                    {
-                        "beat_index": 1,
-                        "title": "Origins and Breakthrough",
-                        "narrative_hook": f"The hidden discovery behind {topic}",
-                        "supported_claim_ids": [claims[0]["claim_id"]],
-                        "estimated_duration_sec": 7.5,
-                    }
-                ],
-                "statistics": [
-                    {
-                        "metric": "Performance Gain",
-                        "value": "10x",
-                        "context": "Compared to legacy architecture",
-                        "source_claim_id": claims[0]["claim_id"],
-                    }
-                ],
-                "suggested_visual_queries": [f"{topic} schematic", f"{topic} laboratory photo"],
-                "metadata": {
-                    "subagent_id": subagent_id,
-                    "isolated": True,
-                    "prompt_cache_preserved": True,
-                },
-            }
+        structured_data["status"] = result_status.value
+        if error_message:
+            structured_data["error"] = error_message
 
         elapsed = time.time() - start_time
-        output_msg = (
-            live_result
-            if live_result
-            else f"Subagent {subagent_id} ({role}) successfully completed goal: {goal}"
-        )
-
         result = SubagentResult(
             subagent_id=subagent_id,
-            status=SubagentStatus.COMPLETED,
-            output=output_msg,
+            status=result_status,
+            output=output_text or error_message or "Subagent did not run.",
             structured_data=structured_data,
-            iterations_used=min(5, max_iterations),
+            iterations_used=min(iterations_used, max_iterations),
             duration_seconds=max(round(elapsed, 4), 0.001),
-            error_message=None,
+            error_message=error_message,
         )
 
         self._subagents[subagent_id] = result
