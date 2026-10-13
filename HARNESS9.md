@@ -21,10 +21,10 @@ python run_harness9.py --topic "Quantum Computing Breakthroughs" --offline
 ### 2. Run Acceptance Verification
 ```bash
 # Run the 6-checkpoint verification harness
-python verify_pipeline.py --test-mode
+python verify_pipeline.py --topic "How GPUs Work" --duration 15 --output-dir output/verify-gpu
 
-# Run the complete test suite (186+ unit, integration & boundary tests)
-pytest tests/ -v
+# Run the complete test suite with the repository's isolated, hermetic runner
+scripts/run_tests.sh
 ```
 
 ---

@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+from urllib.parse import urlsplit
 
 from src.h9_runtime.bridge import get_capability_bridge
 from src.h9_runtime.types import ProductionIR
@@ -51,7 +52,7 @@ H9_RESEARCH_SCHEMA: Dict[str, Any] = {
     "name": "h9.research",
     "description": (
         "Execute deep multi-source factual research, claim extraction, and confidence scoring "
-        "for a content production topic. Returns a verified structured ResearchDossier."
+        "for a content production topic. Returns source-linked claims with per-claim verification status."
     ),
     "parameters": {
         "type": "object",
@@ -155,19 +156,19 @@ H9_GENERATE_SCRIPT_SCHEMA: Dict[str, Any] = {
 H9_RENDER_SCHEMA: Dict[str, Any] = {
     "name": "h9.render",
     "description": (
-        "Render a broadcast MP4 video from a Production IR AST, ensuring hermetic composition "
-        "and asset validation."
+        "Export and re-verify a completed Harness 9 render for this session. Requires a matching "
+        "SUCCESS pipeline summary and a passing media gate; Production IR alone does not contain narration audio."
     ),
     "parameters": {
         "type": "object",
         "properties": {
             "production_ir": {
                 "type": "object",
-                "description": "Production Intermediate Representation dictionary containing timeline blocks and audio tracks.",
+                "description": "Production IR for the same topic, format, and duration as the completed session render.",
             },
             "output_dir": {
                 "type": "string",
-                "description": "Destination directory for rendered MP4 and output artifacts.",
+                "description": "Destination directory for the verified MP4 export.",
             },
         },
         "required": ["production_ir", "output_dir"],
@@ -308,11 +309,14 @@ def handle_h9_research(args: Dict[str, Any], **kwargs: Any) -> str:
             parent_agent=parent_agent,
         )
 
-        dossier_dict = (
-            dossier.to_dict()
-            if hasattr(dossier, "to_dict")
-            else (dossier if isinstance(dossier, dict) else {"topic": topic})
-        )
+        if isinstance(dossier, dict):
+            dossier_dict = dossier
+        elif hasattr(dossier, "to_dict"):
+            dossier_dict = dossier.to_dict()
+        elif hasattr(dossier, "model_dump"):
+            dossier_dict = dossier.model_dump()
+        else:
+            raise TypeError(f"Research returned an unsupported dossier type: {type(dossier).__name__}")
         res = dict(dossier_dict)
         res["success"] = True
         res["topic"] = topic.strip()
@@ -429,29 +433,38 @@ def handle_h9_generate_script(args: Dict[str, Any], **kwargs: Any) -> str:
 
         bridge = get_capability_bridge(session_id=session_id)
 
-        # Parse ResearchDossier from payload
+        # Normalize the caller's claims without manufacturing evidence. A
+        # script may only be generated from claims with measured confidence
+        # and an explicit HTTPS source record.
         claims = dossier_raw.get("claims") or []
-        for c in claims:
-            if isinstance(c, dict):
-                if "claim_id" not in c and "id" in c:
-                    c["claim_id"] = c["id"]
-                if "claim_text" not in c and "text" in c:
-                    c["claim_text"] = c["text"]
-                if "confidence_score" not in c and "confidence" in c:
-                    c["confidence_score"] = c["confidence"]
-                if "primary_source" not in c or not c.get("primary_source"):
-                    c["primary_source"] = {
-                        "title": f"Verified Source for {c.get('claim_id', 'claim')}",
-                        "url": "https://harness9.local/verified-source",
-                        "reliability_score": 0.95,
-                    }
+        if not isinstance(claims, list):
+            return tool_error("Parameter 'dossier.claims' must be a list.", success=False)
+        normalized_claims = []
+        for index, raw_claim in enumerate(claims):
+            if not isinstance(raw_claim, dict):
+                return tool_error(f"Research claim {index} must be an object.", success=False)
+            claim = dict(raw_claim)
+            if "claim_id" not in claim and "id" in claim:
+                claim["claim_id"] = claim["id"]
+            if "claim_text" not in claim and "text" in claim:
+                claim["claim_text"] = claim["text"]
+            if "confidence_score" not in claim and "confidence" in claim:
+                claim["confidence_score"] = claim["confidence"]
+            if claim.get("confidence_score") is None:
+                return tool_error(f"Research claim {index} is missing measured confidence_score.", success=False)
+            source = claim.get("primary_source")
+            source_url = source.get("url") if isinstance(source, dict) else None
+            parsed_source = urlsplit(source_url) if isinstance(source_url, str) else None
+            if not parsed_source or parsed_source.scheme != "https" or not parsed_source.netloc:
+                return tool_error(f"Research claim {index} is missing a valid HTTPS primary_source.", success=False)
+            normalized_claims.append(claim)
 
         dossier = ResearchDossier(
             topic=dossier_raw.get("topic", "Technology Overview"),
             headline=dossier_raw.get("headline", ""),
             executive_summary=dossier_raw.get("executive_summary", ""),
             key_takeaways=dossier_raw.get("key_takeaways") or [],
-            claims=claims,
+            claims=normalized_claims,
             suggested_visual_queries=dossier_raw.get("suggested_visual_queries") or [],
         )
 
@@ -687,7 +700,7 @@ def register_tools(reg: Optional[Any] = None) -> None:
         schema=H9_RENDER_SCHEMA,
         handler=handle_h9_render,
         check_fn=check_h9_available,
-        description="Render broadcast MP4 video from a Production IR AST.",
+        description="Export and re-verify a completed session render matching the Production IR.",
         emoji="🎬",
     )
     r.register(
@@ -696,7 +709,7 @@ def register_tools(reg: Optional[Any] = None) -> None:
         schema={**H9_RENDER_SCHEMA, "name": "h9_render"},
         handler=handle_h9_render,
         check_fn=check_h9_available,
-        description="Render broadcast MP4 video from a Production IR AST.",
+        description="Export and re-verify a completed session render matching the Production IR.",
         emoji="🎬",
     )
 

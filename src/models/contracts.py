@@ -616,8 +616,8 @@ class ScriptScene(H9BaseModel):
     hero_frame_description: str = ""
     component_type: str = "reference_collage_hook"
     component_props: Dict[str, Any] = Field(default_factory=dict)
-    entrance_animation: str = "fade"
-    transition_out: str = "fade"
+    entrance_animation: str = "rise"
+    transition_out: str = "cut"
     beats: List[ScriptBeat] = Field(default_factory=list)
 
     @model_validator(mode="before")
@@ -720,7 +720,7 @@ class AssetRecord(H9BaseModel):
     page_url: Optional[str] = None
     creator_name: Optional[str] = "Harness 9 Procedural Generator"
     license: LicenseInfo = Field(default_factory=LicenseInfo)
-    verification_status: str = "VERIFIED"
+    verification_status: str = "UNVERIFIED"
     scene_target: str = "scene_1"
     claim_id_refs: List[str] = Field(default_factory=list)
 
@@ -765,7 +765,7 @@ class RenderArtifact(H9BaseModel):
     rendered_at: str = Field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
-    validation_status: str = "VERIFIED"
+    validation_status: str = "UNVERIFIED"  # only a measured gate (src.evaluation.media_gate) may set VERIFIED
 
 
 class PublishPackage(H9BaseModel):

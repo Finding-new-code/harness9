@@ -39,9 +39,22 @@ my_project/
 ### Scene 1: The Vacuum Tube Dilemma (0.0s - 7.5s)
 - **Visual Goal**: Establish the bottleneck of early computing (massive, fragile, power-hungry tubes).
 - **Media Asset**: `assets/images/asset_001.svg` (Vacuum tube schematic)
-- **Animation Cue**: Slow zoom-in with kinetic headline reveal.
+- **Animation Cue**: `zoom` for a verified detail; use a hard cut when the next image carries the beat.
 - **Narrative Job**: Hook the viewer by presenting the physical limitation of computing before 1947.
 ```
+
+### Motion Direction
+
+Each scene's `entrance_animation` is a label, not executable JavaScript. The renderer maps it to a bounded preset:
+
+- `rise`: 10-frame upward landing.
+- `slide_left`: 10-frame horizontal entrance for a comparison or change of side.
+- `zoom`: 12-frame scale landing for a sourced detail.
+- `reveal`: 12-frame clip reveal for ordered processes or timelines.
+- `fade`: 6-frame opacity transition, when explicitly chosen.
+- `cut`: no title entrance; the new image carries the beat.
+
+`transition_out` accepts `cut`, `fade`, or `hold`. Intermediate scenes cut by default; the final scene holds its resolved frame. Unknown entrance strings fall back to `rise` and are never evaluated as code. Keep timed captions for accessibility, and avoid separately rendering the full narration as a static card. Review contact sheets and key frames by eye: the media gate checks technical properties, not taste or clarity.
 
 ---
 
@@ -69,8 +82,8 @@ To ensure 100% reproducible frame rendering, Harness 9 adheres to the following 
 3. **No External Network Dependencies**:
    All `<img>`, `<video>`, `<audio>`, and `@font-face` resources must resolve to local relative file paths (e.g. `../assets/images/asset_001.png`). Remote HTTP/HTTPS URLs are strictly forbidden inside the composition during rendering.
 
-4. **Guaranteed Caption & Card Exits**:
-   Every visual element entering the screen must have an explicit exit transition or opacity fadeout before the subsequent scene begins to prevent DOM visual collision.
+4. **Deterministic Scene Boundaries**:
+   Entrances and fades are finite. Scenes cut at their authored boundary by default; timed captions are explicitly hidden at the end of each speech group. Only an intentional fade is allowed to change that behavior.
 
 ---
 
@@ -88,12 +101,16 @@ The rendering pipeline converts web compositions to broadcast `.mp4` video:
   • Captures raw frame buffer (PNG/JPEG) for frame t = 0 .. N
               │
               ▼
-[FFmpeg Pipe (H.264 / AAC Muxer)]
-  • Ingests raw video frame stream via stdin
+[FFmpeg encode (H.264 / AAC Muxer)]
+  • Reads the captured frame sequence from a temp directory (piping via stdin is on the roadmap)
   • Ingests synchronized `narration.wav` audio track
   • Applies high-compatibility encoding flags:
     `-c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k`
               │
               ▼
-[renders/final.mp4]
+[Media gate: decodes the file; flat/black/frozen picture, edge detail, motion,
+ audio level, A/V sync, duration, resolution, fps]
+              │ pass                      │ fail
+              ▼                           ▼
+[renders/final.mp4 + final.gate.json]   [renders/final.rejected.mp4 + final.gate.json; run FAILED]
 ```

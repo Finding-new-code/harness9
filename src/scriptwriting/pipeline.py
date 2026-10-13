@@ -18,7 +18,7 @@ from src.models.ledger import AssetProvenanceLedger
 from src.models.script import Script
 from src.scriptwriting.aligner import TranscriptAligner, TranscriptResult
 from src.scriptwriting.generator import BrandGuidelines, DesignTheme, ScriptGenerator
-from src.scriptwriting.tts import AudioMetadata, TTSEngine
+from src.scriptwriting.tts import AudioMetadata, TTSEngine, fit_audio_duration
 from src.utils.filesystem import ensure_dir
 
 
@@ -42,6 +42,7 @@ class ScriptwritingResult:
     script_model: Script
     status: str = "success"
     brand_guidelines: Optional[BrandGuidelines] = None
+    narration_provider: str = "curated_or_extractively_grounded"
 
     @property
     def audio(self) -> AudioMetadata:
@@ -78,6 +79,7 @@ class ScriptwritingResult:
             },
             "audio_metadata": self.audio_metadata.to_dict(),
             "transcript": self.transcript_result.to_dict(),
+            "narration_provider": self.narration_provider,
         }
 
 
@@ -150,6 +152,8 @@ class ScriptwritingPipeline:
         aspect_ratio: str = "16:9",
         voice: Optional[str] = None,
         format_aspect: Optional[str] = None,
+        model_assisted: bool = False,
+        model_client: Optional[Any] = None,
         **kwargs: Any,
     ) -> ScriptwritingResult:
         """
@@ -174,6 +178,8 @@ class ScriptwritingPipeline:
             target_duration=duration,
             aspect_ratio=effective_aspect,
             output_dir=out_dir_path,
+            model_assisted=model_assisted,
+            model_client=model_client,
         )
 
         script_model: Script = gen_result["script_model"]
@@ -190,6 +196,7 @@ class ScriptwritingPipeline:
             voice=voice or self.tts_voice,
             provider_name=self.prefer_tts_provider,
         )
+        audio_meta = fit_audio_duration(audio_meta, duration)
 
         # 3. Compute Transcript and Word-level Alignment
         actual_audio_duration = audio_meta.duration_seconds
@@ -222,4 +229,5 @@ class ScriptwritingPipeline:
             script_model=script_model,
             status="success",
             brand_guidelines=self.brand_guidelines,
+            narration_provider=str(gen_result.get("narration_provider", "curated_or_extractively_grounded")),
         )

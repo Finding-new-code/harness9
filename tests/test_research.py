@@ -37,9 +37,6 @@ except Exception:
     Statistic = None  # type: ignore
     DossierMetadata = None  # type: ignore
 
-from verify_pipeline import _generate_default_dossier
-
-
 class TestResearchEngineCoverage(unittest.TestCase):
     """Tier 1 Feature Coverage Tests (F1, F2) — 10 Comprehensive Tests."""
 
@@ -53,11 +50,9 @@ class TestResearchEngineCoverage(unittest.TestCase):
 
     def _get_dossier(self, topic=None, duration=30):
         t = topic or self.topic
-        if ResearchEngine is not None:
-            engine = ResearchEngine()
-            dossier = engine.synthesize_research(t, offline=True, target_duration=duration)
-            return dossier.model_dump() if hasattr(dossier, "model_dump") else dossier.to_dict() if hasattr(dossier, "to_dict") else dossier
-        return _generate_default_dossier(t, duration, offline=True)
+        engine = ResearchEngine()
+        dossier = engine.synthesize_research(t, offline=True, target_duration=duration)
+        return dossier.model_dump() if hasattr(dossier, "model_dump") else dossier.to_dict() if hasattr(dossier, "to_dict") else dossier
 
     def test_01_research_dossier_schema_conformance(self):
         """F1: Validate complete schema conformance of generated research dossier."""
@@ -127,7 +122,7 @@ class TestResearchEngineCoverage(unittest.TestCase):
     def test_07_talking_points_duration_scaling(self):
         """F1: Verify talking points durations scale to match target duration."""
         target_dur = 45
-        data = self._get_dossier(topic="Neuromorphic Memristor Circuits", duration=target_dur)
+        data = self._get_dossier(topic="The History of the Transistor", duration=target_dur)
         tp_total = sum(tp.get("estimated_duration_sec", 0.0) for tp in data.get("talking_points", []))
         self.assertAlmostEqual(tp_total, float(target_dur), delta=3.0)
 
@@ -156,7 +151,7 @@ class TestResearchEngineCoverage(unittest.TestCase):
         self.assertIn("run_id", meta)
         self.assertIn("generated_at", meta)
         self.assertIn("mode", meta)
-        self.assertIn(meta["mode"], ["online", "offline_fallback"])
+        self.assertEqual(meta["mode"], "curated_preset")
 
 
 class TestResearchEngineBoundary(unittest.TestCase):
@@ -170,18 +165,15 @@ class TestResearchEngineBoundary(unittest.TestCase):
         self.test_dir.cleanup()
 
     def _get_dossier(self, topic, duration=30):
-        if ResearchEngine is not None:
-            engine = ResearchEngine()
-            dossier = engine.synthesize_research(topic, offline=True, target_duration=duration)
-            return dossier.model_dump() if hasattr(dossier, "model_dump") else dossier.to_dict() if hasattr(dossier, "to_dict") else dossier
-        return _generate_default_dossier(topic, duration, offline=True)
+        engine = ResearchEngine()
+        dossier = engine.synthesize_research(topic, offline=True, target_duration=duration)
+        return dossier.model_dump() if hasattr(dossier, "model_dump") else dossier.to_dict() if hasattr(dossier, "to_dict") else dossier
 
-    def test_11_procedural_synthesis_unknown_topic_offline(self):
-        """F2: Verify procedural synthesis of novel un-preset topics offline with seeded determinism."""
+    def test_11_unknown_offline_topic_is_rejected(self):
+        """Unknown offline topics fail instead of receiving invented claims and citations."""
         novel = "Quantum Metamaterials in Photonic Waveguides"
-        data = self._get_dossier(novel, duration=40)
-        self.assertEqual(data["topic"], novel)
-        self.assertGreaterEqual(len(data["claims"]), 3)
+        with self.assertRaisesRegex(RuntimeError, "Available curated topics"):
+            self._get_dossier(novel, duration=40)
 
     def test_12_empty_or_whitespace_topic_handling(self):
         """F1: Test rejection of empty or whitespace-only topic briefs."""
@@ -208,11 +200,12 @@ class TestResearchEngineBoundary(unittest.TestCase):
             self.assertTrue(True)
 
     def test_15_special_character_and_unicode_topics(self):
-        """F1: Test topics with Unicode characters and accents."""
-        for t in ["L'histoire du transistor en 1947", "半導体の歴史", "تاريخ الترانزستور"]:
-            data = self._get_dossier(t, duration=30)
-            self.assertEqual(data["topic"], t)
-            self.assertGreaterEqual(len(data["claims"]), 3)
+        """Unicode topics fail clearly when no curated preset exists."""
+        topics = ("L'histoire du transistor in 1947", "caf\u00e9", "\u062a\u0627\u0631\u064a\u062e")
+        for topic in topics:
+            with self.subTest(topic=topic):
+                with self.assertRaisesRegex(RuntimeError, "Available curated topics"):
+                    self._get_dossier(topic, duration=30)
 
     def test_16_duplicate_claims_deduplication(self):
         """F1: Test that duplicate claim strings are filtered or deduplicated."""
@@ -220,18 +213,17 @@ class TestResearchEngineBoundary(unittest.TestCase):
         unique_claims = list(dict.fromkeys(raw_claims))
         self.assertEqual(len(unique_claims), 2)
 
-    def test_17_zero_results_search_provider_fallback(self):
-        """F2: Test fallback to procedural synthesis when web search yields zero results."""
+    def test_17_unknown_offline_topic_does_not_fall_back_to_procedural_synthesis(self):
+        """Unknown topics do not receive an invented offline dossier."""
         obscure_topic = "Xy789UnknownQuantumObscurity2099"
-        data = self._get_dossier(obscure_topic, duration=20)
-        self.assertIsNotNone(data)
-        self.assertGreaterEqual(len(data["claims"]), 3)
+        with self.assertRaisesRegex(RuntimeError, "Available curated topics"):
+            self._get_dossier(obscure_topic, duration=20)
 
     def test_18_excessive_topic_length_truncation(self):
-        """F1: Test long topic briefs (e.g. 500 characters) are handled gracefully."""
+        """Overlong briefs are rejected before matching or provider work."""
         long_topic = "A" * 300 + " Transistor History"
-        data = self._get_dossier(long_topic, duration=30)
-        self.assertIsNotNone(data)
+        with self.assertRaisesRegex(RuntimeError, "character limit"):
+            self._get_dossier(long_topic, duration=30)
 
     def test_19_conflict_penalty_scoring_reduction(self):
         """F1: Test conflict penalty correctly discounts claim confidence."""

@@ -20,6 +20,7 @@ import time
 import urllib.error
 import urllib.request
 import wave
+import shutil
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -52,6 +53,91 @@ class AudioMetadata:
             "provider_used": self.provider_used,
             "format": self.format,
         }
+
+
+def fit_audio_duration(
+    metadata: AudioMetadata,
+    target_duration: float,
+    *,
+    max_speedup: float = 1.05,
+) -> AudioMetadata:
+    """Gently time-compress a WAV that barely exceeds its target.
+
+    The narration remains complete; small provider timing overruns are handled
+    with FFmpeg's pitch-preserving ``atempo`` filter. Larger overruns are left
+    untouched so the pipeline's duration gate can reject them.
+    """
+    target = float(target_duration)
+    if target <= 0 or metadata.duration_seconds <= target + 0.01:
+        return metadata
+    if metadata.format.lower() != "wav" or metadata.sample_width_bytes != 2:
+        return metadata
+
+    safety_margin = min(0.05, target * 0.005)
+    adjusted_target = target - safety_margin
+    speedup = metadata.duration_seconds / adjusted_target
+    if speedup > max_speedup:
+        return metadata
+
+    ffmpeg = shutil.which("ffmpeg")
+    audio_path = Path(metadata.file_path).resolve()
+    if not ffmpeg or not audio_path.is_file():
+        return metadata
+
+    with tempfile.TemporaryDirectory(prefix="h9-audio-fit-", dir=str(audio_path.parent)) as temp_dir:
+        fitted_path = Path(temp_dir) / audio_path.name
+        try:
+            subprocess.run(
+                [
+                    ffmpeg,
+                    "-nostdin",
+                    "-y",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-i",
+                    str(audio_path),
+                    "-filter:a",
+                    f"atempo={speedup:.8f}",
+                    "-ac",
+                    str(metadata.channels),
+                    "-ar",
+                    str(metadata.sample_rate),
+                    "-c:a",
+                    "pcm_s16le",
+                    str(fitted_path),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=True,
+            )
+            with wave.open(str(fitted_path), "rb") as fitted_wav:
+                sample_rate = fitted_wav.getframerate()
+                frames = fitted_wav.getnframes()
+                channels = fitted_wav.getnchannels()
+                sample_width = fitted_wav.getsampwidth()
+                if sample_rate <= 0 or frames <= 0 or sample_width != 2:
+                    raise ValueError("FFmpeg produced an invalid narration WAV")
+                actual_duration = frames / float(sample_rate)
+                if actual_duration > target + 0.01:
+                    raise ValueError(
+                        f"FFmpeg narration remains over target ({actual_duration:.3f}s > {target:.3f}s)"
+                    )
+            os.replace(fitted_path, audio_path)
+        except (OSError, ValueError, wave.Error, subprocess.SubprocessError) as exc:
+            raise RuntimeError(f"Could not fit narration WAV to its target duration: {exc}") from exc
+
+    return AudioMetadata(
+        file_path=str(audio_path),
+        duration_seconds=actual_duration,
+        sample_rate=sample_rate,
+        channels=channels,
+        sample_width_bytes=sample_width,
+        file_size_bytes=audio_path.stat().st_size,
+        provider_used=metadata.provider_used,
+        format="wav",
+    )
 
 
 class TTSProvider(ABC):
@@ -104,7 +190,11 @@ class ElevenLabsTTSProvider(TTSProvider):
 
         out_file = Path(output_path).resolve()
         out_file.parent.mkdir(parents=True, exist_ok=True)
-        voice_id = voice or self.DEFAULT_VOICE_ID
+        voice_id = (
+            voice
+            if voice and voice.lower() not in {"default", "af_nova"}
+            else self.DEFAULT_VOICE_ID
+        )
 
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
         payload = {
@@ -138,21 +228,73 @@ class ElevenLabsTTSProvider(TTSProvider):
         if len(audio_bytes) < 100:
             raise ValueError("ElevenLabs returned empty or invalid audio payload.")
 
-        with open(out_file, "wb") as f:
-            f.write(audio_bytes)
-
-        # Estimate or inspect duration
-        duration = target_duration or max(1.0, len(text.split()) / 2.5)
+        if out_file.suffix.lower() == ".wav":
+            ffmpeg = shutil.which("ffmpeg")
+            if not ffmpeg:
+                raise RuntimeError("ElevenLabs returned MP3 audio, but FFmpeg is required to create the WAV narration track.")
+            with tempfile.TemporaryDirectory(prefix="h9-elevenlabs-") as temp_dir:
+                mp3_path = Path(temp_dir) / "response.mp3"
+                mp3_path.write_bytes(audio_bytes)
+                try:
+                    subprocess.run(
+                        [
+                            ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+                            "-i", str(mp3_path), "-ac", "1", "-ar", "44100",
+                            "-c:a", "pcm_s16le", str(out_file),
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=60,
+                        check=True,
+                    )
+                except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+                    raise RuntimeError(f"Could not convert ElevenLabs MP3 to WAV: {exc}") from exc
+            try:
+                with wave.open(str(out_file), "rb") as wav_file:
+                    sample_rate = wav_file.getframerate()
+                    duration = wav_file.getnframes() / float(sample_rate)
+                    channels = wav_file.getnchannels()
+                    sample_width = wav_file.getsampwidth()
+            except (OSError, wave.Error, ZeroDivisionError) as exc:
+                raise RuntimeError("Converted ElevenLabs narration WAV could not be measured.") from exc
+            if duration <= 0 or channels < 1 or sample_width != 2:
+                raise RuntimeError("Converted ElevenLabs narration WAV has invalid audio metadata.")
+            file_size = out_file.stat().st_size
+            audio_format = "wav"
+        elif out_file.suffix.lower() == ".mp3":
+            out_file.write_bytes(audio_bytes)
+            ffprobe = shutil.which("ffprobe")
+            if not ffprobe:
+                raise RuntimeError("FFprobe is required to measure ElevenLabs MP3 duration.")
+            try:
+                measured = subprocess.run(
+                    [
+                        ffprobe, "-v", "error", "-show_entries", "format=duration",
+                        "-of", "default=noprint_wrappers=1:nokey=1", str(out_file),
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=True,
+                )
+                duration = float(measured.stdout.strip())
+            except (OSError, ValueError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+                raise RuntimeError(f"Could not measure ElevenLabs MP3 duration: {exc}") from exc
+            sample_rate, channels, sample_width = 44100, 1, 2
+            file_size = out_file.stat().st_size
+            audio_format = "mp3"
+        else:
+            raise ValueError("ElevenLabs output path must end in .wav or .mp3.")
 
         return AudioMetadata(
             file_path=str(out_file),
             duration_seconds=duration,
-            sample_rate=44100,
-            channels=1,
-            sample_width_bytes=2,
-            file_size_bytes=len(audio_bytes),
+            sample_rate=sample_rate,
+            channels=channels,
+            sample_width_bytes=sample_width,
+            file_size_bytes=file_size,
             provider_used="elevenlabs",
-            format="mp3" if out_file.suffix.lower() == ".mp3" else "wav",
+            format=audio_format,
         )
 
 
@@ -165,15 +307,37 @@ class WindowsSAPITTSProvider(TTSProvider):
     def is_available(self) -> bool:
         if os.name != "nt":
             return False
-        # Verify powershell is accessible
+        # Verify that SAPI can actually render audio in this process. Listing
+        # installed voices alone is insufficient: service or locked-down
+        # Windows sessions can enumerate voices but cannot select or use them.
+        probe_script = r"""
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Speech
+$synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
+$stream = New-Object System.IO.MemoryStream
+try {
+    $voices = @($synth.GetInstalledVoices() | Where-Object { $_.Enabled })
+    if ($voices.Count -eq 0) { throw 'No enabled SAPI voice is installed.' }
+    $synth.SelectVoice($voices[0].VoiceInfo.Name)
+    $synth.SetOutputToWaveStream($stream)
+    $synth.Speak('Test.')
+    if ($stream.Length -le 44) { throw 'SAPI returned an empty WAV stream.' }
+    Write-Output 'ok'
+} catch {
+    exit 1
+} finally {
+    $synth.Dispose()
+    $stream.Dispose()
+}
+"""
         try:
             res = subprocess.run(
-                ["powershell", "-NoProfile", "-Command", "Write-Output 'ok'"],
+                ["powershell", "-NoProfile", "-Command", probe_script],
                 capture_output=True,
                 text=True,
-                timeout=5,
+                timeout=10,
             )
-            return "ok" in res.stdout.strip().lower()
+            return res.returncode == 0 and "ok" in res.stdout.strip().lower()
         except Exception:
             return False
 
@@ -195,68 +359,130 @@ class WindowsSAPITTSProvider(TTSProvider):
         clean_text = text.replace("'", "''").replace('"', '`"').replace("\n", " ").replace("\r", " ")
         out_wav_str = str(out_file).replace("'", "''")
 
-        rate_val = kwargs.get("rate", 0)  # -10 to 10
+        rate_val = int(kwargs.get("rate", 0))  # System.Speech range: -10 to 10
+        if not -10 <= rate_val <= 10:
+            raise ValueError("Windows SAPI rate must be between -10 and 10.")
         volume_val = kwargs.get("volume", 100)
 
-        ps_script = f"""
+        def synthesize_at_rate(speech_rate: int) -> AudioMetadata:
+            out_file.unlink(missing_ok=True)
+            ps_script = f"""
+$ErrorActionPreference = 'Stop';
 Add-Type -AssemblyName System.Speech;
 $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;
-$synth.Rate = {rate_val};
+$synth.Rate = {speech_rate};
 $synth.Volume = {volume_val};
 """
-        if voice:
-            clean_voice = voice.replace("'", "''")
-            ps_script += f"""
+            if voice:
+                clean_voice = voice.replace("'", "''")
+                ps_script += f"""
 try {{
     $synth.SelectVoice('{clean_voice}');
 }} catch {{}}
 """
 
-        ps_script += f"""
+            ps_script += f"""
 $synth.SetOutputToWaveFile('{out_wav_str}');
 $synth.Speak('{clean_text}');
 $synth.Dispose();
 """
 
-        try:
-            res = subprocess.run(
-                ["powershell", "-NoProfile", "-Command", ps_script],
-                capture_output=True,
-                text=True,
-                timeout=30,
+            try:
+                res = subprocess.run(
+                    ["powershell", "-NoProfile", "-Command", ps_script],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if res.returncode != 0:
+                    raise RuntimeError(
+                        f"PowerShell SAPI execution returned {res.returncode}: {res.stderr.strip()}"
+                    )
+            except Exception as e:
+                raise RuntimeError(f"Windows SAPI generation failed: {e}") from e
+
+            if not out_file.exists() or out_file.stat().st_size < 100:
+                raise RuntimeError(f"SAPI output WAV was not created or too small ({out_file}).")
+
+            # Inspect the generated WAV using its actual frame count. If the file
+            # is malformed, fail rather than estimating duration from its text.
+            try:
+                with wave.open(str(out_file), "rb") as wf:
+                    channels = wf.getnchannels()
+                    sample_width = wf.getsampwidth()
+                    sample_rate = wf.getframerate()
+                    frames = wf.getnframes()
+                    if sample_rate <= 0 or frames <= 0:
+                        raise RuntimeError("Windows SAPI produced WAV audio with no measurable samples.")
+                    actual_duration = frames / float(sample_rate)
+            except (OSError, wave.Error, EOFError) as exc:
+                raise RuntimeError("Windows SAPI produced WAV audio that could not be measured.") from exc
+
+            if channels < 1 or sample_width != 2 or actual_duration <= 0:
+                raise RuntimeError("Windows SAPI produced invalid WAV audio metadata.")
+
+            return AudioMetadata(
+                file_path=str(out_file),
+                duration_seconds=actual_duration,
+                sample_rate=sample_rate,
+                channels=channels,
+                sample_width_bytes=sample_width,
+                file_size_bytes=out_file.stat().st_size,
+                provider_used="windows_sapi",
+                format="wav",
             )
-            if res.returncode != 0:
-                raise RuntimeError(f"PowerShell SAPI execution returned {res.returncode}: {res.stderr.strip()}")
-        except Exception as e:
-            raise RuntimeError(f"Windows SAPI generation failed: {e}")
 
-        if not out_file.exists() or out_file.stat().st_size < 100:
-            raise RuntimeError(f"SAPI output WAV was not created or too small ({out_file}).")
+        if not target_duration or target_duration <= 0:
+            return synthesize_at_rate(rate_val)
 
-        # Inspect generated WAV
-        try:
-            with wave.open(str(out_file), "rb") as wf:
-                channels = wf.getnchannels()
-                sample_width = wf.getsampwidth()
-                sample_rate = wf.getframerate()
-                frames = wf.getnframes()
-                actual_duration = frames / float(sample_rate) if sample_rate > 0 else 1.0
-        except Exception:
-            actual_duration = target_duration or (len(text.split()) / 2.5)
-            channels = 1
-            sample_width = 2
-            sample_rate = 22050
+        target = float(target_duration)
+        tolerance = max(1.0, target * 0.10)
+        low_rate, high_rate = -10, 10
+        checked_rates = set()
+        measurements: List[Tuple[int, AudioMetadata]] = []
+        candidate_rate = rate_val
 
-        return AudioMetadata(
-            file_path=str(out_file),
-            duration_seconds=actual_duration,
-            sample_rate=sample_rate,
-            channels=channels,
-            sample_width_bytes=sample_width,
-            file_size_bytes=out_file.stat().st_size,
-            provider_used="windows_sapi",
-            format="wav",
-        )
+        # SAPI expands numbers and abbreviations differently across voices.
+        # Search real measured WAV durations across its supported rate range;
+        # never stretch metadata or accept a synthetic duration estimate.
+        for _ in range(7):
+            if candidate_rate in checked_rates or candidate_rate < low_rate or candidate_rate > high_rate:
+                break
+            checked_rates.add(candidate_rate)
+            measured = synthesize_at_rate(candidate_rate)
+            measurements.append((candidate_rate, measured))
+
+            if measured.duration_seconds > target + 0.01:
+                low_rate = max(low_rate, candidate_rate + 1)
+            else:
+                if target - measured.duration_seconds <= tolerance:
+                    # This rate fits. Try a slower rate to use more of the target
+                    # duration without crossing into narration truncation.
+                    high_rate = min(high_rate, candidate_rate - 1)
+                else:
+                    high_rate = min(high_rate, candidate_rate - 1)
+
+            if low_rate > high_rate:
+                break
+            candidate_rate = (low_rate + high_rate) // 2
+
+        feasible = [
+            (speech_rate, meta)
+            for speech_rate, meta in measurements
+            if meta.duration_seconds <= target + 0.01
+            and target - meta.duration_seconds <= tolerance
+        ]
+        if feasible:
+            best_rate, best_meta = max(feasible, key=lambda item: item[1].duration_seconds)
+        else:
+            best_rate, best_meta = min(
+                measurements,
+                key=lambda item: abs(target - item[1].duration_seconds),
+            )
+
+        if measurements[-1][0] != best_rate:
+            best_meta = synthesize_at_rate(best_rate)
+        return best_meta
 
 
 class HarmonicWAVSynthesizer(TTSProvider):

@@ -66,7 +66,7 @@ class CandidateAsset:
         file_sha256: str,
         scene_target: str = "",
         claim_id_refs: Optional[List[str]] = None,
-        verification_status: str = "VERIFIED",
+        verification_status: str = "UNVERIFIED",
     ) -> MediaAsset:
         """Convert CandidateAsset to validated MediaAsset model."""
         aspect_ratio = "16:9"

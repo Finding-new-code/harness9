@@ -13,6 +13,7 @@ import time
 from typing import Any, Dict, List, Optional, Union
 
 from adapters.hermes.sandbox import HermesSessionSandbox
+from src.evaluation.render_evaluation import evaluate_render, pick_video_to_evaluate
 from src.h9_runtime import (
     ContentRuntime,
     DefaultContentRuntime,
@@ -189,32 +190,14 @@ class HermesBridge:
         }
 
     def evaluate_session(self, session_id: str) -> Dict[str, Any]:
-        """Evaluate the quality metrics of a session's output."""
+        """Evaluate a session's rendered video by MEASURING it (decoded pixels, motion, audio, container).
+
+        Nothing here is assumed: ``passed`` is the media gate's verdict, every score is a measured ratio,
+        and the quality dimensions Harness 9 cannot measure yet are listed as NOT MEASURED in the feedback.
+        """
         sandbox = self.get_sandbox(session_id)
-        renders = sandbox.list_render_artifacts()
-
-        has_video = len(renders) > 0 and renders[0].exists()
-
-        report = EvaluationReport(
-            run_id=f"eval_{session_id}_{int(time.time())}",
-            layer=EvaluationLayer.VIDEO,
-            scores={
-                "video_integrity": 1.0 if has_video else 0.0,
-                "audio_speech_alignment": 0.95,
-                "scene_pacing": 0.92,
-                "factual_grounding": 0.96,
-            },
-            composite_score=0.96 if has_video else 0.0,
-            passed=has_video,
-            feedback=[
-                (
-                    "All scenes render with paused GSAP timelines."
-                    if has_video
-                    else "Video file not found."
-                ),
-                "Zero external remote URL dependencies detected.",
-            ],
-        )
+        video = pick_video_to_evaluate(sandbox.list_render_artifacts())
+        report = evaluate_render(video, run_id=f"eval_{session_id}_{int(time.time())}")
 
         sandbox.save_audit_record("evaluation_report", report.to_dict())
         return report.to_dict()

@@ -63,7 +63,7 @@ from src.models.dossier import (
     Summary,
     TalkingPoint,
 )
-from src.research.engine import ResearchEngine
+from src.research.engine import ResearchEngine, ResearchUnavailableError
 from src.research.providers import (
     BaseSearchProvider,
     DuckDuckGoProvider,
@@ -93,109 +93,49 @@ from src.research.scoring import (
 
 
 class TestFuzzInputs(unittest.TestCase):
-    """Adversarial testing with malformed, extreme, and fuzzed topic inputs."""
+    """Untrusted and unsupported briefs fail closed instead of receiving fake facts."""
 
     def setUp(self):
         self.engine = ResearchEngine()
 
-    def test_fuzz_empty_string_rejected(self):
-        """Assert empty topic string raises ValueError."""
-        with self.assertRaises(ValueError):
-            self.engine.synthesize_research("", offline=True)
+    def test_empty_and_whitespace_topics_are_rejected(self):
+        for topic in ("", "   ", "\t\n", "\u200b\u200b"):
+            with self.subTest(topic=topic):
+                if topic.strip():
+                    with self.assertRaises(ResearchUnavailableError):
+                        self.engine.synthesize_research(topic, offline=True)
+                else:
+                    with self.assertRaises(ValueError):
+                        self.engine.synthesize_research(topic, offline=True)
 
-    def test_fuzz_pure_whitespace_rejected(self):
-        """Assert various whitespace combinations raise ValueError."""
-        whitespace_samples = [
-            "   ",
-            "\t\t\t",
-            "\n\r\n",
-            "   \t  \n  \r  ",
-            "\u200b\u200b",  # zero-width spaces (if stripped or handled)
-        ]
-        for ws in whitespace_samples:
-            if not ws.strip():
-                with self.assertRaises(ValueError):
-                    self.engine.synthesize_research(ws, offline=True)
+    def test_long_unicode_and_untrusted_topics_do_not_receive_fabricated_dossiers(self):
+        topics = (
+            ("Transistor semiconductor physics " * 350)[:10000],
+            ("Quantum Entanglement Superposition " * 1500)[:50000],
+            "\U0001f52c \U0001f680 \U0001f916",
+            "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0631\u0627\u0646\u0632\u0633\u062a\u0648\u0631",
+            "\u534a\u5c0e\u4f53\u306e\u6b74\u53f2",
+            "caf\u00e9 semiconductor history",
+            "' OR '1'='1'; DROP TABLE dossiers; --",
+            '{"__proto__": {"admin": true}, "topic": "hacked"}',
+            "!!python/object/apply:os.system ['echo pwned']",
+            "transistor; rm -rf /; echo pwned",
+            "<script>alert('XSS')</script><b>Bold Topic</b>",
+            "transistor\x00\x01 history",
+            "((a+)+)+b topic brief",
+        )
+        for topic in topics:
+            with self.subTest(topic=topic[:80]):
+                with self.assertRaises(ResearchUnavailableError):
+                    self.engine.synthesize_research(topic, offline=True)
 
-    def test_fuzz_long_topic_10k_characters(self):
-        """Assert a 10,000-character topic string does not crash and produces valid dossier."""
-        long_topic = ("Transistor semiconductor physics " * 350)[:10000]
-        dossier = self.engine.synthesize_research(long_topic, offline=True)
-        self.assertIsInstance(dossier, ResearchDossier)
-        self.assertEqual(dossier.topic, long_topic)
-        self.assertGreaterEqual(len(dossier.claims), 3)
-        for claim in dossier.claims:
-            self.assertTrue(0.0 <= claim.confidence_score <= 1.0)
-
-    def test_fuzz_long_topic_50k_characters(self):
-        """Assert a 50,000-character topic string executes safely."""
-        long_topic = ("Quantum Entanglement Superposition " * 1500)[:50000]
-        dossier = self.engine.synthesize_research(long_topic, offline=True)
-        self.assertIsInstance(dossier, ResearchDossier)
-        self.assertEqual(len(dossier.claims), 4)
-
-    def test_fuzz_emojis_and_pictographs(self):
-        """Assert topics containing exclusively emojis and pictographs are synthesized."""
-        emoji_topics = [
-            "🔬 ⚛️ 🚀 🤖 💥 🔥",
-            "🧠 ⚡ 💡 🛰️ 💻 📡",
-            "✨🌟⭐🚀🛰️🪐",
-        ]
-        for em in emoji_topics:
-            dossier = self.engine.synthesize_research(em, offline=True)
-            self.assertEqual(dossier.topic, em)
-            self.assertGreaterEqual(len(dossier.claims), 3)
-            self.assertTrue(all(0.0 <= c.confidence_score <= 1.0 for c in dossier.claims))
-
-    def test_fuzz_multilingual_unicode_scripts(self):
-        """Assert multi-lingual scripts (Arabic, Chinese, Japanese, Hebrew, Cyrillic, Devanagari, Greek, Thai) are supported."""
-        multilingual_samples = [
-            ("Arabic RTL", "تاريخ الترانزستور والدوائر المتكاملة"),
-            ("Chinese", "量子计算与半导体芯片发展史"),
-            ("Japanese", "グラフィックスプロセッシングユニットの並列計算機構"),
-            ("Hebrew RTL", "היסטוריה של המחשב ומעגלים משولבים"),
-            ("Cyrillic", "История создания транзистора в Bell Labs"),
-            ("Devanagari", "ट्रांजिस्टर का इतिहास और आधुनिक कंप्यूटर"),
-            ("Greek", "Ιστορία του τρανζίστορ και ημιαγωγοί"),
-            ("Thai", "ประวัติศาสตร์ของทรานซิสเตอร์และไมโครโปรเซสเซอร์"),
-            ("Accented French", "L'histoire des semi-conducteurs et la théorie de la relativité"),
-            ("German Umlauts", "Über die Entwicklung von Halbleiterbauelementen"),
-        ]
-        for label, topic in multilingual_samples:
-            with self.subTest(language=label):
-                dossier = self.engine.synthesize_research(topic, offline=True)
-                self.assertEqual(dossier.topic, topic)
-                self.assertGreaterEqual(len(dossier.claims), 3)
-                self.assertGreaterEqual(len(dossier.talking_points), 3)
-                self.assertGreaterEqual(len(dossier.statistics), 1)
-                # Verify JSON/YAML roundtrip with unicode
-                json_str = dossier.to_json()
-                roundtrip = ResearchDossier.from_json(json_str)
-                self.assertEqual(roundtrip.topic, topic)
-
-    def test_fuzz_injection_and_security_payloads(self):
-        """Assert security attack vectors (SQLi, JSON injection, YAML exploits, XSS, shell syntax, null bytes) execute safely."""
-        payloads = [
-            ("SQL Injection", "' OR '1'='1'; DROP TABLE dossiers; --"),
-            ("JSON Injection", '{"__proto__": {"admin": true}, "topic": "hacked"}'),
-            ("YAML Exploit", "!!python/object/apply:os.system ['echo pwned']"),
-            ("Shell Injection", "transistor; rm -rf /; echo pwned"),
-            ("XSS HTML", "<script>alert('XSS')</script><b>Bold Topic</b>"),
-            ("Null Bytes", "transistor\x00\x01\x02\x08\x1b\x7f history"),
-            ("Regex Backtracking", "((a+)+)+b topic brief"),
-            ("Special Characters", "??!!##$$%%&&**(())__++--==::;;\"\"''<<>>,,..//||\\\\~~^^@@"),
-        ]
-        for label, payload in payloads:
-            with self.subTest(payload_type=label):
-                dossier = self.engine.synthesize_research(payload, offline=True)
-                self.assertIsInstance(dossier, ResearchDossier)
-                self.assertEqual(dossier.topic, payload.strip())
-                # Ensure serializable and deserializable without code execution
-                json_out = dossier.to_json()
-                self.assertIn("1.0.0", json_out)
-                yaml_out = dossier.to_yaml()
-                loaded = ResearchDossier.from_yaml(yaml_out)
-                self.assertEqual(loaded.topic, payload.strip())
+    def test_unknown_topic_failure_does_not_write_a_dossier(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaises(ResearchUnavailableError):
+                self.engine.synthesize_research(
+                    "Unsupported beta topic", offline=True, output_dir=temp_dir
+                )
+            self.assertEqual(list(Path(temp_dir).iterdir()), [])
 
 
 class TestExtremeDurations(unittest.TestCase):
@@ -212,11 +152,11 @@ class TestExtremeDurations(unittest.TestCase):
         total_tp_preset = sum(tp.estimated_duration_sec for tp in dossier_preset.talking_points)
         self.assertAlmostEqual(total_tp_preset, 1.0, delta=0.5)
 
-        # 2. Procedural topic
-        dossier_proc = self.engine.synthesize_research("Novel Synthetic Topic For Duration Test", offline=True, target_duration=1)
-        self.assertEqual(dossier_proc.metadata.target_duration_seconds, 1)
-        total_tp_proc = sum(tp.estimated_duration_sec for tp in dossier_proc.talking_points)
-        self.assertAlmostEqual(total_tp_proc, 1.0, delta=0.1)
+        # Another bundled preset uses the same duration scaling path.
+        dossier_gpu = self.engine.synthesize_research("How GPUs Work", offline=True, target_duration=1)
+        self.assertEqual(dossier_gpu.metadata.target_duration_seconds, 1)
+        total_tp_gpu = sum(tp.estimated_duration_sec for tp in dossier_gpu.talking_points)
+        self.assertAlmostEqual(total_tp_gpu, 1.0, delta=0.1)
 
     def test_extreme_duration_500_seconds(self):
         """Assert large 500s duration scales talking points accurately."""
@@ -233,8 +173,8 @@ class TestExtremeDurations(unittest.TestCase):
         self.assertAlmostEqual(total_tp, 3600.0, delta=10.0)
 
     def test_extreme_duration_100k_seconds(self):
-        """Assert massive duration (100,000s) does not overflow or crash."""
-        dossier = self.engine.synthesize_research("Quantum Metamaterials", offline=True, target_duration=100000)
+        """Assert a bundled preset duration of 100,000s does not overflow."""
+        dossier = self.engine.synthesize_research("How Quantum Computers Work", offline=True, target_duration=100000)
         self.assertEqual(dossier.metadata.target_duration_seconds, 100000)
         total_tp = sum(tp.estimated_duration_sec for tp in dossier.talking_points)
         self.assertAlmostEqual(total_tp, 100000.0, delta=1.0)
@@ -261,63 +201,48 @@ class TestNetworkFailureSimulation(unittest.TestCase):
     def setUp(self):
         self.engine = ResearchEngine()
 
-    def test_network_dns_resolution_failure_fallback(self):
-        """Assert DNS resolution failure (URLError) triggers graceful offline fallback."""
-        with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("[Errno 11001] getaddrinfo failed")):
-            dossier = self.engine.synthesize_research("Advanced Superconductors In Fusion Reactors", offline=False)
-            self.assertIsInstance(dossier, ResearchDossier)
-            self.assertIn(dossier.metadata.mode, ["offline_fallback", "online"])
-            self.assertGreaterEqual(len(dossier.claims), 3)
+    def test_network_dns_resolution_failure_is_reported(self):
+        """DNS failure is reported instead of returning fabricated fallback research."""
+        with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("DNS lookup failed")):
+            with self.assertRaises(ResearchUnavailableError):
+                self.engine.synthesize_research("Advanced Superconductors In Fusion Reactors", offline=False)
 
-    def test_network_http_status_codes_handling(self):
-        """Assert HTTP error codes (403, 404, 429, 500, 502, 503, 504) are caught and handled."""
-        http_codes = [403, 404, 429, 500, 502, 503, 504]
-        for code in http_codes:
+    def test_network_http_status_codes_are_reported(self):
+        """HTTP errors do not produce a successful-looking dossier."""
+        for code in [403, 404, 429, 500, 502, 503, 504]:
             with self.subTest(http_status=code):
                 err = urllib.error.HTTPError(
-                    url="https://api.example.com",
-                    code=code,
-                    msg=f"HTTP Error {code}",
-                    hdrs={},
-                    fp=io.BytesIO(b"Error response body"),
+                    url="https://api.example.com", code=code, msg=f"HTTP Error {code}",
+                    hdrs={}, fp=io.BytesIO(b"Error response body"),
                 )
                 with patch("urllib.request.urlopen", side_effect=err):
-                    dossier = self.engine.synthesize_research("Photonic Quantum Processors", offline=False)
-                    self.assertIsInstance(dossier, ResearchDossier)
-                    self.assertGreaterEqual(len(dossier.claims), 3)
+                    with self.assertRaises(ResearchUnavailableError):
+                        self.engine.synthesize_research("Photonic Quantum Processors", offline=False)
 
-    def test_network_socket_timeout_handling(self):
-        """Assert socket connection timeout triggers graceful fallback."""
-        with patch("urllib.request.urlopen", side_effect=TimeoutError("Connection timed out after 10s")):
-            dossier = self.engine.synthesize_research("Neuromorphic Computing Architectures", offline=False)
-            self.assertIsInstance(dossier, ResearchDossier)
-            self.assertGreaterEqual(len(dossier.claims), 3)
+    def test_network_socket_timeout_is_reported(self):
+        with patch("urllib.request.urlopen", side_effect=TimeoutError("Connection timed out")):
+            with self.assertRaises(ResearchUnavailableError):
+                self.engine.synthesize_research("Neuromorphic Computing Architectures", offline=False)
 
-    def test_network_connection_reset_by_peer(self):
-        """Assert ConnectionResetError triggers graceful fallback."""
+    def test_network_connection_reset_is_reported(self):
         with patch("urllib.request.urlopen", side_effect=ConnectionResetError("Connection reset by peer")):
-            dossier = self.engine.synthesize_research("Carbon Nanotube Field-Effect Transistors", offline=False)
-            self.assertIsInstance(dossier, ResearchDossier)
-            self.assertGreaterEqual(len(dossier.claims), 3)
+            with self.assertRaises(ResearchUnavailableError):
+                self.engine.synthesize_research("Carbon Nanotube Field-Effect Transistors", offline=False)
 
-    def test_network_malformed_json_response_handling(self):
-        """Assert unparseable or malformed API JSON responses are safely handled."""
+    def test_network_malformed_json_does_not_return_a_dossier(self):
         malformed_bodies = [
             b"<!DOCTYPE html><html><body>502 Bad Gateway</body></html>",
-            b"{ invalid json content here ...",
-            b"",
-            b"null",
-            b"42",
+            b"{ invalid json content here ...", b"", b"null", b"42",
             b"{\"results\": \"should_be_list_not_string\"}",
         ]
         for body in malformed_bodies:
-            mock_resp = MagicMock()
-            mock_resp.read.return_value = body
-            mock_resp.__enter__.return_value = mock_resp
-            with patch("urllib.request.urlopen", return_value=mock_resp):
-                dossier = self.engine.synthesize_research("High Temperature Superconductivity", offline=False)
-                self.assertIsInstance(dossier, ResearchDossier)
-                self.assertGreaterEqual(len(dossier.claims), 3)
+            with self.subTest(body=body):
+                mock_resp = MagicMock()
+                mock_resp.read.return_value = body
+                mock_resp.__enter__.return_value = mock_resp
+                with patch("urllib.request.urlopen", return_value=mock_resp):
+                    with self.assertRaises(ResearchUnavailableError):
+                        self.engine.synthesize_research("High Temperature Superconductivity", offline=False)
 
     def test_network_multi_provider_fault_isolation(self):
         """Assert dispatcher continues when individual providers fail."""
@@ -359,14 +284,8 @@ class TestConfidenceScoreBoundsAndHeuristics(unittest.TestCase):
         sample_topics = [
             "The History of the Transistor",
             "How GPUs Work",
-            "The Apollo 11 Guidance Computer",
+            "The Apollo Guidance Computer",
             "How Quantum Computers Work",
-            "Spintronics and Magnetic RAM",
-            "Graphene Ballistic Transistors",
-            "Cryogenic CMOS Circuit Design",
-            "Optical Interconnects in Supercomputers",
-            "DNA Data Storage Technology",
-            "Topological Quantum Error Correction",
         ]
         for topic in sample_topics:
             dossier = engine.synthesize_research(topic, offline=True)
@@ -514,9 +433,15 @@ class TestConfidenceScoreBoundsAndHeuristics(unittest.TestCase):
         preset_files = list(presets_dir.glob("*.yaml"))
         self.assertGreaterEqual(len(preset_files), 3)
 
+        preset_topics = {
+            "transistor_history": "The History of the Transistor",
+            "how_gpus_work": "How GPUs Work",
+            "apollo_computer": "The Apollo Guidance Computer",
+            "quantum_computing": "How Quantum Computers Work",
+        }
         for p_file in preset_files:
             with self.subTest(preset=p_file.name):
-                dossier = ResearchDossier.load(p_file)
+                dossier = ResearchEngine().synthesize_research(preset_topics[p_file.stem], offline=True)
                 self.assertGreaterEqual(len(dossier.claims), 3)
                 for c in dossier.claims:
                     self.assertGreaterEqual(c.confidence_score, 0.0)
@@ -539,8 +464,8 @@ class TestResearchEngineIntegrityAndContract(unittest.TestCase):
         topics = [
             "The History of the Transistor",
             "How GPUs Work",
-            "Superconducting Qubits",
-            "Photonic Integrated Circuits",
+            "The Apollo Guidance Computer",
+            "How Quantum Computers Work",
         ]
         for t in topics:
             with self.subTest(topic=t):
@@ -556,30 +481,11 @@ class TestResearchEngineIntegrityAndContract(unittest.TestCase):
                 for stat in dossier.statistics:
                     self.assertIn(stat.source_claim_id, claim_ids, f"Statistic {stat.metric} references non-existent claim {stat.source_claim_id}")
 
-    def test_procedural_seed_reproducibility(self):
-        """Assert same novel topic produces byte-identical procedural research dossier."""
-        topic = "Topological Insulators and Quantum Spin Hall Effect"
-        d1 = self.engine.synthesize_research(topic, offline=True)
-        d2 = self.engine.synthesize_research(topic, offline=True)
-
-        self.assertEqual(d1.topic, d2.topic)
-        self.assertEqual(d1.metadata.run_id, d2.metadata.run_id)
-        self.assertEqual(len(d1.claims), len(d2.claims))
-        for c1, c2 in zip(d1.claims, d2.claims):
-            self.assertEqual(c1.claim_id, c2.claim_id)
-            self.assertEqual(c1.claim_text, c2.claim_text)
-            self.assertEqual(c1.confidence_score, c2.confidence_score)
-
-    def test_procedural_seed_diversity(self):
-        """Assert distinct topics produce distinct seeds, run IDs, and claim texts."""
-        t1 = "Cryogenic CMOS Logic"
-        t2 = "Optoelectronic Neural Networks"
-
-        d1 = self.engine.synthesize_research(t1, offline=True)
-        d2 = self.engine.synthesize_research(t2, offline=True)
-
-        self.assertNotEqual(d1.metadata.run_id, d2.metadata.run_id)
-        self.assertNotEqual(d1.claims[0].claim_text, d2.claims[0].claim_text)
+    def test_unknown_topics_are_not_procedurally_synthesized(self):
+        for topic in ("Topological Insulators and Quantum Spin Hall Effect", "Cryogenic CMOS Logic"):
+            with self.subTest(topic=topic):
+                with self.assertRaises(ResearchUnavailableError):
+                    self.engine.synthesize_research(topic, offline=True)
 
     def test_atomic_save_and_load_roundtrip(self):
         """Assert atomic saving to JSON & YAML preserves complete fidelity."""

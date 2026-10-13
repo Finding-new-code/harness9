@@ -7,7 +7,7 @@ Harness 9 runs natively on Windows, macOS, and Linux with Python 3.10+ and Node.
 ### Dependencies
 - **Python**: `httpx`, `pydantic`, `pyyaml`, `pytest`
 - **System**: `ffmpeg` (for video/audio encoding)
-- **Node.js**: Chromium / Puppeteer for headless browser frame extraction (optional; automated pure-canvas/snapshot fallbacks included).
+- **Node.js (>= 18) + Chrome/Chromium/Edge**: required for real rendering (headless frame capture via puppeteer-core; installed once into `~/.harness9/render-toolchain`). There are **no automatic fallbacks**: if the renderer is unavailable the run fails with instructions. Use `--render-backend stub` (or `HARNESS9_RENDER_BACKEND=stub`) for an explicit, labelled dry run. Tests that only exercise pipeline stages select the stub backend via `tests/h9_render_env.py`; real-render tests skip when the toolchain is absent. See `RENDERING.md`.
 
 ---
 
@@ -58,13 +58,20 @@ pytest tests/test_e2e_pipeline.py -v
 The `verify_pipeline.py` script is the automated acceptance validator. It evaluates the 6 fundamental production checkpoints:
 
 ```bash
-python verify_pipeline.py --test-mode
+python verify_pipeline.py --topic "How GPUs Work" --duration 15 --output-dir output/verify-gpu
 ```
 
+To verify the configured model and real online assets as well, add `--online-assets --model-script`. For live research, replace the default `--offline` with `--no-offline`; unverified live claims correctly leave the run `PARTIAL` and the verifier exits non-zero.
+
 ### Checkpoints Evaluated:
-1. **Checkpoint 1 (Research Dossier)**: Validates JSON/YAML structure, at least 3 verifiable claims with sources, category mappings, and confidence scores $\ge 0.70$.
-2. **Checkpoint 2 (Asset Ledger & Rights)**: Validates local frozen assets, valid SPDX/CC licenses, SHA-256 hash matching, and attribution metadata.
-3. **Checkpoint 3 (Audio Narration & Beat Alignment)**: Validates non-empty audio files (`.wav`/`.mp3`), header format validity, and duration alignment with scene beats ($\pm 2.0\text{s}$).
-4. **Checkpoint 4 (HyperFrames Project Contract)**: Verifies presence and structure of `BRIEF.md`, `DESIGN.md`, `SCRIPT.md`, and `STORYBOARD.md`.
-5. **Checkpoint 5 (Composition Linter)**: Statically parses `index.html` and `main.js` to ensure zero remote URL links, synchronous `window.__timelines["root"]` binding, and bounded animation loops.
-6. **Checkpoint 6 (Video File Validity)**: Uses FFprobe/FFmpeg to inspect `renders/final.mp4` for valid H.264 video streams, AAC audio streams, positive duration, and correct pixel dimensions (1920x1080 or 1080x1920).
+1. **Checkpoint 1 (Research Dossier)**: Requires at least three claims, HTTPS sources, finite confidence scores in `[0, 1]`, and `VERIFIED` status.
+2. **Checkpoint 2 (Asset Ledger & Rights)**: Requires frozen local assets, HTTPS source metadata, creator and license details, attribution text when required, an in-project path, and a matching SHA-256 hash.
+3. **Checkpoint 3 (Audio Narration)**: Parses WAV headers and duration; other supported audio formats must pass `ffprobe` stream and duration checks.
+4. **Checkpoint 4 (HyperFrames Project Contract)**: Requires `BRIEF.md`, `DESIGN.md`, `SCRIPT.md`, `STORYBOARD.md`, `index.html`, `styles.css`, and `main.js`.
+5. **Checkpoint 5 (Composition Linter)**: Checks the root composition, local media references, and finite animation loops.
+6. **Checkpoint 6 (Video File Validity)**: Requires `ffprobe` to confirm an H.264/AAC MP4 with video and audio streams and a positive duration. The production media gate separately measures resolution, frame rate, audio/video sync, and visual/audio quality.
+
+The verifier runs the real production pipeline; it does not fabricate replacement
+artifacts. It only applies these checks to a pipeline run whose status is
+`SUCCESS`. A live-research result with unreviewed claims is expected to remain
+`PARTIAL` and exit non-zero.

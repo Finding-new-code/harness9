@@ -10,107 +10,95 @@ metadata:
 summary:
   headline: "How GPUs Work: Parallel Computing from Pixels to Neural Networks"
   executive_summary: >
-    While CPUs are optimized for sequential execution using a few complex, low-latency cores,
-    GPUs execute thousands of simple arithmetic threads simultaneously. This massively parallel
-    SIMD architecture, originally built for 3D polygon rasterization, now forms the computational
-    backbone of modern Artificial Intelligence and scientific simulation.
+    CPUs and GPUs are designed for different workloads. GPUs emphasize high-throughput parallel
+    execution, using thread groups and specialized units for graphics, scientific computing, and
+    machine-learning workloads. The exact performance depends on the application and hardware.
   key_takeaways:
-    - "CPUs optimize for single-threaded latency, while GPUs maximize aggregate parallel throughput."
-    - "Modern GPUs contain tens of thousands of ALU cores operating under SIMD/SIMT models."
-    - "Tensor cores and specialized matrix units accelerate deep learning operations by orders of magnitude."
+    - "NVIDIA describes GPU execution using the SIMT model, with threads scheduled in warps."
+    - "The NVIDIA H100 SXM5 specification lists 16,896 FP32 cores and 528 Tensor Cores."
+    - "GPU speed depends on workload, data movement, and the device's architecture."
 
 claims:
   - claim_id: "claim_01"
-    claim_text: "A central processing unit (CPU) typically possesses between 8 and 64 high-speed cores designed for complex branching logic and low latency."
+    claim_text: "CPUs and GPUs are designed for different goals: CPUs emphasize fast execution of a few threads, while GPUs emphasize high instruction throughput across many parallel threads."
     category: "technical_mechanism"
-    confidence_score: 0.96
     primary_source:
-      title: "Computer Organization and Design: RISC-V Edition"
-      url: "https://www.sciencedirect.com/book/9780128122754/computer-organization-and-design-risc-v-edition"
-      publisher: "Morgan Kaufmann"
-    corroborating_sources:
-      - title: "ACM Digital Library - Principles of Multi-Core Processor Architecture"
-        url: "https://dl.acm.org/doi/10.1145/2694344"
+      title: "CUDA Programming Guide: Benefits of Using GPUs"
+      url: "https://docs.nvidia.com/cuda/cuda-programming-guide/index.html"
+      publisher: "NVIDIA"
     visual_cue_suggestion: "Diagram comparing a CPU with a few large complex cores to a GPU grid with thousands of tiny stream cores"
-    verification_notes: "Standard computer architecture taxonomy."
+    verification_notes: "Reviewed against NVIDIA's official CUDA Programming Guide on 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_02"
-    claim_text: "Modern flagship GPUs feature over 16,000 arithmetic logic units (ALUs) executing parallel mathematical operations across high-bandwidth memory."
+    claim_text: "The NVIDIA H100 SXM5 GPU specification lists 16,896 FP32 cores and 528 Tensor Cores."
     category: "quantitative_metric"
-    confidence_score: 0.98
     primary_source:
-      title: "NVIDIA Hopper Architecture Whitepaper"
-      url: "https://www.nvidia.com/en-us/data-center/technologies/hopper-architecture/"
+      title: "NVIDIA Hopper Architecture In-Depth"
+      url: "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
       publisher: "NVIDIA Corporation"
-    corroborating_sources:
-      - title: "IEEE Micro - Trends in High-Performance GPU Computing"
-        url: "https://ieeexplore.ieee.org/document/8356041"
     visual_cue_suggestion: "High-resolution silicon die shot of modern GPU showing symmetric grid of streaming multiprocessors"
-    verification_notes: "Verified against Nvidia H100/Blackwell and AMD CDNA specifications."
+    verification_notes: "The NVIDIA article's H100 SXM5 table lists these model-specific core counts; reviewed 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_03"
-    claim_text: "Graphics pipelines transform 3D vertex coordinates and texture matrices using SIMD (Single Instruction, Multiple Data) parallel execution."
+    claim_text: "NVIDIA's CUDA guide describes GPU SIMT execution in groups of 32 threads called warps; SIMT is related to, but distinct from, SIMD."
     category: "technical_mechanism"
-    confidence_score: 0.95
     primary_source:
-      title: "Real-Time Rendering, Fourth Edition"
-      url: "https://www.realtimerendering.com/"
-      publisher: "CRC Press"
-    corroborating_sources:
-      - title: "SIGGRAPH Computer Graphics Proceedings"
-        url: "https://www.siggraph.org/learn/conference-content/"
+      title: "CUDA Programming Guide: SIMT Execution Model"
+      url: "https://docs.nvidia.com/cuda/cuda-programming-guide/index.html"
+      publisher: "NVIDIA"
     visual_cue_suggestion: "3D wireframe polygon model being rendered and shaded in real-time across thousands of parallel pixels"
-    verification_notes: "Universal standard in real-time graphics rendering theory."
+    verification_notes: "Reviewed against NVIDIA's official description of SIMT and warp execution on 2026-10-11."
+    verification_status: "VERIFIED"
 
   - claim_id: "claim_04"
-    claim_text: "Matrix multiplication in neural networks maps directly to GPU tensor architectures, enabling trillion-parameter AI models to train efficiently."
+    claim_text: "NVIDIA describes H100 Tensor Cores and its Transformer Engine as hardware features for accelerating AI and high-performance computing workloads."
     category: "modern_impact"
-    confidence_score: 0.97
     primary_source:
-      title: "Deep Learning - Goodfellow, Bengio, Courville"
-      url: "https://www.deeplearningbook.org/"
-      publisher: "MIT Press"
-    corroborating_sources:
-      - title: "Communications of the ACM - Hardware Acceleration for Deep Learning"
-        url: "https://cacm.acm.org/magazines/2020/6/245162-hardware-acceleration-for-deep-learning/fulltext"
+      title: "NVIDIA Hopper Architecture In-Depth"
+      url: "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"
+      publisher: "NVIDIA"
     visual_cue_suggestion: "Visualization of matrix multiplication dot-products accelerating through hardware systolic array tensor cores"
-    verification_notes: "Consensus across academic and industry AI research."
+    verification_notes: "Reviewed against NVIDIA's H100 architecture description on 2026-10-11; no numeric speedup claim retained."
+    verification_status: "VERIFIED"
 
 talking_points:
   - beat_index: 1
-    title: "The Chef vs. The Assembly Line"
-    narrative_hook: "If a CPU is a master chef preparing one complex dish at lighting speed, a GPU is a factory of ten thousand cooks chopping vegetables at once."
+    title: "Parallel Workloads"
+    narrative_hook: "CPUs emphasize a few fast threads; GPUs emphasize throughput across many parallel threads."
     supported_claim_ids: ["claim_01"]
     estimated_duration_sec: 8.0
+    narration_short: "CPUs favor a few fast threads; GPUs favor parallel throughput."
+    narration_text: "CPUs favor fast execution for few threads; GPUs focus on high throughput across parallel threads."
 
   - beat_index: 2
-    title: "The Power of SIMD Parallelism"
-    narrative_hook: "Originally designed to render 3D video game polygons, GPUs process massive arrays of pixels with a single broadcast instruction."
+    title: "The SIMT Thread Model"
+    narrative_hook: "NVIDIA's H100 specification lists 16,896 FP32 cores and 528 Tensor Cores in its SXM5 model."
     supported_claim_ids: ["claim_02", "claim_03"]
     estimated_duration_sec: 12.0
+    narration_short: "The H100 lists 16,896 FP32 cores."
+    narration_text: "NVIDIA's H100 SXM5 lists 16,896 FP32 cores and 528 Tensor Cores. CUDA's 32-thread SIMT warps differ from SIMD."
 
   - beat_index: 3
     title: "Fueling the AI Revolution"
-    narrative_hook: "Because artificial intelligence calculations are essentially giant matrix multiplications, GPUs became the turbo-engine of modern deep learning."
+    narrative_hook: "H100 Tensor Cores and its Transformer Engine accelerate AI and high-performance computing workloads."
     supported_claim_ids: ["claim_04"]
     estimated_duration_sec: 10.0
+    narration_short: "H100 Tensor Cores accelerate AI and HPC."
+    narration_text: "H100 Tensor Cores and Transformer Engine accelerate AI and high-performance computing workloads."
 
 statistics:
-  - metric: "Typical GPU Core Count"
-    value: "16,000+ Cores"
-    context: "ALU units inside flagship computing GPUs"
+  - metric: "H100 FP32 Core Count"
+    value: "16,896"
+    context: "NVIDIA H100 SXM5 specification"
     source_claim_id: "claim_02"
-  - metric: "Memory Bandwidth"
-    value: "3+ TB/s"
-    context: "High Bandwidth Memory (HBM3e) throughput"
+  - metric: "H100 Tensor Core Count"
+    value: "528"
+    context: "NVIDIA H100 SXM5 specification"
     source_claim_id: "claim_02"
-  - metric: "Deep Learning Speedup"
-    value: "100x+"
-    context: "Matrix compute acceleration vs standard general-purpose CPUs"
-    source_claim_id: "claim_04"
 
 suggested_visual_queries:
-  - "CPU vs GPU architecture parallel comparison diagram"
-  - "Silicon die shot of modern GPU streaming multiprocessors"
-  - "3D wireframe polygon rendering graphics pipeline"
-  - "Artificial intelligence neural network matrix tensor core visualization"
+  - "GPU"
+  - "GPU SIMT diagram"
+  - "GPU core"

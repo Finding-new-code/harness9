@@ -14,7 +14,6 @@ import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from adapters.hyperframes.registry import ComponentRegistry, get_registry
-from src.hyperframes.generator import HyperFramesGenerator
 from src.hyperframes.renderer import HyperFramesRenderer, RenderResult
 from src.hyperframes.validator import CompositionValidator, validate_composition
 from src.models.contracts import AssetRecord, RenderArtifact, Script, ScriptScene
@@ -240,6 +239,10 @@ class HyperFramesAdapter:
         )
 
         # Build full styles.css
+        # Imported lazily: src.models.ir imports this module, and src.hyperframes.generator imports src.models,
+        # so a top-level import here made `from src.hyperframes.renderer import ...` fail on a cold interpreter.
+        from src.hyperframes.generator import HyperFramesGenerator
+
         base_generator = HyperFramesGenerator(format_aspect=format_aspect)
         base_css = base_generator.generate_css(brand=brand)
         custom_css = "\n\n".join(scenes_css_blocks)

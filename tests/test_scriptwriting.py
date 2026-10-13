@@ -7,8 +7,11 @@ Covers:
 """
 
 import json
+import math
 import os
+import shutil
 import struct
+import subprocess
 import tempfile
 import unittest
 import wave
@@ -42,11 +45,13 @@ from src.scriptwriting.generator import (
     MotionRules,
     ScriptGenerator,
     TypographyStyle,
+    _entrance_for_visual_cue,
     generate_brief,
     generate_design,
     generate_script,
     generate_storyboard,
 )
+from src.scriptwriting.model_writer import generate_narration
 from src.scriptwriting.pipeline import ScriptwritingPipeline, ScriptwritingResult
 from src.scriptwriting.tts import (
     AudioMetadata,
@@ -54,6 +59,7 @@ from src.scriptwriting.tts import (
     HarmonicWAVSynthesizer,
     TTSEngine,
     WindowsSAPITTSProvider,
+    fit_audio_duration,
 )
 
 
@@ -162,6 +168,48 @@ class TestScriptwritingCoverage(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
+    def test_model_narration_uses_injected_client_and_validates_claim_links(self):
+        scenes = ScriptGenerator().synthesize_scenes_from_dossier(
+            dossier=self.dossier,
+            target_duration=15.0,
+        )
+
+        class FixedNarrationModel:
+            label = "fixture:source-grounded"
+
+            def complete(self, prompt):
+                request = json.loads(prompt)
+                self.request = request
+                entries = []
+                for index, scene_data in enumerate(request["scenes"]):
+                    text = [
+                        "Bardeen and Brattain demonstrated a transistor in 1947.",
+                        "Bell Labs developed transistor devices after wartime research.",
+                        "Modern computers rely on billions of tiny transistors.",
+                    ][index]
+                    entries.append({
+                        "scene_id": scene_data["scene_id"],
+                        "claim_ids": scene_data["allowed_claim_ids"][:1],
+                        "narration_text": text,
+                    })
+                return json.dumps({"scenes": entries})
+
+        model = FixedNarrationModel()
+        label, narration = generate_narration(
+            dossier=self.dossier,
+            scenes=scenes,
+            target_duration=15.0,
+            model_client=model,
+        )
+
+        self.assertEqual(model.request["target_total_words"], 24)
+        self.assertEqual(model.request["allowed_total_word_range"], [23, 24])
+        self.assertEqual(label, "fixture:source-grounded")
+        self.assertEqual(set(narration), {scene.scene_id for scene in scenes})
+        for scene in scenes:
+            allowed = self.dossier.talking_points[int(scene.scene_id.rsplit("_", 1)[1]) - 1].supported_claim_ids
+            self.assertIn(narration[scene.scene_id]["claim_ids"][0], allowed)
+
     def test_01_brief_generation_content_and_structure(self):
         """F6: Validate BRIEF.md generation containing topic, duration, format, narrative arc, objectives."""
         brief_md = generate_brief(
@@ -252,8 +300,8 @@ class TestScriptwritingCoverage(unittest.TestCase):
         self.assertIn("**Voiceover**:", script_md)
         self.assertIn("**Visual Cue**:", script_md)
 
-    def test_05_storyboard_generation_gsap_and_hero(self):
-        """F6: Validate STORYBOARD.md generation with hero frames, gsap.from() entrance, and transitions."""
+    def test_05_storyboard_generation_uses_source_cues_and_safe_motion_tokens(self):
+        """F6: Storyboards use real visual cues and renderer-supported motion labels."""
         generator = ScriptGenerator()
         scenes = generator.synthesize_scenes_from_dossier(
             dossier=self.dossier,
@@ -266,8 +314,17 @@ class TestScriptwritingCoverage(unittest.TestCase):
         self.assertIn("## SCENE_1", sb_md)
         self.assertIn("**Time Window**:", sb_md)
         self.assertIn("**Hero Frame Description**:", sb_md)
-        self.assertIn("**Entrance Animation**: `gsap.from(", sb_md)
+        self.assertIn("**Entrance Animation**: `rise`", sb_md)
+        self.assertIn("**Transition Out**: `hold`", sb_md)
+        self.assertNotIn("Central visual card", sb_md)
         self.assertIn("**Transition Out**:", sb_md)
+
+    def test_storyboard_motion_preset_tracks_visual_meaning(self):
+        self.assertEqual(_entrance_for_visual_cue("Comparison of two architectures", 1), "slide_left")
+        self.assertEqual(_entrance_for_visual_cue("Timeline of key milestones", 1), "reveal")
+        self.assertEqual(_entrance_for_visual_cue("Verified benchmark statistic", 1), "zoom")
+        self.assertEqual(_entrance_for_visual_cue("A historical workshop photograph", 0), "rise")
+        self.assertEqual(_entrance_for_visual_cue("A historical workshop photograph", 1), "cut")
 
     def test_06_harmonic_wav_tts_synthesis(self):
         """F7: Test Pure Python modulated harmonic WAV synthesizer outputs valid 16-bit PCM WAV."""
@@ -316,15 +373,31 @@ class TestScriptwritingCoverage(unittest.TestCase):
             self.assertIsInstance(provider.is_available(), bool)
 
     def test_08_elevenlabs_tts_provider(self):
-        """F7: Test ElevenLabs provider handling and mock execution."""
+        """Convert and measure valid MP3 bytes; this does not claim to test ElevenLabs speech quality."""
         provider = ElevenLabsTTSProvider(api_key="mock_invalid_key")
         self.assertTrue(provider.is_available())
 
-        # Test request failure handling
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            self.skipTest("FFmpeg is required to verify MP3-to-WAV conversion.")
+
+        mp3_fixture = self.out_path / "fixture.mp3"
+        subprocess.run(
+            [
+                ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+                "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=44100",
+                "-t", "1.0", "-codec:a", "libmp3lame", "-b:a", "64k",
+                str(mp3_fixture),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        mp3_bytes = mp3_fixture.read_bytes()
+
         wav_path = self.out_path / "test_elevenlabs.wav"
         with patch("urllib.request.urlopen") as mock_urlopen:
             mock_resp = MagicMock()
-            mock_resp.read.return_value = b"RIFF" + b"\x00" * 200
+            mock_resp.read.return_value = mp3_bytes
             mock_resp.__enter__.return_value = mock_resp
             mock_urlopen.return_value = mock_resp
 
@@ -335,6 +408,11 @@ class TestScriptwritingCoverage(unittest.TestCase):
             )
             self.assertTrue(wav_path.exists())
             self.assertEqual(meta.provider_used, "elevenlabs")
+            self.assertGreater(meta.duration_seconds, 0.9)
+            self.assertLess(meta.duration_seconds, 1.2)
+            with wave.open(str(wav_path), "rb") as wav_file:
+                self.assertEqual(wav_file.getnchannels(), 1)
+                self.assertEqual(wav_file.getsampwidth(), 2)
 
     def test_09_tts_engine_provider_selection_and_fallback(self):
         """F7: Test TTSEngine fallback chain (ElevenLabs -> Windows SAPI -> Harmonic Synthesizer)."""
@@ -437,6 +515,65 @@ class TestScriptwritingBoundaries(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
+    def test_narration_slight_overrun_is_pitch_preserving_and_measured(self):
+        """A small provider overrun is fitted without falsifying WAV metadata."""
+        if not shutil.which("ffmpeg"):
+            self.skipTest("FFmpeg is required to verify duration fitting.")
+
+        audio_path = self.out_path / "slightly_long.wav"
+        sample_rate = 44100
+        duration = 15.352
+        total_samples = int(sample_rate * duration)
+        frames = bytearray()
+        for index in range(total_samples):
+            sample = int(5000 * math.sin(2.0 * math.pi * 440 * index / sample_rate))
+            frames.extend(struct.pack("<h", sample))
+        with wave.open(str(audio_path), "wb") as output:
+            output.setnchannels(1)
+            output.setsampwidth(2)
+            output.setframerate(sample_rate)
+            output.writeframes(frames)
+
+        original = AudioMetadata(
+            file_path=str(audio_path),
+            duration_seconds=duration,
+            sample_rate=sample_rate,
+            channels=1,
+            sample_width_bytes=2,
+            file_size_bytes=audio_path.stat().st_size,
+            provider_used="windows_sapi",
+            format="wav",
+        )
+        fitted = fit_audio_duration(original, 15.0)
+
+        self.assertGreater(fitted.duration_seconds, 14.8)
+        self.assertLessEqual(fitted.duration_seconds, 15.01)
+        self.assertEqual(fitted.provider_used, "windows_sapi")
+        with wave.open(str(audio_path), "rb") as output:
+            self.assertAlmostEqual(
+                fitted.duration_seconds,
+                output.getnframes() / output.getframerate(),
+                places=6,
+            )
+
+    def test_narration_large_overrun_is_not_compressed(self):
+        audio_path = self.out_path / "too_long.wav"
+        with wave.open(str(audio_path), "wb") as output:
+            output.setnchannels(1)
+            output.setsampwidth(2)
+            output.setframerate(44100)
+            output.writeframes(b"\x00\x00" * 44100)
+        metadata = AudioMetadata(
+            file_path=str(audio_path),
+            duration_seconds=16.0,
+            sample_rate=44100,
+            file_size_bytes=audio_path.stat().st_size,
+            provider_used="windows_sapi",
+            format="wav",
+        )
+
+        self.assertIs(fit_audio_duration(metadata, 15.0), metadata)
+
     def test_12_empty_or_minimal_text_tts(self):
         """Edge Case: Single word or empty text handling in TTS synthesizer."""
         synth = HarmonicWAVSynthesizer()
@@ -535,8 +672,8 @@ class TestScriptwritingBoundaries(unittest.TestCase):
             if i > 0:
                 self.assertGreaterEqual(g.start, res.groups[i-1].start)
 
-    def test_19_missing_dossier_talking_points_fallback(self):
-        """Edge Case: Dossier without talking points falls back to clean default scene synthesis."""
+    def test_19_missing_dossier_talking_points_fails_closed(self):
+        """Do not invent narrated facts when the dossier has no talking points."""
         dossier_no_tp = ResearchDossier(
             topic="Minimal Topic",
             metadata=DossierMetadata(run_id="run_min"),
@@ -545,9 +682,8 @@ class TestScriptwritingBoundaries(unittest.TestCase):
             talking_points=[],
         )
         generator = ScriptGenerator()
-        scenes = generator.synthesize_scenes_from_dossier(dossier_no_tp, target_duration=18.0)
-        self.assertEqual(len(scenes), 3)
-        self.assertAlmostEqual(sum(s.duration for s in scenes), 18.0, places=1)
+        with self.assertRaisesRegex(ValueError, "no talking points"):
+            generator.synthesize_scenes_from_dossier(dossier_no_tp, target_duration=18.0)
 
     def test_20_pipeline_custom_voice_and_aspect_ratio(self):
         """Edge Case: Pipeline execution with 9:16 portrait aspect ratio and custom voice."""

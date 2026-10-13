@@ -94,6 +94,7 @@ from src.models.contracts import (
     ScriptScene,
     SourceRecord,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 from src.models.ir import (
     AudioNarration,
     HyperFramesCompiler,
@@ -786,7 +787,7 @@ class TestAcceptanceDimensionESubagentCoupling(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_e01_subagent_spawning_and_context_isolation(self):
-        """Verify subagent spawning creates an isolated session context and fresh history."""
+        """Verify an unavailable local delegate is tracked as failed, not completed."""
         agent_rt = DefaultAgentRuntime()
         parent_session = "sess_parent_01"
         agent_rt.create_session(parent_session)
@@ -798,7 +799,7 @@ class TestAcceptanceDimensionESubagentCoupling(unittest.TestCase):
             allowed_tools=["h9.research", "web_search"],
         )
         self.assertIsInstance(sub_res, SubagentResult)
-        self.assertEqual(sub_res.status, SubagentStatus.COMPLETED)
+        self.assertEqual(sub_res.status, SubagentStatus.FAILED)
         self.assertTrue(sub_res.subagent_id.startswith("subagent_"))
         self.assertNotEqual(sub_res.subagent_id, parent_session)
 
@@ -814,22 +815,24 @@ class TestAcceptanceDimensionESubagentCoupling(unittest.TestCase):
             task="Perform isolated research",
             allowed_tools=["delegate_task", "clarify", "h9.research", "send_message"],
         )
-        # Check that execution did not fail and subagent executed within constrained scope
-        self.assertEqual(sub_res.status, SubagentStatus.COMPLETED)
+        # No live parent agent was supplied, so delegation must fail honestly.
+        self.assertEqual(sub_res.status, SubagentStatus.FAILED)
+        for blocked in ("delegate_task", "clarify", "send_message"):
+            self.assertNotIn(blocked, sub_res.structured_data["allowed_tools"])
 
     def test_e03_research_subagent_returns_verified_dossier(self):
-        """Verify research delegation via bridge returns a structured, validated ResearchDossier."""
+        """Verify curated fallback returns a structured dossier with real citations."""
         bridge = HermesCapabilityBridge(session_id="sess_dim_e_03", workspace_root=self.base_dir)
-        dossier = bridge.delegate_research(topic="Artificial Intelligence", depth="overview")
+        dossier = bridge.delegate_research(topic="How GPUs Work", depth="overview")
 
         self.assertIsInstance(dossier, ResearchDossier)
-        self.assertEqual(dossier.topic, "Artificial Intelligence")
+        self.assertEqual(dossier.topic, "How GPUs Work")
         self.assertGreater(len(dossier.claims), 0)
         self.assertIsInstance(dossier.claims[0], ClaimRecord)
         self.assertIsInstance(dossier.claims[0].primary_source, SourceRecord)
 
     def test_e04_subagent_lifecycle_status_and_result_reporting(self):
-        """Verify subagent transitions through status lifecycle with duration and result tracking."""
+        """Verify unavailable delegation has an error, duration, and task context."""
         agent_rt = DefaultAgentRuntime()
         agent_rt.create_session("parent_sess_04")
 
@@ -837,7 +840,8 @@ class TestAcceptanceDimensionESubagentCoupling(unittest.TestCase):
             parent_session_id="parent_sess_04",
             task="Investigate Superconductors",
         )
-        self.assertEqual(sub_res.status, SubagentStatus.COMPLETED)
+        self.assertEqual(sub_res.status, SubagentStatus.FAILED)
+        self.assertIn("will not synthesize", sub_res.error_message)
         self.assertGreater(sub_res.duration_seconds, 0.0)
         self.assertIn("task", sub_res.result)
 
@@ -1081,7 +1085,9 @@ class TestAcceptanceDimensionGSandboxCoupling(unittest.TestCase):
         )
         mock_exec.validate_path.side_effect = lambda p: Path(p).resolve()
 
-        renderer = HyperFramesRenderer(execution_runtime=mock_exec)
+        # This test is about sandbox ROUTING, not pixels: it uses the explicit dry-run backend, whose
+        # status is "STUB" (never "VERIFIED"). Real-render behaviour lives in tests/test_render_backend.py.
+        renderer = HyperFramesRenderer(execution_runtime=mock_exec, backend="stub")
 
         with patch("src.hyperframes.renderer.is_ffmpeg_available", return_value=True), \
              patch("src.hyperframes.renderer.probe_media_file", return_value={
@@ -1091,7 +1097,9 @@ class TestAcceptanceDimensionGSandboxCoupling(unittest.TestCase):
 
             res = renderer.render(project_dir=proj_dir)
             self.assertIsInstance(res, RenderResult)
-            self.assertEqual(res.validation_status, "VERIFIED")
+            self.assertEqual(res.validation_status, "STUB")
+            self.assertEqual(res.backend, "stub")
+            self.assertEqual(mock_ffmpeg.call_args.kwargs.get("execution_runtime"), mock_exec)
 
     def test_g07_sandboxed_media_streaming_and_byte_capping(self):
         """Verify download_stream_sandboxed restricts byte size and confines destination to jail."""
@@ -1130,7 +1138,7 @@ class TestAcceptanceDimensionHEndToEndVideoArtifactGeneration(unittest.TestCase)
         self.temp_dir.cleanup()
 
     def test_h01_end_to_end_content_creation_to_rendered_mp4(self):
-        """Verify full autonomous pipeline from brief to verified MP4 video artifact."""
+        """Verify artifact generation while preserving the explicit stub status."""
         session_id = "sess_e2e_video_01"
         bridge = HermesCapabilityBridge(session_id=session_id, workspace_root=self.workspace)
 
@@ -1168,24 +1176,11 @@ class TestAcceptanceDimensionHEndToEndVideoArtifactGeneration(unittest.TestCase)
         self.assertEqual(ir_doc.metadata.project_id, script.project_id)
         self.assertGreater(ir_doc.total_duration_sec, 0.0)
 
-        # 6. Stage: Rendering Video Artifact
+        # 6. Stage: Production IR cannot be advertised as video without real narration/render output.
         renders_dir = self.workspace / "renders"
-        artifact = bridge.render_video(ir=ir_doc, output_dir=renders_dir)
-
-        self.assertIsInstance(artifact, RenderArtifact)
-        video_path = Path(artifact.video_path)
-        self.assertTrue(video_path.exists(), f"Rendered video {video_path} must exist on disk.")
-        self.assertGreater(video_path.stat().st_size, 0, "Video artifact must be non-zero in size.")
-
-        # Verify MP4 container header (ftyp box)
-        header_bytes = video_path.read_bytes()[:32]
-        self.assertIn(b"ftyp", header_bytes, "Rendered artifact must be a valid ISO base media file (MP4).")
-
-        # Verify artifact contract properties
-        self.assertEqual(artifact.width, 1920)
-        self.assertEqual(artifact.height, 1080)
-        self.assertEqual(artifact.fps, 30)
-        self.assertEqual(artifact.video_codec, "h264")
+        with self.assertRaisesRegex(RuntimeError, "No completed Harness 9 production summary"):
+            bridge.render_video(ir=ir_doc, output_dir=renders_dir)
+        self.assertFalse((renders_dir / "final.mp4").exists())
 
     def test_h02_end_to_end_publishing_and_manifest_generation(self):
         """Verify publishing workflow produces verified publication manifest and records state."""
@@ -1218,8 +1213,8 @@ class TestAcceptanceDimensionHEndToEndVideoArtifactGeneration(unittest.TestCase)
         self.assertIn("video_sha256", manifest_data)
         self.assertEqual(len(manifest_data["video_sha256"]), 64)
 
-    def test_h03_full_pipeline_multi_dimensional_governance_coordination(self):
-        """Verify end-to-end autonomous production with capability tokens and execution sandbox."""
+    def test_h03_unknown_offline_topic_fails_without_synthesized_research(self):
+        """Reject an uncurated offline brief without fabricating evidence or a finished run."""
         session_id = "sess_e2e_coord_03"
         guard = get_security_guard()
 
@@ -1245,19 +1240,21 @@ class TestAcceptanceDimensionHEndToEndVideoArtifactGeneration(unittest.TestCase)
             offline_mode=True,
         )
 
-        # Run full production
+        # The request has no curated dossier, and offline mode cannot claim
+        # that fabricated research is a completed, verified production.
         prod_result = bridge.run_production(brief=brief)
 
-        self.assertTrue(prod_result.success)
+        self.assertFalse(prod_result.success)
         self.assertEqual(prod_result.project_id, brief.project_id)
-        self.assertTrue(Path(prod_result.video_path).exists())
+        self.assertIsNone(prod_result.video_path)
+        self.assertIn("FAILED", [s["state"] for s in prod_result.state_history])
+        self.assertTrue(all("state" in entry for entry in prod_result.state_history))
 
-        # Audit log verifies canonical states
-        states = [s["state"] for s in prod_result.state_history]
-        self.assertIn("CREATED", states)
-        self.assertIn("RESEARCH_PLANNED", states)
-        self.assertIn("RESEARCH_IN_PROGRESS", states)
-        self.assertIn("COMPLETED", states)
+        workspace = self.workspace / "content" / session_id / "workspace"
+        summary = json.loads((workspace / "pipeline_summary.json").read_text(encoding="utf-8"))
+        self.assertEqual(summary["status"], "FAILED")
+        self.assertFalse((workspace / "research_dossier.json").exists())
+        self.assertFalse((workspace / "renders" / "final.mp4").exists())
 
 
 if __name__ == "__main__":

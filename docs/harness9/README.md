@@ -70,9 +70,10 @@ Harness 9 is an AI-native content production operating system built upon **Herme
 - **Process**:
   1. Compiles responsive HTML5 (`index.html`), CSS styling (`styles.css`), and synchronous GSAP master timeline code (`main.js`).
   2. Runs static linter and validation checks (verifying local file paths, no remote network URLs, finite loops, and track bounds).
-  3. Executes headless frame capture (via Chromium/Puppeteer or local canvas snapshotting) and feeds frames into FFmpeg.
+  3. Executes headless frame capture (Chromium via puppeteer-core seeks the GSAP timelines frame by frame; hermetic, no placeholder frames) and encodes the frames with FFmpeg.
   4. Encodes and muxes audio/video into a standard H.264 / AAC `.mp4` file.
-- **Output**: Validated composition workspace and `renders/final.mp4`.
+  5. Runs the **media gate** (`src/evaluation/media_gate.py`), which decodes the file and measures picture content, motion, audio and container. Only a video that passes is `VERIFIED`; a failing one is quarantined as `renders/final.rejected.mp4` and the run fails.
+- **Output**: Validated composition workspace, `renders/final.mp4` and `renders/final.gate.json` (the measurements). See `RENDERING.md`.
 
 ### Stage 5: Orchestration & CLI (`src/orchestrator/`)
 - **Input**: CLI arguments, configuration files, and environment variables.

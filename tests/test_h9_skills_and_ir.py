@@ -528,8 +528,8 @@ class TestHyperFramesIRIntegration(unittest.TestCase):
         self.assertIsInstance(ir_doc, ProductionIRDocument)
         self.assertEqual(len(ir_doc.scenes), 1)
 
-    def test_capability_bridge_ir_seam_and_render(self) -> None:
-        """HermesCapabilityBridge compiles ProductionIRDocument and renders video artifact."""
+    def test_capability_bridge_ir_seam_fails_closed_without_rendered_media(self) -> None:
+        """Production IR without narration media cannot be reported as a rendered artifact."""
         bridge = HermesCapabilityBridge(
             session_id="test_bridge_ir",
             workspace_root=self.output_path / "bridge_ws",
@@ -547,9 +547,9 @@ class TestHyperFramesIRIntegration(unittest.TestCase):
             ir_doc = bridge.compile_production_ir(script)
             self.assertIsInstance(ir_doc, ProductionIRDocument)
 
-            artifact = bridge.render_video(ir_doc)
-            self.assertTrue(Path(artifact.video_path).exists())
-            self.assertGreater(artifact.duration_seconds, 0.0)
+            with self.assertRaisesRegex(RuntimeError, "No completed Harness 9 production summary"):
+                bridge.render_video(ir_doc)
+            self.assertFalse((self.output_path / "bridge_ws" / "renders" / "final.mp4").exists())
         finally:
             bridge.close()
 

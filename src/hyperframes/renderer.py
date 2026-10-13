@@ -1,11 +1,17 @@
 """
-src.hyperframes.renderer — HyperFrames Headless Video Renderer & FFmpeg Encoder (Milestone 4 - F10).
+src.hyperframes.renderer — HyperFrames video renderer & FFmpeg encoder.
 
-Orchestrates:
-1. Composition Pre-validation (syntax, local assets, timing, zero external URLs)
-2. Frame Extraction / Synthesis (deterministic timeline stepping)
-3. FFmpeg Video Encoding & Audio Muxing (H.264 / AAC into broadcast MP4)
-4. Post-Render Integrity Verification (duration, stream presence, byte exactness)
+Pipeline (backend "chrome", the default):
+1. Composition pre-validation (syntax, local assets, timing)
+2. Real frame capture: headless Chromium seeks the composition's GSAP timelines frame by frame
+   (src.hyperframes.browser_capture) — hermetic, deterministic, no placeholder frames
+3. Strict FFmpeg encode + narration mux (H.264 / AAC, bt709). ffmpeg failures raise; nothing is faked
+4. Measured media gate (src.evaluation.media_gate): decoded pixels, motion, audio and container are
+   analysed, and only a video that passes is reported as VERIFIED. A video that fails is moved to
+   ``*.rejected.mp4`` and the render raises MediaGateError.
+
+Backend "stub" is an explicit dry-run for tests and demos: solid-colour placeholder frames,
+status "STUB", never VERIFIED. It is never selected automatically.
 """
 
 import html
@@ -16,10 +22,12 @@ import re
 import shutil
 import subprocess
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from src.evaluation.media_gate import ExpectedMedia, MediaGate, MediaGateError, MediaGateReport
+from src.hyperframes.browser_capture import RenderUnavailableError, capture_frames
 from src.hyperframes.validator import CompositionValidator, validate_composition
 from src.utils.ffmpeg import (
     create_fallback_mp4,
@@ -40,7 +48,14 @@ class CompositionValidationError(Exception):
 
 @dataclass
 class RenderResult:
-    """Outcome and technical metadata of a video render operation."""
+    """Outcome and technical metadata of a video render operation.
+
+    validation_status:
+        VERIFIED     real render AND the measured media gate passed
+        STUB         explicit dry-run placeholder (never a real video)
+        GATE_FAILED  real render whose media gate failed (only when enforce_gate=False)
+        UNVERIFIED   nothing has been measured
+    """
     output_path: str
     duration_seconds: float
     file_size_bytes: int
@@ -51,7 +66,11 @@ class RenderResult:
     has_audio: bool = True
     video_codec: str = "h264"
     audio_codec: str = "aac"
-    validation_status: str = "VERIFIED"
+    validation_status: str = "UNVERIFIED"
+    backend: str = "chrome"
+    frames_captured: int = 0
+    warnings: List[str] = field(default_factory=list)
+    gate: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -66,7 +85,19 @@ class RenderResult:
             "video_codec": self.video_codec,
             "audio_codec": self.audio_codec,
             "validation_status": self.validation_status,
+            "backend": self.backend,
+            "frames_captured": self.frames_captured,
+            "warnings": list(self.warnings),
+            "gate": self.gate,
         }
+
+
+_QUALITY_PROFILES: Dict[str, Dict[str, Any]] = {
+    "draft": {"format": "jpeg", "jpeg_quality": 80, "crf": 26, "preset": "veryfast"},
+    "standard": {"format": "jpeg", "jpeg_quality": 95, "crf": 20, "preset": "fast"},
+    "high": {"format": "png", "jpeg_quality": 100, "crf": 16, "preset": "slow"},
+}
+RENDER_BACKENDS = ("chrome", "stub")
 
 
 class HyperFramesRenderer:
@@ -78,11 +109,20 @@ class HyperFramesRenderer:
         quality: str = "standard",
         strict_validation: bool = False,
         execution_runtime: Optional[Any] = None,
+        backend: Optional[str] = None,
+        enforce_gate: bool = True,
+        gate: Optional[MediaGate] = None,
     ):
         self.fps = fps
         self.quality = quality
         self.strict_validation = strict_validation
         self.execution_runtime = execution_runtime
+        chosen = (backend or os.environ.get("HARNESS9_RENDER_BACKEND") or "chrome").strip().lower()
+        if chosen not in RENDER_BACKENDS:
+            raise ValueError(f"Unknown render backend {chosen!r}; expected one of {RENDER_BACKENDS}")
+        self.backend = chosen
+        self.enforce_gate = enforce_gate
+        self.gate = gate or MediaGate()
 
     def render(
         self,
@@ -96,7 +136,11 @@ class HyperFramesRenderer:
         execution_runtime: Optional[Any] = None,
     ) -> RenderResult:
         """
-        Render the HyperFrames composition in project_dir to a playable MP4 video.
+        Render the HyperFrames composition in project_dir to an MP4.
+
+        Raises RenderUnavailableError when the real renderer cannot run (no browser / Node / ffmpeg),
+        BrowserCaptureError / FFmpegError when a stage fails, and MediaGateError when the finished
+        video fails the measured quality gate. It never returns a fake video as a success.
         """
         proj_path = Path(project_dir).resolve()
         renders_dir = proj_path / "renders"
@@ -107,7 +151,7 @@ class HyperFramesRenderer:
 
         render_fps = fps or self.fps
 
-        # 1. Composition Pre-validation
+        # 1. Composition pre-validation
         validator = CompositionValidator(proj_path)
         val_result = validator.validate()
         if not val_result["valid"] and self.strict_validation:
@@ -140,67 +184,178 @@ class HyperFramesRenderer:
 
         runtime = execution_runtime or self.execution_runtime
 
-        # Execute node or headless browser script if present
+        if self.backend == "chrome" and runtime is None and not is_ffmpeg_available():
+            raise RenderUnavailableError(
+                "FFmpeg is required to encode and measure the real video, but it is not available on PATH. "
+                "Install FFmpeg, refresh the process PATH, and retry."
+            )
+
+        # A video left over from an earlier run must never be mistaken for this run's output.
+        for stale in (target_mp4, self._rejected_path(target_mp4), self._gate_path(target_mp4)):
+            try:
+                stale.unlink()
+            except FileNotFoundError:
+                pass
+
+        self._run_project_hook(proj_path, runtime)
+
+        ctx = dict(
+            proj_path=proj_path, renders_dir=renders_dir, target_mp4=target_mp4, audio=resolved_audio,
+            width=render_w, height=render_h, duration=render_dur, fps=render_fps, runtime=runtime,
+            composition_errors=[] if val_result["valid"] else list(val_result.get("errors", [])),
+        )
+        if self.backend == "stub":
+            return self._render_stub(**ctx)
+        return self._render_chrome(**ctx)
+
+    # -- helpers ------------------------------------------------------------
+    @staticmethod
+    def _rejected_path(target_mp4: Path) -> Path:
+        return target_mp4.with_name(target_mp4.stem + ".rejected" + target_mp4.suffix)
+
+    @staticmethod
+    def _gate_path(target_mp4: Path) -> Path:
+        return target_mp4.with_name(target_mp4.stem + ".gate.json")
+
+    @staticmethod
+    def _run_project_hook(proj_path: Path, runtime: Optional[Any]) -> None:
+        """Legacy hook: run <project>/render.js if the project ships one. Failures are logged, not swallowed."""
         node_script = proj_path / "render.js"
-        if node_script.exists():
+        if not node_script.exists():
+            return
+        try:
             if runtime is not None:
                 runtime.execute_command(["node", str(node_script)], cwd=proj_path)
             else:
-                try:
-                    import subprocess
-                    subprocess.run(["node", str(node_script)], cwd=str(proj_path), timeout=60)
-                except Exception:
-                    pass
+                subprocess.run(["node", str(node_script)], cwd=str(proj_path), timeout=60)
+        except Exception as exc:  # noqa: BLE001 - hook is optional; make the failure visible
+            logger.warning("Project render hook %s failed: %s", node_script, exc)
 
-        # 3. Frame Sequence Generation & FFmpeg Encoding
+    def _render_chrome(
+        self, *, proj_path: Path, renders_dir: Path, target_mp4: Path, audio: Optional[Path],
+        width: int, height: int, duration: float, fps: int, runtime: Optional[Any],
+        composition_errors: List[str],
+    ) -> RenderResult:
+        profile = _QUALITY_PROFILES.get(self.quality, _QUALITY_PROFILES["standard"])
+        warnings: List[str] = [f"composition validator: {e}" for e in composition_errors]
+
+        if audio is None:
+            warnings.append("no narration audio found; the video was encoded without an audio track")
+        else:
+            audio_info = probe_media_file(audio, execution_runtime=runtime)
+            audio_len = audio_info.get("duration_seconds") or 0.0
+            if audio_len and audio_len > duration + 0.5:
+                warnings.append(
+                    f"narration ({audio_len:.1f}s) is longer than the video ({duration:.1f}s) and was truncated"
+                )
+
+        frames_tmp = Path(tempfile.mkdtemp(prefix=".frames_", dir=str(renders_dir)))
+        try:
+            cap = capture_frames(
+                proj_path, frames_tmp, width=width, height=height, fps=fps, duration=duration,
+                image_format=profile["format"], jpeg_quality=profile["jpeg_quality"], execution_runtime=runtime,
+            )
+            warnings.extend(cap.warnings())
+            render_video_with_ffmpeg(
+                frames_pattern_or_input=cap.frame_pattern,
+                audio_path=audio,
+                output_mp4=target_mp4,
+                duration=duration,
+                fps=fps,
+                width=width,
+                height=height,
+                crf=profile["crf"],
+                preset=profile["preset"],
+                execution_runtime=runtime,
+                strict=True,
+                silent_audio_if_missing=False,
+            )
+        finally:
+            shutil.rmtree(frames_tmp, ignore_errors=True)
+
+        # Measured verification of what was actually encoded.
+        gate_report = self.gate.evaluate(
+            target_mp4,
+            ExpectedMedia(duration=duration, width=width, height=height, fps=fps, require_audio=audio is not None),
+        )
+        gate_report.save(self._gate_path(target_mp4))
+        warnings.extend(f"media gate warning — {c.name}: {c.message}" for c in gate_report.warnings())
+
+        output_path = target_mp4
+        if gate_report.passed:
+            status = "VERIFIED"
+        else:
+            output_path = self._rejected_path(target_mp4)
+            target_mp4.replace(output_path)  # keep the evidence, but never at the canonical path
+            if self.enforce_gate:
+                raise MediaGateError(gate_report)
+            status = "GATE_FAILED"
+
+        media_info = probe_media_file(output_path, execution_runtime=runtime)
+        return RenderResult(
+            output_path=str(output_path),
+            duration_seconds=media_info.get("duration_seconds") or duration,
+            file_size_bytes=output_path.stat().st_size,
+            width=width,
+            height=height,
+            fps=fps,
+            has_video=bool(media_info.get("has_video")),
+            has_audio=bool(media_info.get("has_audio")),
+            video_codec=media_info.get("video_codec") or "h264",
+            audio_codec=media_info.get("audio_codec") or "aac",
+            validation_status=status,
+            backend="chrome",
+            frames_captured=cap.frames,
+            warnings=warnings,
+            gate=gate_report.to_dict(),
+        )
+
+    def _render_stub(
+        self, *, proj_path: Path, renders_dir: Path, target_mp4: Path, audio: Optional[Path],
+        width: int, height: int, duration: float, fps: int, runtime: Optional[Any],
+        composition_errors: List[str],
+    ) -> RenderResult:
+        """Explicit dry-run: solid-colour placeholder frames. Labelled STUB; never VERIFIED."""
+        warnings = [
+            "STUB render: solid-colour placeholder frames — this is NOT a real video and is never marked VERIFIED",
+            *(f"composition validator: {e}" for e in composition_errors),
+        ]
         with tempfile.TemporaryDirectory() as temp_frames_dir:
             temp_path = Path(temp_frames_dir)
             self._generate_frame_sequence(
-                proj_path=proj_path,
-                frames_dir=temp_path,
-                duration=render_dur,
-                fps=render_fps,
-                width=render_w,
-                height=render_h,
+                proj_path=proj_path, frames_dir=temp_path, duration=duration, fps=fps, width=width, height=height,
             )
-
-            # Mux frames + audio into MP4
-            frame_pattern = str(temp_path / "frame_%04d.png")
             render_video_with_ffmpeg(
-                frames_pattern_or_input=frame_pattern,
-                audio_path=resolved_audio,
+                frames_pattern_or_input=str(temp_path / "frame_%04d.png"),
+                audio_path=audio,
                 output_mp4=target_mp4,
-                duration=render_dur,
-                fps=render_fps,
-                width=render_w,
-                height=render_h,
+                duration=duration,
+                fps=fps,
+                width=width,
+                height=height,
                 execution_runtime=runtime,
             )
 
-        # 4. Post-Render Verification
         if not target_mp4.exists() or target_mp4.stat().st_size == 0:
-            create_fallback_mp4(target_mp4, duration=render_dur, width=render_w, height=render_h)
+            create_fallback_mp4(target_mp4, duration=duration, width=width, height=height)
 
         media_info = probe_media_file(target_mp4, execution_runtime=runtime)
-        file_size = target_mp4.stat().st_size
-
-        if val_result["valid"] or (not self.strict_validation and media_info.get("has_video", True) and target_mp4.exists()):
-            val_status = "VERIFIED"
-        else:
-            val_status = "WARNINGS"
-
         return RenderResult(
             output_path=str(target_mp4),
-            duration_seconds=media_info.get("duration_seconds") or render_dur,
-            file_size_bytes=file_size,
-            width=render_w,
-            height=render_h,
-            fps=render_fps,
+            duration_seconds=media_info.get("duration_seconds") or duration,
+            file_size_bytes=target_mp4.stat().st_size,
+            width=width,
+            height=height,
+            fps=fps,
             has_video=media_info.get("has_video", True),
             has_audio=media_info.get("has_audio", True),
             video_codec=media_info.get("video_codec") or "h264",
             audio_codec=media_info.get("audio_codec") or "aac",
-            validation_status=val_status,
+            validation_status="STUB",
+            backend="stub",
+            frames_captured=0,
+            warnings=warnings,
+            gate=None,
         )
 
     def _extract_composition_metadata(self, html_file: Path) -> Tuple[int, int, float]:

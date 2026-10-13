@@ -45,7 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--offline",
         action="store_true",
         default=True,
-        help="Force offline mode using curated presets, procedural SVGs, and deterministic TTS",
+        help="Use curated research presets, procedural offline visuals, and local text-to-speech",
     )
 
     parser.add_argument(
@@ -53,6 +53,20 @@ def build_parser() -> argparse.ArgumentParser:
         dest="offline",
         action="store_false",
         help="Enable live web research and online asset discovery",
+    )
+
+    parser.add_argument(
+        "--online-assets",
+        action="store_true",
+        default=False,
+        help="Keep curated offline research but discover and freeze real images online",
+    )
+
+    parser.add_argument(
+        "--model-script",
+        action="store_true",
+        default=False,
+        help="Use the model selected in Hermes config.yaml to write source-grounded, duration-bounded narration (requires --online or --online-assets)",
     )
 
     parser.add_argument(
@@ -81,6 +95,21 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["draft", "standard", "high"],
         default="standard",
         help="Video rendering quality profile",
+    )
+
+    parser.add_argument(
+        "--render-backend",
+        choices=["chrome", "stub"],
+        default=None,
+        help="chrome = real headless-Chromium render + measured media gate (default, or $HARNESS9_RENDER_BACKEND); "
+             "stub = labelled dry run with placeholder frames (never marked VERIFIED)",
+    )
+
+    parser.add_argument(
+        "--check-render",
+        action="store_true",
+        default=False,
+        help="Report whether the real renderer can run on this machine (Node, Chrome, FFmpeg, toolchain) and exit",
     )
 
     parser.add_argument(
@@ -117,6 +146,13 @@ def main(args: Optional[List[str]] = None) -> int:
     parser = build_parser()
     parsed_args = parser.parse_args(args)
 
+    if parsed_args.check_render:
+        from src.hyperframes.browser_capture import availability
+
+        report = availability()
+        print(json.dumps(report, indent=2))
+        return 0 if not report["problems"] else 1
+
     topic = parsed_args.topic.strip()
     if not topic:
         print("Error: --topic must not be empty.", file=sys.stderr)
@@ -124,6 +160,13 @@ def main(args: Optional[List[str]] = None) -> int:
 
     if parsed_args.duration <= 0:
         print("Error: --duration must be greater than 0.", file=sys.stderr)
+        return 1
+
+    if parsed_args.model_script and parsed_args.offline and not parsed_args.online_assets:
+        print(
+            "Error: --model-script requires --online or --online-assets; offline-only runs make no model calls.",
+            file=sys.stderr,
+        )
         return 1
 
     if parsed_args.test_mode:
@@ -147,6 +190,9 @@ def main(args: Optional[List[str]] = None) -> int:
             duration=duration,
             voice=parsed_args.voice,
             quality=parsed_args.quality,
+            model_assisted_scripts=parsed_args.model_script,
+            online_assets=parsed_args.online_assets,
+            render_backend=parsed_args.render_backend,
         )
         success = pipeline.run()
 
@@ -157,14 +203,37 @@ def main(args: Optional[List[str]] = None) -> int:
             else:
                 print(json.dumps({"success": success, "output_directory": str(out_dir)}))
 
-        if success:
-            print(f"\n[SUCCESS] Video generation pipeline completed successfully!")
+        summary_file = out_dir / "pipeline_summary.json"
+        status = "FAILED"
+        video = out_dir / "renders" / "final.mp4"
+        if summary_file.exists():
+            try:
+                data = json.loads(summary_file.read_text(encoding="utf-8"))
+                status = data.get("status", status)
+                video = out_dir / (data.get("final_video_path") or "renders/final.mp4")
+            except (OSError, ValueError):
+                pass
+        if status == "SUCCESS":
+            print("\n[SUCCESS] Video generated and verified by the media gate.")
             print(f"Artifacts and summary written to: {out_dir}")
-            print(f"Rendered video: {out_dir / 'renders' / 'final.mp4'}")
+            print(f"Rendered video: {video}")
             return 0
-        else:
-            print(f"\n[FAILED] Pipeline execution failed. See logs for details.", file=sys.stderr)
-            return 1
+        if status == "PARTIAL":
+            print("\n[PARTIAL] Real video rendered and measured; review unverified claims or fallback visuals in the summary.", file=sys.stderr)
+            print(f"Artifacts and summary written to: {out_dir}")
+            print(f"Rendered video: {video}")
+            return 2
+
+        print("\n[FAILED] Pipeline execution failed. See logs for details.", file=sys.stderr)
+        if summary_file.exists():
+            try:
+                data = json.loads(summary_file.read_text(encoding="utf-8"))
+                for stage in data.get("stages", []):
+                    if not stage.get("success") and stage.get("error"):
+                        print(f"  {stage['stage_name']}: {stage['error']}", file=sys.stderr)
+            except (OSError, ValueError):
+                pass
+        return 1
     except Exception as e:
         logger.exception(f"Unhandled pipeline exception: {e}")
         if parsed_args.json:

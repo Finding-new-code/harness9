@@ -40,7 +40,8 @@ headless frame-accurate MP4 video renders.
 
 ## Quick Reference
 
-- **Invocation Tool**: `h9.render(production_ir: dict, output_dir: str = None)`
+- **Invocation Tool**: `h9.render(production_ir: dict, output_dir: str)`
+- The render tool exports a completed session render after confirming the matching topic, format, duration, and measured media gate. It cannot render from Production IR alone because IR does not contain synthesized narration audio; run the full production pipeline first.
 - **AST Seam Interface**: `src/models/ir.py` (`ProductionIRDocument`, `compile_script_to_ir`, `HyperFramesCompiler`).
 - **Headless Video Output**: H.264 video + AAC audio at 1920x1080 (16:9) or 1080x1920 (9:16), 30 fps.
 - **Composition Linter Invariants**: 100% hermetic (0 external network requests), finite animations, strict temporal conservation.

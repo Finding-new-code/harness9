@@ -12,7 +12,7 @@ from enum import Enum
 import hashlib
 from pathlib import Path
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, model_validator
 
 from src.h9_runtime.types import ProductionIR
@@ -24,7 +24,8 @@ from src.models.contracts import (
     ScriptBeat,
     ScriptScene,
 )
-from adapters.hyperframes.adapter import HyperFramesAdapter, HyperFramesProject
+if TYPE_CHECKING:  # annotations only: the models layer must not import the adapters layer at runtime
+    from adapters.hyperframes.adapter import HyperFramesAdapter, HyperFramesProject
 
 
 # ===========================================================================
@@ -54,7 +55,7 @@ class IRAssetReference(BaseModel):
     height: int = Field(default=1080, gt=0, description="Pixel height")
     aspect_ratio: str = Field(default="16:9", description="Standard aspect ratio")
     license_type: str = Field(default="Public Domain", description="License provenance type")
-    verified: bool = Field(default=True, description="Integrity verification status")
+    verified: bool = Field(default=False, description="Integrity verification status")
 
 
 # ===========================================================================
@@ -175,8 +176,8 @@ class IRVisualBlockNode(BaseModel):
 # ===========================================================================
 class IRTransitionSpec(BaseModel):
     """Scene entrance and exit transition dynamics."""
-    entrance_type: str = Field(default="fade")
-    exit_type: str = Field(default="fade")
+    entrance_type: str = Field(default="rise")
+    exit_type: str = Field(default="cut")
     transition_duration_sec: float = Field(default=0.4, ge=0.0, le=2.0)
 
 
@@ -512,7 +513,10 @@ def compile_script_to_ir(
             height=h,
             aspect_ratio=ar,
             license_type=l_type,
-            verified=a_dict.get("verification_status") == "VERIFIED" or a_dict.get("verified", True),
+            verified=(
+                a_dict.get("verification_status") == "VERIFIED"
+                or a_dict.get("verified") is True
+            ),
         )
 
     # 3. Process Scenes & Enforce Contiguity
@@ -590,7 +594,7 @@ def compile_script_to_ir(
                     file_path=str(vpath),
                     file_sha256=hashlib.sha256(str(vpath).encode("utf-8")).hexdigest(),
                     media_type="image/svg+xml",
-                    verified=True,
+                    verified=False,
                 )
             bindings["hero_image"] = matched_aid
 
@@ -650,8 +654,8 @@ def compile_script_to_ir(
         )
 
         transitions = IRTransitionSpec(
-            entrance_type=sc_dict.get("entrance_animation", "fade"),
-            exit_type=sc_dict.get("transition_out", "fade"),
+            entrance_type=sc_dict.get("entrance_animation", "rise"),
+            exit_type=sc_dict.get("transition_out", "cut"),
             transition_duration_sec=0.4,
         )
 
@@ -733,7 +737,11 @@ class HyperFramesCompiler:
     """Consumes a validated ProductionIRDocument AST to compile an executable HyperFrames project."""
 
     def __init__(self, adapter: Optional[HyperFramesAdapter] = None) -> None:
-        self.adapter = adapter or HyperFramesAdapter()
+        if adapter is None:
+            from adapters.hyperframes.adapter import HyperFramesAdapter  # lazy: avoids a models<->adapters import cycle
+
+            adapter = HyperFramesAdapter()
+        self.adapter = adapter
 
     def compile(
         self,

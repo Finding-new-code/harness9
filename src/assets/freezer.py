@@ -54,6 +54,10 @@ def sniff_magic_bytes(header: bytes) -> str:
     if header.startswith(b"\x89PNG\r\n\x1a\n"):
         return "image/png"
 
+    # GIF: GIF87a / GIF89a
+    if header.startswith((b"GIF87a", b"GIF89a")):
+        return "image/gif"
+
     # WebP: RIFF....WEBP
     if len(header) >= 12 and header.startswith(b"RIFF") and header[8:12] == b"WEBP":
         return "image/webp"
@@ -83,6 +87,7 @@ def mime_to_extension(mime: str) -> str:
     mapping = {
         "image/jpeg": "jpg",
         "image/png": "png",
+        "image/gif": "gif",
         "image/webp": "webp",
         "image/svg+xml": "svg",
         "video/mp4": "mp4",
@@ -125,7 +130,7 @@ def download_stream(
 ) -> bytes:
     """Stream download media over HTTP/HTTPS with size caps, timeouts, and retries."""
     headers = {
-        "User-Agent": "Harness9-VideoPOC/1.0 (media-freezer; bot@example.com)",
+        "User-Agent": "Harness9/0.2 (https://github.com/nousresearch/hermes-agent)",
         "Accept": "*/*",
     }
 

@@ -32,6 +32,7 @@ from src.orchestrator.state_machine import (
     ProductionStateMachine,
     StateTransitionError,
 )
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 
 
 class TestHermesBridgeIntegrationStress(unittest.TestCase):
@@ -233,7 +234,8 @@ class TestHermesBridgeIntegrationStress(unittest.TestCase):
         res_eval = self.bridge.evaluate_session("unrun_session_xyz")
         self.assertFalse(res_eval["passed"])
         self.assertEqual(res_eval["composite_score"], 0.0)
-        self.assertIn("Video file not found.", res_eval["feedback"])
+        self.assertTrue(any("no rendered video" in f for f in res_eval["feedback"]), res_eval["feedback"])
+        self.assertEqual(res_eval["scores"], {})  # nothing measured => no scores invented
 
 
 class TestContentRuntimeStateMachineAdherence(unittest.TestCase):

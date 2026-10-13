@@ -13,14 +13,45 @@ import unittest
 from pathlib import Path
 from typing import Any, Dict
 
-from verify_pipeline import (
-    PipelineVerifier,
-    _generate_hyperframes_html,
-    _generate_hyperframes_css,
-    _generate_hyperframes_js,
-    _generate_sample_svg,
-    _generate_synthetic_wav,
-)
+from src.assets.procedural import ProceduralSVGGenerator
+from src.hyperframes.generator import HyperFramesGenerator
+from src.hyperframes.validator import CompositionValidator
+from src.scriptwriting.tts import HarmonicWAVSynthesizer
+
+
+def _generate_sample_svg(topic, query, width, height, idx):
+    return ProceduralSVGGenerator().generate_topic_svg(topic, query, width=width, height=height, idx=idx)
+
+
+def _generate_synthetic_wav(path, duration_seconds):
+    return HarmonicWAVSynthesizer().synthesize(
+        "Composition validator test audio.", path, target_duration=duration_seconds
+    )
+
+
+def _generate_hyperframes_html(topic, format_aspect, duration, scenes):
+    generator = HyperFramesGenerator(format_aspect=format_aspect)
+    return generator.generate_html(topic, scenes, duration)
+
+
+def _generate_hyperframes_css(format_aspect):
+    return HyperFramesGenerator(format_aspect=format_aspect).generate_css()
+
+
+def _generate_hyperframes_js(duration, scenes):
+    transcript = {
+        "scenes": [
+            {
+                "groups": [{
+                    "text": scene.get("narration", ""),
+                    "start": scene.get("start", 0.0),
+                    "end": scene.get("start", 0.0) + scene.get("duration", 1.0),
+                }]
+            }
+            for scene in scenes
+        ]
+    }
+    return HyperFramesGenerator().generate_js(scenes, duration, transcript)
 
 
 class TestHyperFramesCoverage(unittest.TestCase):
@@ -62,9 +93,8 @@ class TestHyperFramesCoverage(unittest.TestCase):
         self.assertIn("paused: true", js)
 
     def test_03_finite_repeat_animation_math(self):
-        """F8: Verify repeating animations use calculated finite bounds (never repeat: -1)."""
+        """F8: Verify generated scene motion never uses an unbounded GSAP repeat."""
         js = _generate_hyperframes_js(20, self.scenes)
-        self.assertIn("Math.ceil", js)
         code_no_comments = re.sub(r'//.*', '', js)
         self.assertIsNone(re.search(r'repeat\s*:\s*-1\b', code_no_comments))
 
@@ -80,11 +110,8 @@ class TestHyperFramesCoverage(unittest.TestCase):
         (self.out_path / "styles.css").write_text(_generate_hyperframes_css("16:9"), encoding="utf-8")
         (self.out_path / "main.js").write_text(_generate_hyperframes_js(20, self.scenes), encoding="utf-8")
 
-        verifier = PipelineVerifier(self.out_path)
-        verifier.verify_hyperframes_composition()
-        passed = [r for r in verifier.results if r["id"] == "CP_COMP_VALID"]
-        self.assertEqual(len(passed), 1)
-        self.assertTrue(passed[0]["passed"])
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(report["valid"], report["errors"])
 
     def test_06_css_flexbox_scene_layout(self):
         """F8: Verify CSS uses flexbox layout for responsive positioning."""
@@ -113,6 +140,49 @@ class TestHyperFramesCoverage(unittest.TestCase):
         css = _generate_hyperframes_css("16:9")
         self.assertIn("padding:", css)
 
+    def test_21_generated_scenes_use_filmic_copy_instead_of_default_cards(self):
+        """Generated scenes should keep captions, omit brand badges, and avoid duplicate VO cards."""
+        html = _generate_hyperframes_html("The Transistor", "16:9", 20, self.scenes)
+        css = _generate_hyperframes_css("16:9")
+
+        self.assertNotIn("badge-tag", html)
+        self.assertNotIn("PART 01", html)
+        self.assertNotIn("scene-narration", html)
+        self.assertNotIn("badge-tag", css)
+        self.assertNotIn("scene-narration", css)
+        self.assertIn("text-shadow", css)
+
+    def test_22_scene_motion_directions_use_bounded_safe_presets(self):
+        """Storyboard labels select distinct safe GSAP presets; arbitrary strings are not executed."""
+        scenes = [
+            {"scene_id": "scene_rise", "start": 0.0, "duration": 3.0, "entrance_animation": "rise", "transition_out": "cut"},
+            {"scene_id": "scene_slide", "start": 3.0, "duration": 3.0, "entrance_animation": "slide_left", "transition_out": "cut"},
+            {"scene_id": "scene_zoom", "start": 6.0, "duration": 3.0, "entrance_animation": "zoom", "transition_out": "hold"},
+            {"scene_id": "scene_reveal", "start": 9.0, "duration": 3.0, "entrance_animation": "reveal", "transition_out": "hold"},
+            {"scene_id": "scene_invalid", "start": 12.0, "duration": 3.0, "entrance_animation": "runEvilCode()", "transition_out": "hold"},
+        ]
+        js = HyperFramesGenerator(fps=30).generate_js(scenes, 15.0)
+
+        self.assertIn("y: 42", js)
+        self.assertIn("x: 54", js)
+        self.assertIn("scale: 0.96", js)
+        self.assertIn('clipPath: "inset(0 0 100% 0)"', js)
+        self.assertNotIn("runEvilCode", js)
+        self.assertIn('tl.set("#scene_rise", { autoAlpha: 0 }, 3.0)', js)
+        self.assertNotIn('tl.to("#scene_zoom", { autoAlpha: 0', js)
+
+    def test_23_legacy_motion_notes_are_mapped_without_executing_them(self):
+        generator = HyperFramesGenerator()
+        self.assertEqual(
+            generator._resolve_entrance_animation(
+                "gsap.from('.scene .title', { opacity: 0, y: 30 })"
+            ),
+            "rise",
+        )
+        self.assertEqual(generator._resolve_entrance_animation("fadeInScale"), "zoom")
+        self.assertEqual(generator._resolve_transition_out("crossFade", is_final=True), "fade")
+        self.assertEqual(generator._resolve_transition_out(None, is_final=True), "hold")
+
 
 class TestHyperFramesBoundary(unittest.TestCase):
     """Tier 2 Boundary & Edge Case Tests (F8, F9) — 10 Comprehensive Tests."""
@@ -140,20 +210,16 @@ class TestHyperFramesBoundary(unittest.TestCase):
         bad_html = """<!DOCTYPE html><html><body><div data-composition-id="root" data-width="1920" data-height="1080" data-duration="10"><img src="https://example.com/unfrozen_image.png" /></div></body></html>"""
         (self.out_path / "index.html").write_text(bad_html, encoding="utf-8")
 
-        verifier = PipelineVerifier(self.out_path)
-        verifier.verify_hyperframes_composition()
-        failed = any(not r["passed"] and r["id"] == "CP_COMP_HERMETIC_ASSETS" for r in verifier.results)
-        self.assertTrue(failed)
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(any("Forbidden external media URL" in error for error in report["errors"]))
 
     def test_12_validator_catches_missing_local_assets(self):
         """F9: Verify validator detects broken local asset references."""
         bad_html = """<!DOCTYPE html><html><body><div data-composition-id="root" data-width="1920" data-height="1080" data-duration="10"><img src="assets/images/nonexistent_file_404.png" /></div></body></html>"""
         (self.out_path / "index.html").write_text(bad_html, encoding="utf-8")
 
-        verifier = PipelineVerifier(self.out_path)
-        verifier.verify_hyperframes_composition()
-        failed = any(not r["passed"] and r["id"] == "CP_COMP_LOCAL_ASSETS" for r in verifier.results)
-        self.assertTrue(failed)
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(any("does not exist on disk" in error for error in report["errors"]))
 
     def test_13_validator_catches_infinite_repeat(self):
         """F9: Verify validator flags repeat: -1 in animation scripts."""
@@ -162,10 +228,8 @@ class TestHyperFramesBoundary(unittest.TestCase):
         bad_js = "window.__timelines = {}; const tl = gsap.timeline({ paused: true }); window.__timelines['root'] = tl; tl.to('.spin', { rotation: 360, repeat: -1 });"
         (self.out_path / "main.js").write_text(bad_js, encoding="utf-8")
 
-        verifier = PipelineVerifier(self.out_path)
-        verifier.verify_hyperframes_composition()
-        failed = any(not r["passed"] and r["id"] == "CP_COMP_FINITE_REPEAT" for r in verifier.results)
-        self.assertTrue(failed)
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(any("Infinite loops" in error for error in report["errors"]))
 
     def test_14_aspect_ratio_templates_16_9_and_9_16(self):
         """F8: Verify composition generation for 16:9 landscape vs 9:16 vertical portrait."""
@@ -182,7 +246,9 @@ class TestHyperFramesBoundary(unittest.TestCase):
     def test_16_template_tag_misuse_at_root_level(self):
         """F9: Verify that root composition cannot be wrapped inside <template>."""
         bad_html = """<!DOCTYPE html><html><body><template id="root"><div data-composition-id="root"></div></template></body></html>"""
-        self.assertIn("<template", bad_html)
+        (self.out_path / "index.html").write_text(bad_html, encoding="utf-8")
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(any("wrapped inside a <template>" in error for error in report["errors"]))
 
     def test_17_native_media_play_call_prohibition(self):
         """F8: Verify animation scripts do not invoke native audio.play() or video.play()."""
@@ -198,17 +264,30 @@ class TestHyperFramesBoundary(unittest.TestCase):
         """F9: Verify validator catches missing data-composition-id='root'."""
         bad_html = """<!DOCTYPE html><html><body><div id="composition" data-width="1920" data-height="1080"></div></body></html>"""
         (self.out_path / "index.html").write_text(bad_html, encoding="utf-8")
-        verifier = PipelineVerifier(self.out_path)
-        verifier.verify_hyperframes_composition()
-        failed = any(not r["passed"] and r["id"] == "CP_COMP_ROOT_ID" for r in verifier.results)
-        self.assertTrue(failed)
+        report = CompositionValidator(self.out_path).validate()
+        self.assertTrue(any("Missing root composition element" in error for error in report["errors"]))
 
     def test_20_wcag_contrast_ratio_checks(self):
         """F9: Verify text color against dark background meets WCAG AA contrast (4.5:1)."""
-        text_color = (255, 255, 255)  # White
-        bg_color = (10, 14, 23)       # Dark Navy
-        # Lum ratio > 10:1
-        self.assertTrue(True)
+        contrast_ratio = CompositionValidator._compute_contrast_ratio("#ffffff", "#0a0e17")
+        self.assertGreaterEqual(contrast_ratio, 4.5)
+
+    def test_24_validator_reports_old_template_chrome_as_non_blocking_hint(self):
+        html = _generate_hyperframes_html("The Transistor", "16:9", 10, self.scenes)
+        html = html.replace(
+            '<div class="scene-content">',
+            '<div class="scene-content"><div class="badge-tag">PART 01</div>',
+            1,
+        )
+        (self.out_path / "index.html").write_text(html, encoding="utf-8")
+        (self.out_path / "styles.css").write_text(_generate_hyperframes_css("16:9"), encoding="utf-8")
+        (self.out_path / "main.js").write_text(_generate_hyperframes_js(10, self.scenes), encoding="utf-8")
+
+        report = CompositionValidator(self.out_path).validate()
+
+        self.assertTrue(report["valid"], report["errors"])
+        self.assertTrue(report["details"]["visual_design_hints"]["decorative_scene_badge"])
+        self.assertTrue(any("scene badge" in warning for warning in report["warnings"]))
 
 
 if __name__ == "__main__":

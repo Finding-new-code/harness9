@@ -44,6 +44,7 @@ from src.hyperframes.components.statistic_reveal import StatisticReveal
 from src.hyperframes.components.timeline_reveal import TimelineReveal
 from src.hyperframes.validator import CompositionValidator
 from src.models.contracts import AssetRecord, RenderArtifact, Script, ScriptScene
+from tests.h9_render_env import setUpModule, tearDownModule  # noqa: F401  (explicit dry-run render backend)
 
 
 class TestBaseComponentAndSchema(unittest.TestCase):
@@ -613,7 +614,9 @@ class TestHyperFramesAdapterIntegration(unittest.TestCase):
         self.assertEqual(artifact.width, 1920)
         self.assertEqual(artifact.height, 1080)
         self.assertGreater(artifact.duration_seconds, 0)
-        self.assertIn(artifact.validation_status, ["VERIFIED", "WARNINGS"])
+        # This module runs the explicit dry-run backend (tests.h9_render_env): the contract shape is under test,
+        # and a stub render must be labelled as such, never VERIFIED.
+        self.assertEqual(artifact.validation_status, "STUB")
 
     def test_22_linter_detects_tampered_remote_url(self):
         """Verify CompositionValidator catches tampered external media URL in component project."""
